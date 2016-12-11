@@ -1,0 +1,44 @@
+{
+	"name": "vscode-intelephant-client",
+	"description": "VSCode Intelphant Client",
+	"author": "Ben Mewburn",
+	"license": "MIT",
+	"version": "0.9.0",
+	"engines": {
+		"vscode": "^1.4.0"
+	},
+	"categories": [
+		"Other"
+	],
+	"activationEvents": [
+		"onLanguage:plaintext"
+	],
+	"main": "./out/src/extension",
+	"contributes": {
+		"configuration": {
+			"type": "object",
+			"title": "Example configuration",
+			"properties": {
+				"languageServerExample.maxNumberOfProblems": {
+					"type": "number",
+					"default": 100,
+					"description": "Controls the maximum number of problems produced by the server."
+				}
+			}
+		}
+	},	
+	"scripts": {
+		"vscode:prepublish": "node ./node_modules/vscode/bin/compile",
+		"compile": "node ./node_modules/vscode/bin/compile -watch -p ./",
+		"postinstall": "node ./node_modules/vscode/bin/install"
+
+	},
+	"devDependencies": {
+		"typescript": "^2.0.6",
+		"vscode": "^1.0.3",
+        "@types/node": "^6.0.40"
+	},
+	"dependencies": {
+		"vscode-languageclient": "^3.0.1-alpha.3"
+	}
+}
