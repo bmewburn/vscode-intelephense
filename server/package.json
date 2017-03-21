@@ -9,7 +9,7 @@
 	},
 	"dependencies": {
 		"vscode-languageserver": "^3.2.0",
-		"intelephense": "file:../intelephense"
+		"intelephense": "file:../../intelephense"
 	},
 	"devDependencies": {
 		"typescript": "^2.2.1",
