@@ -7,6 +7,7 @@ import {
 	InitializeParams, InitializeResult, TextDocumentPositionParams,
 	CompletionItem, CompletionItemKind
 } from 'vscode-languageserver';
+import {Intelephense} from 'intelephense';
 
 // Create a connection for the server. The connection uses Node's IPC as a transport
 let connection: IConnection = createConnection(new IPCMessageReader(process), new IPCMessageWriter(process));
@@ -25,12 +26,11 @@ connection.onInitialize((params): InitializeResult => {
 	workspaceRoot = params.rootPath;
 	return {
 		capabilities: {
-			// Tell the client that the server works in FULL text document sync mode
-			textDocumentSync: documents.syncKind,
+			textDocumentSync: TextDocumentSyncKind.Full
 			// Tell the client that the server support code complete
-			completionProvider: {
-				resolveProvider: true
-			}
+			//completionProvider: {
+			//	resolveProvider: true
+			//}
 		}
 	}
 });
