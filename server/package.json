@@ -1,6 +1,6 @@
 {
-	"name": "vscode-intelephant-server",
-	"description": "VSCode Intelephant Server",
+	"name": "vscode-intelephense-server",
+	"description": "VSCode Intelephense Server",
 	"version": "0.9.0",
 	"author": "Ben Mewburn",
 	"license": "MIT",
@@ -8,11 +8,12 @@
 		"node": "*"
 	},
 	"dependencies": {
-		"vscode-languageserver": "^3.0.1-alpha.6"
+		"vscode-languageserver": "^3.2.0",
+		"intelephense": "file:../intelephense"
 	},
 	"devDependencies": {
-		"typescript": "^2.0.6",
-        "@types/node": "^6.0.45"
+		"typescript": "^2.2.1",
+		"@types/node": "^6.0.45"
 	},
 	"scripts": {
 		"compile": "installServerIntoExtension ../client ./package.json ./tsconfig.json && tsc -p .",
