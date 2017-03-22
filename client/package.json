@@ -5,7 +5,7 @@
 	"license": "MIT",
 	"version": "0.9.0",
 	"engines": {
-		"vscode": "^1.8.0"
+		"vscode": "^1.10.0"
 	},
 	"categories": [
 		"Other"
@@ -47,7 +47,7 @@
 		"@types/mocha": "^2.2.33",
 		"@types/node": "^6.0.52",
 		"typescript": "^2.2.1",
-		"vscode": "^1.0.5"
+		"vscode": "^1.1.0"
 	},
 	"dependencies": {
 		"vscode-languageclient": "^3.2.0"

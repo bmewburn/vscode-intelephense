@@ -4,7 +4,10 @@
 		"module": "commonjs",
 		"moduleResolution": "node",
 		"sourceMap": true,
-		"outDir": "../client/server"
+		"outDir": "../client/server",
+		"lib": [
+			"es6"
+		]
 	},
 	"exclude": [
 		"node_modules"
