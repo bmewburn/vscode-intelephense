@@ -1,22 +1,21 @@
 {
-	"name": "vscode-intelephense-server",
-	"description": "VSCode Intelephense Server",
-	"version": "0.9.0",
-	"author": "Ben Mewburn",
-	"license": "MIT",
-	"engines": {
-		"node": "*"
-	},
-	"dependencies": {
-		"vscode-languageserver": "^3.2.0",
-		"intelephense": "file:../../intelephense"
-	},
-	"devDependencies": {
-		"typescript": "^2.2.1",
-		"@types/node": "^6.0.45"
-	},
-	"scripts": {
-		"compile": "installServerIntoExtension ../client ./package.json ./tsconfig.json && tsc -p .",
-		"watch": "installServerIntoExtension ../client ./package.json ./tsconfig.json && tsc --watch -p ."
-	}
+  "name": "vscode-intelephense-server",
+  "description": "Intelephense Server",
+  "version": "0.0.1",
+  "author": "Ben Mewburn",
+  "license": "MIT",
+  "engines": {
+    "node": "*"
+  },
+  "dependencies": {
+    "vscode-languageserver": "^3.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^6.0.52",
+    "typescript": "^2.2.1"
+  },
+  "scripts": {
+    "compile": "installServerIntoExtension ../client ./package.json ./tsconfig.json && tsc -p .",
+    "watch": "installServerIntoExtension ../client ./package.json ./tsconfig.json && tsc --watch -p ."
+  }
 }
