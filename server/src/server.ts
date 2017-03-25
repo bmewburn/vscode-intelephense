@@ -12,8 +12,11 @@ import {
 	CompletionItem, CompletionItemKind
 } from 'vscode-languageserver';
 
+import { Intelephense } from 'intelephense';
+
 // Create a connection for the server. The connection uses Node's IPC as a transport
 let connection: IConnection = createConnection(new IPCMessageReader(process), new IPCMessageWriter(process));
+const languageId = 'php';
 
 // After the server has started the client sends an initialize request. The server receives
 // in the passed params the rootPath of the workspace plus the client capabilities. 
@@ -22,34 +25,109 @@ connection.onInitialize((params): InitializeResult => {
 	workspaceRoot = params.rootPath;
 	return {
 		capabilities: {
-			// Tell the client that the server works in FULL text document sync mode
-			textDocumentSync: TextDocumentSyncKind.Full
+			textDocumentSync: TextDocumentSyncKind.Incremental,
+			documentSymbolProvider: true
 		}
 	}
 });
 
 
 connection.onDidOpenTextDocument((params) => {
-	// A text document got opened in VSCode.
-	// params.textDocument.uri uniquely identifies the document. For documents store on disk this is a file URI.
-	// params.textDocument.text the initial full content of the document.
-	connection.console.log(`${params.textDocument.uri} opened.`);
-	connection.console.info(params.textDocument.languageId);
+
+	let uri = params.textDocument.uri;
+	let langId = params.textDocument.languageId;
+	if (langId !== languageId) {
+		return;
+	}
+
+	let snap = processSnapshot();
+	Intelephense.openDocument(params.textDocument.uri, params.textDocument.text);
+	let diff = processSnapshotDiff(snap);
+	connection.console.info(`${uri} opened ${processSnapshotDiffToString(diff)}`);
 });
 
 connection.onDidChangeTextDocument((params) => {
-	// The content of a text document did change in VSCode.
-	// params.textDocument.uri uniquely identifies the document.
-	// params.contentChanges describe the content changes to the document.
-	connection.console.log(`${params.textDocument.uri} changed: ${JSON.stringify(params.contentChanges)}`);
+
+	let uri = params.textDocument.uri;
+
+	if (!Intelephense.hasDocumentOpen(uri)){
+		return;
+	}
+
+	connection.console.log(JSON.stringify(params.contentChanges));
+
+	let snap = processSnapshot();
+	Intelephense.editDocument(uri, params.contentChanges);
+	let diff = processSnapshotDiff(snap);
+	connection.console.info(`${uri} changed ${processSnapshotDiffToString(diff)}`);
+	connection.console.log(Intelephense.getDocument(uri).text);
 });
 
 connection.onDidCloseTextDocument((params) => {
-	// A text document got closed in VSCode.
-	// params.textDocument.uri uniquely identifies the document.
-	connection.console.log(`${params.textDocument.uri} closed.`);
+	let uri = params.textDocument.uri;
+
+	if (!Intelephense.hasDocumentOpen(uri)){
+		return;
+	}
+
+	let snap = processSnapshot();
+	Intelephense.closeDocument(uri);
+	let diff = processSnapshotDiff(snap);
+	connection.console.info(`${uri} closed ${processSnapshotDiffToString(diff)}`);
+});
+
+connection.onDocumentSymbol((params) => {
+
+	let uri = params.textDocument.uri;
+	if(!Intelephense.hasDocumentOpen(uri)){
+		return;
+	}
+
+	let snap = processSnapshot();
+	let symbols = Intelephense.documentSymbols(params.textDocument.uri);
+	let diff = processSnapshotDiff(snap);
+	connection.console.info(`${uri} symbols ${processSnapshotDiffToString(diff)}`);
+	return symbols;
 });
 
 
 // Listen on the connection
 connection.listen();
+
+interface ProcessSnapshot {
+	time: [number, number];
+	memory: NodeJS.MemoryUsage;
+}
+
+interface ProcessSnapshotDiff {
+	timeDiff:number;
+	memoryDiff:number;
+}
+
+function processSnapshotDiffToString(diff:ProcessSnapshotDiff){
+	return `${diff.timeDiff.toFixed(1)}ms ${diff.memoryDiff}B`;
+}
+
+function processSnapshot() {
+	return <ProcessSnapshot>{
+		time: process.hrtime(),
+		memory: process.memoryUsage()
+	};
+}
+
+function processSnapshotDiff(snapshot:ProcessSnapshot){
+	return <ProcessSnapshotDiff>{
+		timeDiff:timeDiff(snapshot.time),
+		memoryDiff:memoryDiff(snapshot.memory)
+	};
+}
+
+function timeDiff(start: [number, number]) {
+	let diff = process.hrtime(start);
+	return diff[0] * 1000 + diff[1] / 1000000;
+}
+
+function memoryDiff(before: NodeJS.MemoryUsage) {
+	let after = process.memoryUsage();
+	return after.heapUsed - before.heapUsed;
+}
