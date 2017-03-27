@@ -9,7 +9,7 @@ import {
 	createConnection, IConnection, TextDocumentSyncKind,
 	TextDocuments, TextDocument, Diagnostic, DiagnosticSeverity,
 	InitializeParams, InitializeResult, TextDocumentPositionParams,
-	CompletionItem, CompletionItemKind
+	CompletionItem, CompletionItemKind, RequestType, TextDocumentItem
 } from 'vscode-languageserver';
 
 import { Intelephense } from 'intelephense';
@@ -61,6 +61,10 @@ connection.onDocumentSymbol((params) => {
 	return symbols;
 });
 
+let discoverRequest = new RequestType<{ textDocument: TextDocumentItem }, void, void, void>('discover');
+connection.onRequest(discoverRequest, (params) => {
+	connection.console.log('DISCOVER');
+});
 
 // Listen on the connection
 connection.listen();
@@ -71,11 +75,11 @@ interface ProcessSnapshot {
 }
 
 interface ProcessSnapshotDiff {
-	timeDiff:number;
-	memoryDiff:number;
+	timeDiff: number;
+	memoryDiff: number;
 }
 
-function processSnapshotDiffToString(diff:ProcessSnapshotDiff){
+function processSnapshotDiffToString(diff: ProcessSnapshotDiff) {
 	return `${diff.timeDiff.toFixed(1)}ms ${diff.memoryDiff}B`;
 }
 
@@ -86,10 +90,10 @@ function processSnapshot() {
 	};
 }
 
-function processSnapshotDiff(snapshot:ProcessSnapshot){
+function processSnapshotDiff(snapshot: ProcessSnapshot) {
 	return <ProcessSnapshotDiff>{
-		timeDiff:timeDiff(snapshot.time),
-		memoryDiff:memoryDiff(snapshot.memory)
+		timeDiff: timeDiff(snapshot.time),
+		memoryDiff: memoryDiff(snapshot.memory)
 	};
 }
 
