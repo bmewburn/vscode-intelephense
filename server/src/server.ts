@@ -33,60 +33,31 @@ connection.onInitialize((params): InitializeResult => {
 
 
 connection.onDidOpenTextDocument((params) => {
-
-	let uri = params.textDocument.uri;
-	let langId = params.textDocument.languageId;
-	if (langId !== languageId) {
-		return;
-	}
-
 	let snap = processSnapshot();
-	Intelephense.openDocument(params.textDocument.uri, params.textDocument.text);
+	Intelephense.openDocument(params.textDocument);
 	let diff = processSnapshotDiff(snap);
-	connection.console.info(`${uri} opened ${processSnapshotDiffToString(diff)}`);
+	connection.console.info(`${params.textDocument.uri} opened ${processSnapshotDiffToString(diff)}`);
 });
 
 connection.onDidChangeTextDocument((params) => {
-
-	let uri = params.textDocument.uri;
-
-	if (!Intelephense.hasDocumentOpen(uri)){
-		return;
-	}
-
-	connection.console.log(JSON.stringify(params.contentChanges));
-
 	let snap = processSnapshot();
-	Intelephense.editDocument(uri, params.contentChanges);
+	Intelephense.editDocument(params.textDocument, params.contentChanges);
 	let diff = processSnapshotDiff(snap);
-	connection.console.info(`${uri} changed ${processSnapshotDiffToString(diff)}`);
-	connection.console.log(Intelephense.getDocument(uri).text);
+	connection.console.info(`${params.textDocument.uri} changed ${processSnapshotDiffToString(diff)}`);
 });
 
 connection.onDidCloseTextDocument((params) => {
-	let uri = params.textDocument.uri;
-
-	if (!Intelephense.hasDocumentOpen(uri)){
-		return;
-	}
-
 	let snap = processSnapshot();
-	Intelephense.closeDocument(uri);
+	Intelephense.closeDocument(params.textDocument);
 	let diff = processSnapshotDiff(snap);
-	connection.console.info(`${uri} closed ${processSnapshotDiffToString(diff)}`);
+	connection.console.info(`${params.textDocument.uri} closed ${processSnapshotDiffToString(diff)}`);
 });
 
 connection.onDocumentSymbol((params) => {
-
-	let uri = params.textDocument.uri;
-	if(!Intelephense.hasDocumentOpen(uri)){
-		return;
-	}
-
 	let snap = processSnapshot();
-	let symbols = Intelephense.documentSymbols(params.textDocument.uri);
+	let symbols = Intelephense.documentSymbols(params.textDocument);
 	let diff = processSnapshotDiff(snap);
-	connection.console.info(`${uri} symbols ${processSnapshotDiffToString(diff)}`);
+	connection.console.info(`${params.textDocument.uri} symbols ${processSnapshotDiffToString(diff)}`);
 	return symbols;
 });
 
