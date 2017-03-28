@@ -1,7 +1,6 @@
-/* --------------------------------------------------------------------------------------------
- * Copyright (c) Microsoft Corporation. All rights reserved.
- * Licensed under the MIT License. See License.txt in the project root for license information.
- * ------------------------------------------------------------------------------------------ */
+/* Copyright (c) Ben Mewburn ben@mewburn.id.au
+ * Licensed under the MIT Licence.
+ */
 'use strict';
 
 import {
@@ -29,7 +28,7 @@ let enableDebug = true;
 let workspaceRoot: string;
 connection.onInitialize((params): InitializeResult => {
 	initialisedAt = process.hrtime();
-	connection.console.info('Intelephense server initialising.');
+	connection.console.info('Intelephense initialising.');
 	workspaceRoot = params.rootPath;
 	return {
 		capabilities: {
@@ -78,7 +77,7 @@ connection.onRequest(discoverRequest, (params) => {
 	}, `onDiscover | ${params.textDocument.uri}`);
 });
 
-let forgetRequest = new RequestType<{ uri: string }, [number, number], void, void>(forgetRequestName);
+let forgetRequest = new RequestType<{ uri: string }, number, void, void>(forgetRequestName);
 connection.onRequest(forgetRequest, (params) => {
 	return handleRequest(()=> {
 		return Intelephense.forget(params.uri);
