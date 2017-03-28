@@ -15,6 +15,10 @@ import * as fs from 'fs';
 
 const phpLanguageId = 'php';
 const discoverRequestName = 'discover';
+const forgetRequestName = 'forget';
+
+let maxFileSizeBytes = 20000000;
+let languageClient: LanguageClient;
 
 export function activate(context: ExtensionContext) {
 
@@ -41,28 +45,67 @@ export function activate(context: ExtensionContext) {
 		}
 	}
 
+	let fsWatcher = workspace.createFileSystemWatcher('**/*.php');
+	fsWatcher.onDidDelete(onDidDelete);
+	fsWatcher.onDidCreate(onDidCreate);
+	fsWatcher.onDidChange(onDidChange);
+
 	// Create the language client and start the client.
-	let langClient = new LanguageClient('intelephense', 'intelephense', serverOptions, clientOptions);
-	let disposable = langClient.start();
+	languageClient = new LanguageClient('intelephense', 'intelephense', serverOptions, clientOptions);
+	let langClientDisposable = languageClient.start();
+	languageClient.onReady().then(onClientReady);
 
-	// Push the disposable to the context's subscriptions so that the 
-	// client can be deactivated on extension deactivation
-	context.subscriptions.push(disposable);
+	//push disposables
+	context.subscriptions.push(langClientDisposable, fsWatcher);
 
-	langClient.onReady().then(() => {
+}
 
-		//discover workspace symbols
-		workspace.findFiles('**/*.php').then(
-			(uriArray) => {
-				discoverWorkspaceSymbols(langClient, uriArray);
-			}
-		);
+function onClientReady() {
+	//discover workspace symbols
+	workspace.findFiles('**/*.php').then(onWorkspaceFindFiles);
+}
+
+function onDidDelete(uri: Uri) {
+	forgetRequest(uri);
+}
+
+function onDidChange(uri: Uri) {
+
+	fs.stat(uri.fsPath, (statErr, stats) => {
+
+		if (statErr) {
+			languageClient.warn(statErr.message);
+			return;
+		}
+
+		if (stats.isFile()) {
+			onWorkspaceFindFiles([uri]);
+		} else if (stats.isDirectory()) {
+			let include = path.join(workspace.asRelativePath(uri.fsPath), '**/*.php');
+			workspace.findFiles(include).then(onWorkspaceFindFiles);
+		}
 
 	});
 
 }
 
-function discoverWorkspaceSymbols(client: LanguageClient, uriArray: Uri[]) {
+function onDidCreate(uri: Uri) {
+	onDidChange(uri);
+}
+
+function forgetRequest(uri: Uri) {
+
+	let onFailure = () => {
+		languageClient.warn(`${uri} forget request failed.`);
+	};
+
+	languageClient.sendRequest<void>(
+		forgetRequestName,
+		{ uri: uri.toString() }
+	).then(undefined, onFailure);
+}
+
+function onWorkspaceFindFiles(uriArray: Uri[]) {
 
 	let uri: Uri;
 	let fileCount = uriArray.length;
@@ -75,72 +118,84 @@ function discoverWorkspaceSymbols(client: LanguageClient, uriArray: Uri[]) {
 	let onAlways = () => {
 		let uri = uriArray.pop();
 		if (uri) {
-			discoverFileSymbolsRequest(client, uri, onSuccess, onFailure);
+			discoverRequest(uri, onSuccess, onFailure);
 			return;
 		}
 
 		let elapsed = process.hrtime(start);
-		client.info(
+		languageClient.info(
 			[
 				'Workspace symbol discovery ended',
 				`${discoveredFileCount}/${fileCount} files`,
 				`${discoveredSymbolsCount} symbols`,
 				`${elapsed[0]}.${Math.round(elapsed[1] / 1000000)} seconds`
-			].join('. ')
+			].join(' | ')
 		);
 	}
 
-	let onSuccess = (uri: Uri, nSymbols: number) => {
+	let onSuccess = (nSymbols: number) => {
 		discoveredSymbolsCount += nSymbols;
 		++discoveredFileCount;
 		onAlways();
 	}
 
-	let onFailure = (uri: Uri) => {
-		client.warn(`${uri.fsPath} discover request failed.`);
+	let onFailure = () => {
 		onAlways();
 	}
 
 	if ((uri = uriArray.pop())) {
-		client.info('Workspace symbol discovery started.');
-		discoverFileSymbolsRequest(client, uri, onSuccess, onFailure);
+		languageClient.info('Workspace symbol discovery started.');
+		discoverRequest(uri, onSuccess, onFailure);
 	}
 
 }
 
-function discoverFileSymbolsRequest(
-	client: LanguageClient,
+function discoverRequest(
 	uri: Uri,
-	onSuccess: (uri: Uri, numberSymbolsDiscovered: number) => void,
-	onFailure: (uri: Uri) => void) {
+	onSuccess: (numberSymbolsDiscovered: number) => void,
+	onFailure: () => void) {
 
-	fs.readFile(uri.fsPath, (err, data) => {
-		if (err) {
-			client.warn(err.message);
-			onFailure(uri);
+	fs.stat(uri.fsPath, (statErr, stats) => {
+
+		if (statErr) {
+			languageClient.warn(statErr.message);
+			onFailure();
 			return;
 		}
 
-		let textDocument: TextDocumentItem = {
-			uri: uri.toString(),
-			text: data.toString(),
-			languageId: phpLanguageId,
-			version: 0
+		if (stats.size > maxFileSizeBytes) {
+			languageClient.warn(`${uri} larger than max file size. Symbol discovery aborted.`);
+			onFailure();
+			return;
 		}
 
-		let onRequestSuccess = (n: number) => {
-			onSuccess(uri, n);
-		}
+		fs.readFile(uri.fsPath, (readErr, data) => {
 
-		let onRequestFailure = (r: any) => {
-			onFailure(uri);
-		}
+			if (readErr) {
+				languageClient.warn(readErr.message);
+				onFailure();
+				return;
+			}
 
-		client.sendRequest<number>(
-			discoverRequestName,
-			{ textDocument: textDocument }
-		).then(onRequestSuccess, onRequestFailure);
+			let textDocument: TextDocumentItem = {
+				uri: uri.toString(),
+				text: data.toString(),
+				languageId: phpLanguageId,
+				version: 0
+			}
 
+			let onRequestFailure = (r: any) => {
+				languageClient.warn(`${uri} discover request failed.`);
+				onFailure();
+			}
+
+			languageClient.sendRequest<number>(
+				discoverRequestName,
+				{ textDocument: textDocument }
+			).then(onSuccess, onRequestFailure);
+
+		});
 	});
+
 }
 
