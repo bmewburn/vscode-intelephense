@@ -70,23 +70,7 @@ function onDidDelete(uri: Uri) {
 }
 
 function onDidChange(uri: Uri) {
-
-	fs.stat(uri.fsPath, (statErr, stats) => {
-
-		if (statErr) {
-			languageClient.warn(statErr.message);
-			return;
-		}
-
-		if (stats.isFile()) {
-			onWorkspaceFindFiles([uri]);
-		} else if (stats.isDirectory()) {
-			let include = path.join(workspace.asRelativePath(uri.fsPath), '**/*.php');
-			workspace.findFiles(include).then(onWorkspaceFindFiles);
-		}
-
-	});
-
+	discoverRequest(uri);
 }
 
 function onDidCreate(uri: Uri) {
@@ -152,20 +136,24 @@ function onWorkspaceFindFiles(uriArray: Uri[]) {
 
 function discoverRequest(
 	uri: Uri,
-	onSuccess: (numberSymbolsDiscovered: number) => void,
-	onFailure: () => void) {
+	onSuccess?: (numberSymbolsDiscovered: number) => void,
+	onFailure?: () => void) {
 
 	fs.stat(uri.fsPath, (statErr, stats) => {
 
 		if (statErr) {
 			languageClient.warn(statErr.message);
-			onFailure();
+			if (onFailure) {
+				onFailure();
+			}
 			return;
 		}
 
 		if (stats.size > maxFileSizeBytes) {
 			languageClient.warn(`${uri} larger than max file size. Symbol discovery aborted.`);
-			onFailure();
+			if (onFailure) {
+				onFailure();
+			}
 			return;
 		}
 
@@ -173,7 +161,9 @@ function discoverRequest(
 
 			if (readErr) {
 				languageClient.warn(readErr.message);
-				onFailure();
+				if (onFailure) {
+					onFailure();
+				}
 				return;
 			}
 
@@ -186,7 +176,9 @@ function discoverRequest(
 
 			let onRequestFailure = (r: any) => {
 				languageClient.warn(`${uri} discover request failed.`);
-				onFailure();
+				if (onFailure) {
+					onFailure();
+				}
 			}
 
 			languageClient.sendRequest<number>(
