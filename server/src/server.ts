@@ -16,12 +16,16 @@ import { Intelephense } from 'intelephense';
 
 // Create a connection for the server. The connection uses Node's IPC as a transport
 let connection: IConnection = createConnection(new IPCMessageReader(process), new IPCMessageWriter(process));
+
 const languageId = 'php';
+const discoverRequestName = 'discover';
+let enableDebug = true;
 
 // After the server has started the client sends an initialize request. The server receives
 // in the passed params the rootPath of the workspace plus the client capabilities. 
 let workspaceRoot: string;
 connection.onInitialize((params): InitializeResult => {
+	connection.console.info('Intelephense server initialising.');
 	workspaceRoot = params.rootPath;
 	return {
 		capabilities: {
@@ -36,34 +40,38 @@ connection.onDidOpenTextDocument((params) => {
 	let snap = processSnapshot();
 	Intelephense.openDocument(params.textDocument);
 	let diff = processSnapshotDiff(snap);
-	connection.console.info(`${params.textDocument.uri} opened ${processSnapshotDiffToString(diff)}`);
+	debug(`onDidOpenTextDocument ${params.textDocument.uri} ${processSnapshotDiffToString(diff)}`);
 });
 
 connection.onDidChangeTextDocument((params) => {
 	let snap = processSnapshot();
 	Intelephense.editDocument(params.textDocument, params.contentChanges);
 	let diff = processSnapshotDiff(snap);
-	connection.console.info(`${params.textDocument.uri} changed ${processSnapshotDiffToString(diff)}`);
+	debug(`onDidChangeTextDocument ${params.textDocument.uri} ${processSnapshotDiffToString(diff)}`);
 });
 
 connection.onDidCloseTextDocument((params) => {
 	let snap = processSnapshot();
 	Intelephense.closeDocument(params.textDocument);
 	let diff = processSnapshotDiff(snap);
-	connection.console.info(`${params.textDocument.uri} closed ${processSnapshotDiffToString(diff)}`);
+	debug(`onDidCloseTextDocument ${params.textDocument.uri} ${processSnapshotDiffToString(diff)}`);
 });
 
 connection.onDocumentSymbol((params) => {
 	let snap = processSnapshot();
 	let symbols = Intelephense.documentSymbols(params.textDocument);
 	let diff = processSnapshotDiff(snap);
-	connection.console.info(`${params.textDocument.uri} symbols ${processSnapshotDiffToString(diff)}`);
+	debug(`onDocumentSymbol ${params.textDocument.uri} ${processSnapshotDiffToString(diff)}`);
 	return symbols;
 });
 
-let discoverRequest = new RequestType<{ textDocument: TextDocumentItem }, void, void, void>('discover');
+let discoverRequest = new RequestType<{ textDocument: TextDocumentItem }, number, void, void>('discover');
 connection.onRequest(discoverRequest, (params) => {
-	connection.console.log('DISCOVER');
+	let snap = processSnapshot();
+	let numberSymbolsDiscovered = Intelephense.discover(params.textDocument);
+	let diff = processSnapshotDiff(snap);
+	debug(`onDiscover ${params.textDocument.uri} ${processSnapshotDiffToString(diff)}`);
+	return numberSymbolsDiscovered;
 });
 
 // Listen on the connection
@@ -77,6 +85,12 @@ interface ProcessSnapshot {
 interface ProcessSnapshotDiff {
 	timeDiff: number;
 	memoryDiff: number;
+}
+
+function debug(msg:string){
+	if(enableDebug){
+		connection.console.info(msg);
+	}
 }
 
 function processSnapshotDiffToString(diff: ProcessSnapshotDiff) {
