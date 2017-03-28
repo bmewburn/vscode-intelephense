@@ -44,45 +44,45 @@ connection.onInitialize((params): InitializeResult => {
 connection.onDidOpenTextDocument((params) => {
 	handleRequest(() => {
 		Intelephense.openDocument(params.textDocument);
-	}, `onDidOpenTextDocument ${params.textDocument.uri}`);
+	}, `onDidOpenTextDocument | ${params.textDocument.uri}`);
 });
 
 connection.onDidChangeTextDocument((params) => {
 	handleRequest(() => {
 		Intelephense.editDocument(params.textDocument, params.contentChanges);
-	}, `onDidChangeTextDocument ${params.textDocument.uri}`);
+	}, `onDidChangeTextDocument | ${params.textDocument.uri}`);
 });
 
 connection.onDidCloseTextDocument((params) => {
 	handleRequest(() => {
 		Intelephense.closeDocument(params.textDocument);
-	}, `onDidCloseTextDocument ${params.textDocument.uri}`);
+	}, `onDidCloseTextDocument | ${params.textDocument.uri}`);
 });
 
 connection.onDocumentSymbol((params) => {
 	return handleRequest(() => {
 		return Intelephense.documentSymbols(params.textDocument);
-	}, `onDocumentSymbol ${params.textDocument.uri}`);
+	}, `onDocumentSymbol | ${params.textDocument.uri}`);
 });
 
 connection.onWorkspaceSymbol((params)=>{
 	return handleRequest(()=>{
 		return Intelephense.workspaceSymbols(params.query);
-	}, 'onWorkspaceSymbol');	
+	}, `onWorkspaceSymbol | ${params.query}`);	
 });
 
 let discoverRequest = new RequestType<{ textDocument: TextDocumentItem }, number, void, void>(discoverRequestName);
 connection.onRequest(discoverRequest, (params) => {
 	return handleRequest(()=>{
 		return Intelephense.discover(params.textDocument);
-	}, `onDiscover ${params.textDocument.uri}`);
+	}, `onDiscover | ${params.textDocument.uri}`);
 });
 
 let forgetRequest = new RequestType<{ uri: string }, [number, number], void, void>(forgetRequestName);
 connection.onRequest(forgetRequest, (params) => {
 	return handleRequest(()=> {
 		return Intelephense.forget(params.uri);
-	}, `onForget ${params.uri} `);
+	}, `onForget | ${params.uri} `);
 });
 
 // Listen on the connection
