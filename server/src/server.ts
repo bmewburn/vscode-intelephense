@@ -16,107 +16,109 @@ import { Intelephense } from 'intelephense';
 
 // Create a connection for the server. The connection uses Node's IPC as a transport
 let connection: IConnection = createConnection(new IPCMessageReader(process), new IPCMessageWriter(process));
+let initialisedAt: [number, number];
 
 const languageId = 'php';
 const discoverRequestName = 'discover';
+const forgetRequestName = 'forget';
+
 let enableDebug = true;
 
 // After the server has started the client sends an initialize request. The server receives
 // in the passed params the rootPath of the workspace plus the client capabilities. 
 let workspaceRoot: string;
 connection.onInitialize((params): InitializeResult => {
+	initialisedAt = process.hrtime();
 	connection.console.info('Intelephense server initialising.');
 	workspaceRoot = params.rootPath;
 	return {
 		capabilities: {
 			textDocumentSync: TextDocumentSyncKind.Incremental,
-			documentSymbolProvider: true
+			documentSymbolProvider: true,
+			workspaceSymbolProvider: true
 		}
 	}
 });
 
 
 connection.onDidOpenTextDocument((params) => {
-	let snap = processSnapshot();
-	Intelephense.openDocument(params.textDocument);
-	let diff = processSnapshotDiff(snap);
-	debug(`onDidOpenTextDocument ${params.textDocument.uri} ${processSnapshotDiffToString(diff)}`);
+	handleRequest(() => {
+		Intelephense.openDocument(params.textDocument);
+	}, `onDidOpenTextDocument ${params.textDocument.uri}`);
 });
 
 connection.onDidChangeTextDocument((params) => {
-	let snap = processSnapshot();
-	Intelephense.editDocument(params.textDocument, params.contentChanges);
-	let diff = processSnapshotDiff(snap);
-	debug(`onDidChangeTextDocument ${params.textDocument.uri} ${processSnapshotDiffToString(diff)}`);
+	handleRequest(() => {
+		Intelephense.editDocument(params.textDocument, params.contentChanges);
+	}, `onDidChangeTextDocument ${params.textDocument.uri}`);
 });
 
 connection.onDidCloseTextDocument((params) => {
-	let snap = processSnapshot();
-	Intelephense.closeDocument(params.textDocument);
-	let diff = processSnapshotDiff(snap);
-	debug(`onDidCloseTextDocument ${params.textDocument.uri} ${processSnapshotDiffToString(diff)}`);
+	handleRequest(() => {
+		Intelephense.closeDocument(params.textDocument);
+	}, `onDidCloseTextDocument ${params.textDocument.uri}`);
 });
 
 connection.onDocumentSymbol((params) => {
-	let snap = processSnapshot();
-	let symbols = Intelephense.documentSymbols(params.textDocument);
-	let diff = processSnapshotDiff(snap);
-	debug(`onDocumentSymbol ${params.textDocument.uri} ${processSnapshotDiffToString(diff)}`);
-	return symbols;
+	return handleRequest(() => {
+		return Intelephense.documentSymbols(params.textDocument);
+	}, `onDocumentSymbol ${params.textDocument.uri}`);
 });
 
-let discoverRequest = new RequestType<{ textDocument: TextDocumentItem }, number, void, void>('discover');
+connection.onWorkspaceSymbol((params)=>{
+	return handleRequest(()=>{
+		return Intelephense.workspaceSymbols(params.query);
+	}, 'onWorkspaceSymbol');	
+});
+
+let discoverRequest = new RequestType<{ textDocument: TextDocumentItem }, number, void, void>(discoverRequestName);
 connection.onRequest(discoverRequest, (params) => {
-	let snap = processSnapshot();
-	let numberSymbolsDiscovered = Intelephense.discover(params.textDocument);
-	let diff = processSnapshotDiff(snap);
-	debug(`onDiscover ${params.textDocument.uri} ${processSnapshotDiffToString(diff)}`);
-	return numberSymbolsDiscovered;
+	return handleRequest(()=>{
+		return Intelephense.discover(params.textDocument);
+	}, `onDiscover ${params.textDocument.uri}`);
+});
+
+let forgetRequest = new RequestType<{ uri: string }, [number, number], void, void>(forgetRequestName);
+connection.onRequest(forgetRequest, (params) => {
+	return handleRequest(()=> {
+		return Intelephense.forget(params.uri);
+	}, `onForget ${params.uri} `);
 });
 
 // Listen on the connection
 connection.listen();
 
+function handleRequest<T>(handler: () => T, debugMsg: string): T {
+	let start = process.hrtime();
+	let t = handler();
+	let snap = takeProcessSnapshot(start);
+	debug(`${debugMsg} | ${snap.elapsed.toFixed(3)} ms | ${snap.memory.toFixed(1)} MB`);
+	return t;
+}
+
 interface ProcessSnapshot {
-	time: [number, number];
-	memory: NodeJS.MemoryUsage;
+	elapsed: number;
+	memory: number;
 }
 
-interface ProcessSnapshotDiff {
-	timeDiff: number;
-	memoryDiff: number;
-}
-
-function debug(msg:string){
-	if(enableDebug){
+function debug(msg: string) {
+	if (enableDebug) {
 		connection.console.info(msg);
 	}
 }
 
-function processSnapshotDiffToString(diff: ProcessSnapshotDiff) {
-	return `${diff.timeDiff.toFixed(1)}ms ${diff.memoryDiff}B`;
-}
-
-function processSnapshot() {
+function takeProcessSnapshot(hrtimeStart: [number, number]) {
 	return <ProcessSnapshot>{
-		time: process.hrtime(),
-		memory: process.memoryUsage()
+		elapsed: elapsed(hrtimeStart),
+		memory: memory()
 	};
 }
 
-function processSnapshotDiff(snapshot: ProcessSnapshot) {
-	return <ProcessSnapshotDiff>{
-		timeDiff: timeDiff(snapshot.time),
-		memoryDiff: memoryDiff(snapshot.memory)
-	};
-}
-
-function timeDiff(start: [number, number]) {
+function elapsed(start: [number, number]) {
 	let diff = process.hrtime(start);
 	return diff[0] * 1000 + diff[1] / 1000000;
 }
 
-function memoryDiff(before: NodeJS.MemoryUsage) {
-	let after = process.memoryUsage();
-	return after.heapUsed - before.heapUsed;
+function memory() {
+	return process.memoryUsage().heapUsed / 1000000;
 }
