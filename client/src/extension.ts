@@ -61,8 +61,10 @@ export function activate(context: ExtensionContext) {
 }
 
 function onClientReady() {
-	//discover workspace symbols
-	workspace.findFiles('**/*.php').then(onWorkspaceFindFiles);
+	if(workspace.rootPath){
+		//discover workspace symbols
+		workspace.findFiles('**/*.php').then(onWorkspaceFindFiles);
+	}
 }
 
 function onDidDelete(uri: Uri) {
