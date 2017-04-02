@@ -8,7 +8,8 @@ import {
 	createConnection, IConnection, TextDocumentSyncKind,
 	TextDocuments, TextDocument, Diagnostic, DiagnosticSeverity,
 	InitializeParams, InitializeResult, TextDocumentPositionParams,
-	CompletionItem, CompletionItemKind, RequestType, TextDocumentItem
+	CompletionItem, CompletionItemKind, RequestType, TextDocumentItem,
+	PublishDiagnosticsParams
 } from 'vscode-languageserver';
 
 import { Intelephense } from 'intelephense';
@@ -34,7 +35,10 @@ connection.onInitialize((params): InitializeResult => {
 		capabilities: {
 			textDocumentSync: TextDocumentSyncKind.Incremental,
 			documentSymbolProvider: true,
-			workspaceSymbolProvider: true
+			workspaceSymbolProvider: true,
+			completionProvider: {
+				triggerCharacters: ['$', '>', ':']
+			}
 		}
 	}
 });
@@ -43,55 +47,80 @@ connection.onInitialize((params): InitializeResult => {
 connection.onDidOpenTextDocument((params) => {
 	handleRequest(() => {
 		Intelephense.openDocument(params.textDocument);
-	}, `onDidOpenTextDocument | ${params.textDocument.uri}`);
+	}, ['onDidOpenTextDocument', params.textDocument.uri]);
 });
 
 connection.onDidChangeTextDocument((params) => {
 	handleRequest(() => {
 		Intelephense.editDocument(params.textDocument, params.contentChanges);
-	}, `onDidChangeTextDocument | ${params.textDocument.uri}`);
+	}, ['onDidChangeTextDocument', params.textDocument.uri]);
 });
 
 connection.onDidCloseTextDocument((params) => {
 	handleRequest(() => {
 		Intelephense.closeDocument(params.textDocument);
-	}, `onDidCloseTextDocument | ${params.textDocument.uri}`);
+	}, ['onDidCloseTextDocument', params.textDocument.uri]);
 });
 
 connection.onDocumentSymbol((params) => {
 	return handleRequest(() => {
 		return Intelephense.documentSymbols(params.textDocument);
-	}, `onDocumentSymbol | ${params.textDocument.uri}`);
+	}, ['onDocumentSymbol', params.textDocument.uri]);
 });
 
-connection.onWorkspaceSymbol((params)=>{
-	return handleRequest(()=>{
+connection.onWorkspaceSymbol((params) => {
+	return handleRequest(() => {
 		return Intelephense.workspaceSymbols(params.query);
-	}, `onWorkspaceSymbol | ${params.query}`);	
+	}, ['onWorkspaceSymbol', params.query]);
 });
+
+connection.onCompletion((params) => {
+	return handleRequest(() => {
+		return Intelephense.completions(params.textDocument, params.position);
+	}, ['onCompletion', params.textDocument.uri, JSON.stringify(params.position)]);
+});
+
+
+let diagnosticsStartMap: { [index: string]: [number, number] } = {};
+Intelephense.onDiagnosticsStart = (uri: string) => {
+	diagnosticsStartMap[uri] = process.hrtime();
+}
+
+Intelephense.onDiagnosticsEnd = (uri: string, diagnostics: Diagnostic[]) => {
+	let params: PublishDiagnosticsParams = {
+		uri: uri,
+		diagnostics: diagnostics
+	};
+
+	debug([
+		'sendDiagnostics', uri, `${elapsed(diagnosticsStartMap[uri]).toFixed(3)} ms`, `${memory().toFixed(1)} MB`
+	].join(' | '));
+	connection.sendDiagnostics(params);
+}
 
 let discoverRequest = new RequestType<{ textDocument: TextDocumentItem }, number, void, void>(discoverRequestName);
 connection.onRequest(discoverRequest, (params) => {
-	return handleRequest(()=>{
+	return handleRequest(() => {
 		return Intelephense.discover(params.textDocument);
-	}, `onDiscover | ${params.textDocument.uri}`);
+	}, ['onDiscover', params.textDocument.uri]);
 });
 
 let forgetRequest = new RequestType<{ uri: string }, number, void, void>(forgetRequestName);
 connection.onRequest(forgetRequest, (params) => {
-	return handleRequest(()=> {
+	return handleRequest(() => {
 		return Intelephense.forget(params.uri);
-	}, `onForget | ${params.uri} `);
+	}, ['onForget', params.uri]);
 });
 
 // Listen on the connection
 connection.listen();
 
-function handleRequest<T>(handler: () => T, debugMsg: string): T {
+function handleRequest<T>(handler: () => T, debugMsgArray: string[]): T {
 	let start = process.hrtime();
 	let t = handler();
 	let snap = takeProcessSnapshot(start);
-	debug(`${debugMsg} | ${snap.elapsed.toFixed(3)} ms | ${snap.memory.toFixed(1)} MB`);
+	debugMsgArray.push(`${snap.elapsed.toFixed(3)} ms`, `${snap.memory.toFixed(1)} MB`);
+	debug(debugMsgArray.join(' | '));
 	return t;
 }
 
@@ -114,6 +143,9 @@ function takeProcessSnapshot(hrtimeStart: [number, number]) {
 }
 
 function elapsed(start: [number, number]) {
+	if (!start) {
+		return -1;
+	}
 	let diff = process.hrtime(start);
 	return diff[0] * 1000 + diff[1] / 1000000;
 }
