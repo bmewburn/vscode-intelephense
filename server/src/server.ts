@@ -39,8 +39,8 @@ connection.onInitialize((params): InitializeResult => {
 			completionProvider: {
 				triggerCharacters: ['$', '>', ':']
 			},
-			signatureHelpProvider:{
-				triggerCharacters:['(', ',']
+			signatureHelpProvider: {
+				triggerCharacters: ['(', ',']
 			}
 		}
 	}
@@ -83,25 +83,10 @@ connection.onCompletion((params) => {
 	}, ['onCompletion', params.textDocument.uri, JSON.stringify(params.position)]);
 });
 
-connection.onSignatureHelp((params)=>{
-	return handleRequest(()=>{
-		return <SignatureHelp>{
-			activeSignature:0,
-			activeParameter:0,
-			signatures:[
-				{
-					label:'($param1):void',
-					documentation:'sig1 documentation',
-					parameters:[
-						{
-							label:'$param1',
-							documentation:'param1 documentation'
-						}
-					]
-				}
-			]
-		};
-	},['onSignatureHelp', params.textDocument.uri, JSON.stringify(params.position)]);
+connection.onSignatureHelp((params) => {
+	return handleRequest(() => {
+		return Intelephense.provideSignatureHelp(params.textDocument.uri, params.position);
+	}, ['onSignatureHelp', params.textDocument.uri, JSON.stringify(params.position)]);
 });
 
 
@@ -119,6 +104,8 @@ Intelephense.onDiagnosticsEnd = (uri: string, diagnostics: Diagnostic[]) => {
 	debug([
 		'sendDiagnostics', uri, `${elapsed(diagnosticsStartMap[uri]).toFixed(3)} ms`, `${memory().toFixed(1)} MB`
 	].join(' | '));
+	
+	delete diagnosticsStartMap[uri];
 	connection.sendDiagnostics(params);
 }
 
