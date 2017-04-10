@@ -66,27 +66,39 @@ connection.onDidCloseTextDocument((params) => {
 });
 
 connection.onDocumentSymbol((params) => {
+	let debugInfo = ['onDocumentSymbol', params.textDocument.uri];
 	return handleRequest(() => {
-		return Intelephense.documentSymbols(params.textDocument);
-	}, ['onDocumentSymbol', params.textDocument.uri]);
+		let symbols = Intelephense.documentSymbols(params.textDocument);
+		debugInfo.push(`${symbols.length} symbols`);
+		return symbols;
+	}, debugInfo);
 });
 
 connection.onWorkspaceSymbol((params) => {
+	let debugInfo = ['onWorkspaceSymbol', params.query];
 	return handleRequest(() => {
-		return Intelephense.workspaceSymbols(params.query);
-	}, ['onWorkspaceSymbol', params.query]);
+		let symbols = Intelephense.workspaceSymbols(params.query);
+		debugInfo.push(`${symbols.length} symbols`);
+		return symbols;
+	}, debugInfo);
 });
 
 connection.onCompletion((params) => {
+	let debugInfo = ['onCompletion', params.textDocument.uri, JSON.stringify(params.position)];
 	return handleRequest(() => {
-		return Intelephense.completions(params.textDocument, params.position);
-	}, ['onCompletion', params.textDocument.uri, JSON.stringify(params.position)]);
+		let completions = Intelephense.completions(params.textDocument, params.position);
+		debugInfo.push(`${completions.items.length} items`);
+		return completions;
+	}, debugInfo);
 });
 
 connection.onSignatureHelp((params) => {
+	let debugInfo = ['onSignatureHelp', params.textDocument.uri, JSON.stringify(params.position)];
 	return handleRequest(() => {
-		return Intelephense.provideSignatureHelp(params.textDocument.uri, params.position);
-	}, ['onSignatureHelp', params.textDocument.uri, JSON.stringify(params.position)]);
+		let sigHelp = Intelephense.provideSignatureHelp(params.textDocument.uri, params.position);
+		debugInfo.push(`${sigHelp ? sigHelp.signatures.length : 0} signatures`);
+		return sigHelp;
+	}, debugInfo);
 });
 
 
@@ -111,16 +123,22 @@ Intelephense.onDiagnosticsEnd = (uri: string, diagnostics: Diagnostic[]) => {
 
 let discoverRequest = new RequestType<{ textDocument: TextDocumentItem }, number, void, void>(discoverRequestName);
 connection.onRequest(discoverRequest, (params) => {
+	let debugInfo = ['onDiscover', params.textDocument.uri];
 	return handleRequest(() => {
-		return Intelephense.discover(params.textDocument);
-	}, ['onDiscover', params.textDocument.uri]);
+		let nDiscovered = Intelephense.discover(params.textDocument);
+		debugInfo.push(`${nDiscovered} symbols`);
+		return nDiscovered;
+	}, debugInfo);
 });
 
 let forgetRequest = new RequestType<{ uri: string }, number, void, void>(forgetRequestName);
 connection.onRequest(forgetRequest, (params) => {
+	let debugInfo = ['onForget', params.uri];
 	return handleRequest(() => {
-		return Intelephense.forget(params.uri);
-	}, ['onForget', params.uri]);
+		let nForgot = Intelephense.forget(params.uri);
+		debugInfo.push(`${nForgot} symbols`);
+		return nForgot;
+	}, debugInfo);
 });
 
 // Listen on the connection
@@ -142,8 +160,13 @@ interface ProcessSnapshot {
 
 function debug(msg: string) {
 	if (enableDebug) {
-		connection.console.info(msg);
+		connection.console.log(`[Debug - ${timeString()}] ${msg}`);
 	}
+}
+
+function timeString(){
+	let time = new Date();
+	return time.toLocaleString(undefined, { hour: 'numeric',minute:'numeric', second:'numeric'});
 }
 
 function takeProcessSnapshot(hrtimeStart: [number, number]) {
