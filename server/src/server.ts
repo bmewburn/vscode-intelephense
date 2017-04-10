@@ -86,7 +86,7 @@ connection.onWorkspaceSymbol((params) => {
 connection.onCompletion((params) => {
 	let debugInfo = ['onCompletion', params.textDocument.uri, JSON.stringify(params.position)];
 	return handleRequest(() => {
-		let completions = Intelephense.completions(params.textDocument, params.position);
+		let completions = Intelephense.provideCompletions(params.textDocument, params.position);
 		debugInfo.push(`${completions.items.length} items`);
 		return completions;
 	}, debugInfo);
@@ -95,7 +95,7 @@ connection.onCompletion((params) => {
 connection.onSignatureHelp((params) => {
 	let debugInfo = ['onSignatureHelp', params.textDocument.uri, JSON.stringify(params.position)];
 	return handleRequest(() => {
-		let sigHelp = Intelephense.provideSignatureHelp(params.textDocument.uri, params.position);
+		let sigHelp = Intelephense.provideSignatureHelp(params.textDocument, params.position);
 		debugInfo.push(`${sigHelp ? sigHelp.signatures.length : 0} signatures`);
 		return sigHelp;
 	}, debugInfo);
@@ -145,12 +145,19 @@ connection.onRequest(forgetRequest, (params) => {
 connection.listen();
 
 function handleRequest<T>(handler: () => T, debugMsgArray: string[]): T {
-	let start = process.hrtime();
-	let t = handler();
-	let snap = takeProcessSnapshot(start);
-	debugMsgArray.push(`${snap.elapsed.toFixed(3)} ms`, `${snap.memory.toFixed(1)} MB`);
-	debug(debugMsgArray.join(' | '));
-	return t;
+	
+	try{
+		let start = process.hrtime();
+		let t = handler();
+		let snap = takeProcessSnapshot(start);
+		debugMsgArray.push(`${snap.elapsed.toFixed(3)} ms`, `${snap.memory.toFixed(1)} MB`);
+		debug(debugMsgArray.join(' | '));
+		return t;
+	} catch(err) {
+		connection.console.error(err.stack);
+		return null;
+	}
+	
 }
 
 interface ProcessSnapshot {
