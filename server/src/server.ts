@@ -29,7 +29,9 @@ let enableDebug = true;
 let workspaceRoot: string;
 connection.onInitialize((params): InitializeResult => {
 	initialisedAt = process.hrtime();
-	connection.console.info('Intelephense initialising.');
+	connection.console.info('Initialising');
+	Intelephense.initialise();
+	connection.console.info(`Initialised in ${elapsed(initialisedAt)} ms`);
 	workspaceRoot = params.rootPath;
 	return {
 		capabilities: {
