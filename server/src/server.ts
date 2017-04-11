@@ -31,7 +31,7 @@ connection.onInitialize((params): InitializeResult => {
 	initialisedAt = process.hrtime();
 	connection.console.info('Initialising');
 	Intelephense.initialise();
-	connection.console.info(`Initialised in ${elapsed(initialisedAt)} ms`);
+	connection.console.info(`Initialised in ${elapsed(initialisedAt).toFixed()} ms`);
 	workspaceRoot = params.rootPath;
 	return {
 		capabilities: {
