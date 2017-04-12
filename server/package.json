@@ -1,9 +1,9 @@
 {
   "name": "vscode-intelephense-server",
-  "description": "Intelephense Server",
-  "version": "0.0.1",
-  "author": "Ben Mewburn",
-  "license": "MIT",
+  "description": "PHP Language Server",
+  "version": "0.6.0",
+  "author": "Ben Mewburn <ben@mewburn.id.au>",
+  "license": "ISC",
   "engines": {
     "node": "*"
   },

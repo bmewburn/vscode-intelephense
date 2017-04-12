@@ -1,5 +1,5 @@
-/* Copyright (c) Ben Mewburn ben@mewburn.id.au
- * Licensed under the MIT Licence.
+/* Copyright (c) Ben Robert Mewburn 
+ * Licensed under the ISC Licence.
  */
 'use strict';
 
@@ -9,7 +9,7 @@ import {
 	TextDocuments, TextDocument, Diagnostic, DiagnosticSeverity,
 	InitializeParams, InitializeResult, TextDocumentPositionParams,
 	CompletionItem, CompletionItemKind, RequestType, TextDocumentItem,
-	PublishDiagnosticsParams, SignatureHelp
+	PublishDiagnosticsParams, SignatureHelp, DidChangeConfigurationParams
 } from 'vscode-languageserver';
 
 import { Intelephense } from 'intelephense';
@@ -22,7 +22,15 @@ const languageId = 'php';
 const discoverRequestName = 'discover';
 const forgetRequestName = 'forget';
 
-let enableDebug = true;
+let intelephenseConfig:IntelephenseConfig = {
+	enableDebug:false,
+	enableCompletionProvider:true,
+	enableDefinitionProvider:true,
+	enableDiagnosticsProvider:true,
+	enableDocumentSymbolsProvider:true,
+	enableSignatureHelpProvider:true,
+	enableWorkspaceSymbolsProvider:true
+};
 
 // After the server has started the client sends an initialize request. The server receives
 // in the passed params the rootPath of the workspace plus the client capabilities. 
@@ -43,11 +51,17 @@ connection.onInitialize((params): InitializeResult => {
 			},
 			signatureHelpProvider: {
 				triggerCharacters: ['(', ',']
-			}
+			},
+			definitionProvider: true
 		}
 	}
 });
 
+connection.onDidChangeConfiguration((params)=>{
+
+	connection.console.log(params.settings);
+
+});
 
 connection.onDidOpenTextDocument((params) => {
 	handleRequest(() => {
@@ -68,6 +82,11 @@ connection.onDidCloseTextDocument((params) => {
 });
 
 connection.onDocumentSymbol((params) => {
+
+	if(!intelephenseConfig.enableDocumentSymbolsProvider){
+		return [];
+	}
+
 	let debugInfo = ['onDocumentSymbol', params.textDocument.uri];
 	return handleRequest(() => {
 		let symbols = Intelephense.documentSymbols(params.textDocument);
@@ -77,6 +96,11 @@ connection.onDocumentSymbol((params) => {
 });
 
 connection.onWorkspaceSymbol((params) => {
+
+	if(!intelephenseConfig.enableWorkspaceSymbolsProvider){
+		return [];
+	}
+
 	let debugInfo = ['onWorkspaceSymbol', params.query];
 	return handleRequest(() => {
 		let symbols = Intelephense.workspaceSymbols(params.query);
@@ -86,6 +110,11 @@ connection.onWorkspaceSymbol((params) => {
 });
 
 connection.onCompletion((params) => {
+
+	if(!intelephenseConfig.enableCompletionProvider){
+		return [];
+	}
+
 	let debugInfo = ['onCompletion', params.textDocument.uri, JSON.stringify(params.position)];
 	return handleRequest(() => {
 		let completions = Intelephense.provideCompletions(params.textDocument, params.position);
@@ -95,6 +124,11 @@ connection.onCompletion((params) => {
 });
 
 connection.onSignatureHelp((params) => {
+
+	if(!intelephenseConfig.enableSignatureHelpProvider){
+		return null;
+	}
+
 	let debugInfo = ['onSignatureHelp', params.textDocument.uri, JSON.stringify(params.position)];
 	return handleRequest(() => {
 		let sigHelp = Intelephense.provideSignatureHelp(params.textDocument, params.position);
@@ -103,6 +137,17 @@ connection.onSignatureHelp((params) => {
 	}, debugInfo);
 });
 
+connection.onDefinition((params) => {
+
+	if(!intelephenseConfig.enableDefinitionProvider){
+		return null;
+	}
+
+	let debugInfo = ['onDefinition', params.textDocument.uri, JSON.stringify(params.position)];
+	return handleRequest(() => {
+		return Intelephense.provideDefinition(params.textDocument, params.position);
+	}, debugInfo);
+});
 
 let diagnosticsStartMap: { [index: string]: [number, number] } = {};
 Intelephense.onDiagnosticsStart = (uri: string) => {
@@ -118,7 +163,7 @@ Intelephense.onDiagnosticsEnd = (uri: string, diagnostics: Diagnostic[]) => {
 	debug([
 		'sendDiagnostics', uri, `${elapsed(diagnosticsStartMap[uri]).toFixed(3)} ms`, `${memory().toFixed(1)} MB`
 	].join(' | '));
-	
+
 	delete diagnosticsStartMap[uri];
 	connection.sendDiagnostics(params);
 }
@@ -147,19 +192,19 @@ connection.onRequest(forgetRequest, (params) => {
 connection.listen();
 
 function handleRequest<T>(handler: () => T, debugMsgArray: string[]): T {
-	
-	try{
+
+	try {
 		let start = process.hrtime();
 		let t = handler();
 		let snap = takeProcessSnapshot(start);
 		debugMsgArray.push(`${snap.elapsed.toFixed(3)} ms`, `${snap.memory.toFixed(1)} MB`);
 		debug(debugMsgArray.join(' | '));
 		return t;
-	} catch(err) {
+	} catch (err) {
 		connection.console.error(err.stack);
 		return null;
 	}
-	
+
 }
 
 interface ProcessSnapshot {
@@ -168,14 +213,14 @@ interface ProcessSnapshot {
 }
 
 function debug(msg: string) {
-	if (enableDebug) {
+	if (intelephenseConfig.enableDebug) {
 		connection.console.log(`[Debug - ${timeString()}] ${msg}`);
 	}
 }
 
-function timeString(){
+function timeString() {
 	let time = new Date();
-	return time.toLocaleString(undefined, { hour: 'numeric',minute:'numeric', second:'numeric'});
+	return time.toLocaleString(undefined, { hour: 'numeric', minute: 'numeric', second: 'numeric' });
 }
 
 function takeProcessSnapshot(hrtimeStart: [number, number]) {
@@ -195,4 +240,14 @@ function elapsed(start: [number, number]) {
 
 function memory() {
 	return process.memoryUsage().heapUsed / 1000000;
+}
+
+interface IntelephenseConfig {
+	enableDebug:boolean;
+	enableDiagnosticsProvider:boolean;
+	enableCompletionProvider:boolean;
+	enableSignatureHelpProvider:boolean;
+	enableDocumentSymbolsProvider:boolean;
+	enableWorkspaceSymbolsProvider:boolean;
+	enableDefinitionProvider:boolean;
 }

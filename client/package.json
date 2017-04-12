@@ -1,31 +1,73 @@
 {
   "name": "vscode-intelephense-client",
-  "description": "Intelephense Client",
-  "author": "Ben Mewburn",
-  "license": "MIT",
-  "version": "0.0.1",
+  "displayName": "Intelephense",
+  "description": "PHP Language Server",
+  "author": "Ben Mewburn <ben@mewburn.id.au>",
+  "license": "ISC",
+  "version": "0.6.0",
   "publisher": "bmewburn",
   "engines": {
-    "vscode": "^1.8.0"
+    "vscode": "^1.11.0"
   },
   "categories": [
-    "Other"
+    "Languages", "Linters","Other"
   ],
   "activationEvents": [
     "onLanguage:php"
+  ],
+  "keywords": [
+    "php", 
+    "intellisense",
+    "autocompletion", 
+    "language server", 
+    "completion", 
+    "signature",
+    "symbols", 
+    "diagnostics", 
+    "definition"
   ],
   "main": "./out/src/extension",
   "contributes": {
     "configuration": {
       "type": "object",
-      "title": "Example configuration",
+      "title": "intelephense",
       "properties": {
-        "languageServerExample.maxNumberOfProblems": {
-          "type": "number",
-          "default": 100,
-          "description": "Controls the maximum number of problems produced by the server."
+        "intelephense.enableDebug": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable debug logging."
         },
-        "languageServerExample.trace.server": {
+        "intelephense.enableDiagnosticsProvider": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable diagnostics."
+        },
+        "intelephense.enableCompletionProvider": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable code completion."
+        },
+        "intelephense.enableSignatureHelpProvider": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable signature help."
+        },
+        "intelephense.enableDefinitionProvider": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable definition go to."
+        },
+        "intelephense.enableDocumentSymbolsProvider": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable document symbol search."
+        },
+        "intelephense.enableWorkspaceSymbolsProvider": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable workspace symbol search."
+        },
+        "intelephense.trace.server": {
           "type": "string",
           "enum": [
             "off",
@@ -33,7 +75,7 @@
             "verbose"
           ],
           "default": "off",
-          "description": "Traces the communication between VSCode and the languageServerExample service."
+          "description": "Traces the communication between VSCode and the intelephense service."
         }        
       }
     }
