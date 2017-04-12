@@ -59,7 +59,14 @@ connection.onInitialize((params): InitializeResult => {
 
 connection.onDidChangeConfiguration((params)=>{
 
-	connection.console.log(params.settings);
+	let config = params.settings.intelephense as IntelephenseConfig;
+	intelephenseConfig.enableDebug = config.enableDebug;
+	intelephenseConfig.enableCompletionProvider = config.enableCompletionProvider;
+	intelephenseConfig.enableDefinitionProvider = config.enableDefinitionProvider;
+	intelephenseConfig.enableDiagnosticsProvider = config.enableDiagnosticsProvider;
+	intelephenseConfig.enableDocumentSymbolsProvider = config.enableDocumentSymbolsProvider;
+	intelephenseConfig.enableSignatureHelpProvider = config.enableSignatureHelpProvider;
+	intelephenseConfig.enableWorkspaceSymbolsProvider = config.enableWorkspaceSymbolsProvider;
 
 });
 
@@ -151,10 +158,20 @@ connection.onDefinition((params) => {
 
 let diagnosticsStartMap: { [index: string]: [number, number] } = {};
 Intelephense.onDiagnosticsStart = (uri: string) => {
+
+	if(!intelephenseConfig.enableDiagnosticsProvider){
+		return;
+	}
+
 	diagnosticsStartMap[uri] = process.hrtime();
 }
 
 Intelephense.onDiagnosticsEnd = (uri: string, diagnostics: Diagnostic[]) => {
+	
+	if(!intelephenseConfig.enableDiagnosticsProvider){
+		return;
+	}
+	
 	let params: PublishDiagnosticsParams = {
 		uri: uri,
 		diagnostics: diagnostics
