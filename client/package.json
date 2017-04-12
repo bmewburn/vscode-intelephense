@@ -10,20 +10,23 @@
     "vscode": "^1.11.0"
   },
   "categories": [
-    "Languages", "Linters","Other"
+    "Languages",
+    "Linters",
+    "Other"
   ],
+  "preview": true,
   "activationEvents": [
     "onLanguage:php"
   ],
   "keywords": [
-    "php", 
+    "php",
     "intellisense",
-    "autocompletion", 
-    "language server", 
-    "completion", 
+    "autocompletion",
+    "language server",
+    "completion",
     "signature",
-    "symbols", 
-    "diagnostics", 
+    "symbols",
+    "diagnostics",
     "definition"
   ],
   "main": "./out/src/extension",
@@ -76,7 +79,7 @@
           ],
           "default": "off",
           "description": "Traces the communication between VSCode and the intelephense service."
-        }        
+        }
       }
     }
   },
