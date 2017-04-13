@@ -59,10 +59,24 @@ export function activate(context: ExtensionContext) {
 
 }
 
+function workspaceFilesIncludeGlob(){
+	let settings = workspace.getConfiguration('files.associations');
+	let associations = Object.keys(settings).filter((x)=>{
+		return settings[x] === phpLanguageId;
+	});
+
+	if(!associations.length){
+		associations.push('*.php');
+	}
+	return `**/{${associations.join(',')}}`;
+}
+
 function onClientReady() {
-	if(workspace.rootPath){
+
+	let includeGlob = workspaceFilesIncludeGlob();
+	if (workspace.rootPath) {
 		//discover workspace symbols
-		workspace.findFiles('**/*.php').then(onWorkspaceFindFiles);
+		workspace.findFiles(includeGlob).then(onWorkspaceFindFiles);
 	}
 }
 
@@ -92,18 +106,32 @@ function forgetRequest(uri: Uri) {
 
 function onWorkspaceFindFiles(uriArray: Uri[]) {
 
-	let uri: Uri;
 	let fileCount = uriArray.length;
+	let remaining = fileCount;
 	let discoveredFileCount = 0;
 	let discoveredSymbolsCount = 0;
 	let start = process.hrtime();
+	let nActive = 0;
 
 	uriArray = uriArray.reverse();
 
-	let onAlways = () => {
-		let uri = uriArray.pop();
-		if (uri) {
+	let batchDiscover = () => {
+
+		let uri: Uri;
+		while (nActive < 100 && (uri = uriArray.pop())) {
+			++nActive;
 			discoverRequest(uri, onSuccess, onFailure);
+		}
+
+	}
+
+	let onAlways = () => {
+
+		--remaining;
+		--nActive;
+
+		if (remaining > 0) {
+			batchDiscover();
 			return;
 		}
 
@@ -128,10 +156,8 @@ function onWorkspaceFindFiles(uriArray: Uri[]) {
 		onAlways();
 	}
 
-	if ((uri = uriArray.pop())) {
-		languageClient.info('Workspace symbol discovery started.');
-		discoverRequest(uri, onSuccess, onFailure);
-	}
+	languageClient.info('Workspace symbol discovery started.');
+	batchDiscover();
 
 }
 
