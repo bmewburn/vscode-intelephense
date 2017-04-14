@@ -32,6 +32,9 @@ let config: IntelephenseConfig = {
 	diagnosticsProvider:{
 		debounce:1000,
 		maxItems:100
+	},
+	file:{
+		maxSize:1000000
 	}
 };
 
@@ -70,6 +73,12 @@ connection.onDidChangeConfiguration((params) => {
 });
 
 connection.onDidOpenTextDocument((params) => {
+
+	if(params.textDocument.text.length > config.file.maxSize){
+		connection.console.warn(`${params.textDocument.uri} not opened -- over max file size.`);
+		return;
+	}
+
 	handleRequest(() => {
 		Intelephense.openDocument(params.textDocument);
 	}, ['onDidOpenTextDocument', params.textDocument.uri]);
@@ -153,6 +162,12 @@ Intelephense.onPublishDiagnostics((args)=>{
 
 let discoverRequest = new RequestType<{ textDocument: TextDocumentItem }, number, void, void>(discoverRequestName);
 connection.onRequest(discoverRequest, (params) => {
+
+	if(params.textDocument.text.length > config.file.maxSize){
+		connection.console.warn(`${params.textDocument.uri} not discovered -- above max file size.`);
+		return;
+	}
+
 	let debugInfo = ['onDiscover', params.textDocument.uri];
 	return handleRequest(() => {
 		let nDiscovered = Intelephense.discover(params.textDocument);
@@ -235,5 +250,8 @@ interface IntelephenseConfig {
 	},
 	completionProvider: {
 		maxItems: number
+	},
+	file:{
+		maxSize:number
 	}
 }
