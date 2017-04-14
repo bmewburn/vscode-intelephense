@@ -22,12 +22,13 @@
     "php",
     "intellisense",
     "autocompletion",
-    "language server",
     "completion",
     "signature",
     "symbols",
     "diagnostics",
-    "definition"
+    "definition",
+    "help",
+    "code"
   ],
   "main": "./out/src/extension",
   "contributes": {
