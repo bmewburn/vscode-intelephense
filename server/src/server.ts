@@ -22,14 +22,17 @@ const languageId = 'php';
 const discoverRequestName = 'discover';
 const forgetRequestName = 'forget';
 
-let intelephenseConfig:IntelephenseConfig = {
-	enableDebug:false,
-	enableCompletionProvider:true,
-	enableDefinitionProvider:true,
-	enableDiagnosticsProvider:true,
-	enableDocumentSymbolsProvider:true,
-	enableSignatureHelpProvider:true,
-	enableWorkspaceSymbolsProvider:true
+let config: IntelephenseConfig = {
+	debug:{
+		enable:false
+	},
+	completionProvider:{
+		maxItems: 100
+	},
+	diagnosticsProvider:{
+		debounce:1000,
+		maxItems:100
+	}
 };
 
 // After the server has started the client sends an initialize request. The server receives
@@ -57,16 +60,12 @@ connection.onInitialize((params): InitializeResult => {
 	}
 });
 
-connection.onDidChangeConfiguration((params)=>{
+connection.onDidChangeConfiguration((params) => {
 
-	let config = params.settings.intelephense as IntelephenseConfig;
-	intelephenseConfig.enableDebug = config.enableDebug;
-	intelephenseConfig.enableCompletionProvider = config.enableCompletionProvider;
-	intelephenseConfig.enableDefinitionProvider = config.enableDefinitionProvider;
-	intelephenseConfig.enableDiagnosticsProvider = config.enableDiagnosticsProvider;
-	intelephenseConfig.enableDocumentSymbolsProvider = config.enableDocumentSymbolsProvider;
-	intelephenseConfig.enableSignatureHelpProvider = config.enableSignatureHelpProvider;
-	intelephenseConfig.enableWorkspaceSymbolsProvider = config.enableWorkspaceSymbolsProvider;
+	config = params.settings.intelephense as IntelephenseConfig;
+	Intelephense.setCompletionProviderMaxItems(config.completionProvider.maxItems);
+	Intelephense.setDiagnosticsProviderDebounce(config.diagnosticsProvider.debounce);
+	Intelephense.setDiagnosticsProviderMaxItems(config.diagnosticsProvider.maxItems);
 
 });
 
@@ -90,10 +89,6 @@ connection.onDidCloseTextDocument((params) => {
 
 connection.onDocumentSymbol((params) => {
 
-	if(!intelephenseConfig.enableDocumentSymbolsProvider){
-		return [];
-	}
-
 	let debugInfo = ['onDocumentSymbol', params.textDocument.uri];
 	return handleRequest(() => {
 		let symbols = Intelephense.documentSymbols(params.textDocument);
@@ -103,10 +98,6 @@ connection.onDocumentSymbol((params) => {
 });
 
 connection.onWorkspaceSymbol((params) => {
-
-	if(!intelephenseConfig.enableWorkspaceSymbolsProvider){
-		return [];
-	}
 
 	let debugInfo = ['onWorkspaceSymbol', params.query];
 	return handleRequest(() => {
@@ -118,10 +109,6 @@ connection.onWorkspaceSymbol((params) => {
 
 connection.onCompletion((params) => {
 
-	if(!intelephenseConfig.enableCompletionProvider){
-		return [];
-	}
-
 	let debugInfo = ['onCompletion', params.textDocument.uri, JSON.stringify(params.position)];
 	return handleRequest(() => {
 		let completions = Intelephense.provideCompletions(params.textDocument, params.position);
@@ -131,10 +118,6 @@ connection.onCompletion((params) => {
 });
 
 connection.onSignatureHelp((params) => {
-
-	if(!intelephenseConfig.enableSignatureHelpProvider){
-		return null;
-	}
 
 	let debugInfo = ['onSignatureHelp', params.textDocument.uri, JSON.stringify(params.position)];
 	return handleRequest(() => {
@@ -146,10 +129,6 @@ connection.onSignatureHelp((params) => {
 
 connection.onDefinition((params) => {
 
-	if(!intelephenseConfig.enableDefinitionProvider){
-		return null;
-	}
-
 	let debugInfo = ['onDefinition', params.textDocument.uri, JSON.stringify(params.position)];
 	return handleRequest(() => {
 		return Intelephense.provideDefinition(params.textDocument, params.position);
@@ -157,33 +136,20 @@ connection.onDefinition((params) => {
 });
 
 let diagnosticsStartMap: { [index: string]: [number, number] } = {};
-Intelephense.onDiagnosticsStart = (uri: string) => {
-
-	if(!intelephenseConfig.enableDiagnosticsProvider){
-		return;
-	}
-
+Intelephense.onDiagnosticsStart((uri: string) => {
 	diagnosticsStartMap[uri] = process.hrtime();
-}
+});
 
-Intelephense.onDiagnosticsEnd = (uri: string, diagnostics: Diagnostic[]) => {
-	
-	if(!intelephenseConfig.enableDiagnosticsProvider){
-		return;
-	}
-	
-	let params: PublishDiagnosticsParams = {
-		uri: uri,
-		diagnostics: diagnostics
-	};
+Intelephense.onPublishDiagnostics((args)=>{
 
+	let uri = args.uri;
 	debug([
 		'sendDiagnostics', uri, `${elapsed(diagnosticsStartMap[uri]).toFixed(3)} ms`, `${memory().toFixed(1)} MB`
 	].join(' | '));
 
 	delete diagnosticsStartMap[uri];
-	connection.sendDiagnostics(params);
-}
+	connection.sendDiagnostics(args);
+});
 
 let discoverRequest = new RequestType<{ textDocument: TextDocumentItem }, number, void, void>(discoverRequestName);
 connection.onRequest(discoverRequest, (params) => {
@@ -230,7 +196,7 @@ interface ProcessSnapshot {
 }
 
 function debug(msg: string) {
-	if (intelephenseConfig.enableDebug) {
+	if (config.debug.enable) {
 		connection.console.log(`[Debug - ${timeString()}] ${msg}`);
 	}
 }
@@ -260,11 +226,14 @@ function memory() {
 }
 
 interface IntelephenseConfig {
-	enableDebug:boolean;
-	enableDiagnosticsProvider:boolean;
-	enableCompletionProvider:boolean;
-	enableSignatureHelpProvider:boolean;
-	enableDocumentSymbolsProvider:boolean;
-	enableWorkspaceSymbolsProvider:boolean;
-	enableDefinitionProvider:boolean;
+	debug: {
+		enable: boolean;
+	},
+	diagnosticsProvider: {
+		debounce: number,
+		maxItems: number
+	},
+	completionProvider: {
+		maxItems: number
+	}
 }

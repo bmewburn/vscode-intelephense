@@ -36,40 +36,30 @@
       "type": "object",
       "title": "intelephense",
       "properties": {
-        "intelephense.enableDebug": {
+        "intelephense.debug.enable": {
           "type": "boolean",
           "default": false,
           "description": "Enable debug logging."
         },
-        "intelephense.enableDiagnosticsProvider": {
-          "type": "boolean",
-          "default": true,
-          "description": "Enable diagnostics."
+        "intelephense.file.maxSize": {
+          "type": "number",
+          "default": 1000000,
+          "description": "Maximum file size in bytes."
         },
-        "intelephense.enableCompletionProvider": {
-          "type": "boolean",
-          "default": true,
-          "description": "Enable code completion."
+        "intelephense.diagnosticsProvider.debounce": {
+          "type": "number",
+          "default": 1000,
+          "description": "Diagnostics publish debounce wait time in ms."
         },
-        "intelephense.enableSignatureHelpProvider": {
-          "type": "boolean",
-          "default": true,
-          "description": "Enable signature help."
+        "intelephense.diagnosticsProvider.maxItems": {
+          "type": "number",
+          "default": 100,
+          "description": "Maximum number of diagnostic items."
         },
-        "intelephense.enableDefinitionProvider": {
-          "type": "boolean",
-          "default": true,
-          "description": "Enable definition go to."
-        },
-        "intelephense.enableDocumentSymbolsProvider": {
-          "type": "boolean",
-          "default": true,
-          "description": "Enable document symbol search."
-        },
-        "intelephense.enableWorkspaceSymbolsProvider": {
-          "type": "boolean",
-          "default": true,
-          "description": "Enable workspace symbol search."
+        "intelephense.completionProvider.maxItems": {
+          "type": "number",
+          "default": 100,
+          "description": "Maximum number of completion items."
         },
         "intelephense.trace.server": {
           "type": "string",
