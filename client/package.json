@@ -63,8 +63,8 @@
         },
         "intelephense.workspaceDiscovery.maxOpenFiles":{
           "type":"number",
-          "default":100,
-          "description":"Maximum open files when discovering workspace symbols. Increasing this may improve workspace discovery time"
+          "default":10,
+          "description":"Maximum open files when discovering workspace symbols."
         },
         "intelephense.trace.server": {
           "type": "string",
