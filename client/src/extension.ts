@@ -16,7 +16,8 @@ const phpLanguageId = 'php';
 const discoverRequestName = 'discover';
 const forgetRequestName = 'forget';
 
-let maxFileSizeBytes = 20000000;
+let maxFileSizeBytes = 10000000;
+let discoverMaxOpenFiles = 100;
 let languageClient: LanguageClient;
 
 export function activate(context: ExtensionContext) {
@@ -56,11 +57,13 @@ export function activate(context: ExtensionContext) {
 
 	//push disposables
 	context.subscriptions.push(langClientDisposable, fsWatcher);
+	discoverMaxOpenFiles = workspace.getConfiguration("intelephense.workspaceDiscovery").get('maxOpenFiles') as number;
+	maxFileSizeBytes = workspace.getConfiguration("intelephense.file").get('maxSize') as number;
 
 }
 
 function workspaceFilesIncludeGlob(){
-	let settings = workspace.getConfiguration('files.associations');
+	let settings = workspace.getConfiguration('files').get('associations');
 	let associations = Object.keys(settings).filter((x)=>{
 		return settings[x] === phpLanguageId;
 	});
@@ -118,7 +121,7 @@ function onWorkspaceFindFiles(uriArray: Uri[]) {
 	let batchDiscover = () => {
 
 		let uri: Uri;
-		while (nActive < 100 && (uri = uriArray.pop())) {
+		while (nActive < discoverMaxOpenFiles && (uri = uriArray.pop())) {
 			++nActive;
 			discoverRequest(uri, onSuccess, onFailure);
 		}
