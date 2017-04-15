@@ -1,3 +1,4 @@
+# Intelephense
 
 Welcome to Intelephense! 
 
@@ -14,15 +15,18 @@ This extension is currently in beta. Additional features are under development. 
 
 Turn off vscode `php.suggest.basic` for best results. It is recomended to keep the vscode built-in php linter enabled as the Intelephense parser does not identify all compile time errors at present.
 
-FAQ
+## FAQ
 
-How can I increase workspace symbol discovery time?
+_How can I increase workspace symbol discovery time?_
+
 Intelephense workspace symbol discovery is fast, non-blocking and symbols become available as they are discovered.The total discovery time will depend on the number of files processed and the size of each file. On a core i5 a fresh ZF3 project can be scanned in under 10 seconds. Check the contents of your dependencies folder and add any files you do not need intelligence on to `files.exclude` to reduce total discovery time. Increasing `intelephense.workspaceDiscovery.maxOpenFiles` may also reduce discovery time.
 
-How can I get intelligence on php files with a non-standard file extension?
+_How can I get intelligence on php files with a non-standard file extension?_
+
 Add your file extension to the vscode `files.associations` setting.
 
-Can I adjust the frequency of diagnostics?
+_Can I adjust the frequency of diagnostics?_
+
 Yes, just adjust the `intelephense.diagnosticsProvider.debounce` setting. A higher number will reduce the frequency that diagnostics are published. 
 
 
