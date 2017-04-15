@@ -15,10 +15,14 @@ This extension is currently in beta. Additional features are under development. 
 
 Turn off vscode `php.suggest.basic` for best results. It is recomended to keep the vscode built-in php linter enabled as the Intelephense parser does not identify all compile time errors at present.
 
+## Acknowledgements
+
+* Microsoft vscode team for vscode and vscode-languageserver-node
+
 ## FAQ
 
 _*How can I increase workspace symbol discovery time?*_
-Intelephense workspace symbol discovery is fast, non-blocking and symbols become available as they are discovered. A fresh ZF3 project (2700 files) can be scanned in under 10 seconds. The total discovery time will depend on the number of files processed and the size of each file. Check the contents of your dependencies folder and add any files you do not need intelligence on to `files.exclude` to reduce total discovery time.
+Intelephense workspace symbol discovery is fast, non-blocking and symbols become available as they are discovered. A fresh ZF3 project (~2700 files) can be scanned in under 10 seconds. The total discovery time will depend on the number of files processed and the size of each file. Check the contents of your dependencies folder and add any files you do not need intelligence on to `files.exclude` to reduce total discovery time.
 
 _*How can I get intelligence on php files with a non-standard file extension?*_
 Add your file extension to the vscode `files.associations` setting.
