@@ -20,16 +20,10 @@
   ],
   "keywords": [
     "php",
-    "php7",
     "intellisense",
-    "autocompletion",
     "completion",
     "signature",
-    "symbols",
-    "diagnostics",
-    "definition",
-    "help",
-    "code"
+    "symbols"
   ],
   "bugs": {
     "url": "https://github.com/bmewburn/intelephense/issues"
