@@ -5,7 +5,7 @@
 
 import * as path from 'path';
 
-import { workspace, Disposable, ExtensionContext, Uri, TextDocument } from 'vscode';
+import { workspace, Disposable, ExtensionContext, Uri, TextDocument, languages } from 'vscode';
 import {
 	LanguageClient, LanguageClientOptions, SettingMonitor, ServerOptions,
 	TransportKind, TextDocumentItem
@@ -17,10 +17,12 @@ const discoverRequestName = 'discover';
 const forgetRequestName = 'forget';
 
 let maxFileSizeBytes = 10000000;
-let discoverMaxOpenFiles = 100;
+let discoverMaxOpenFiles = 10;
 let languageClient: LanguageClient;
 
 export function activate(context: ExtensionContext) {
+
+
 
 	// The server is implemented in node
 	let serverModule = context.asAbsolutePath(path.join('server', 'server.js'));
@@ -60,15 +62,24 @@ export function activate(context: ExtensionContext) {
 	discoverMaxOpenFiles = workspace.getConfiguration("intelephense.workspaceDiscovery").get('maxOpenFiles') as number;
 	maxFileSizeBytes = workspace.getConfiguration("intelephense.file").get('maxSize') as number;
 
+	let wordPatternParts = [
+		/([$a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff\\]*)/.source,
+		/([^\$\-\`\~\!\@\#\%\^\&\*\(\)\=\+\[\{\]\}\\\|\;\:\'\"\,\.\<\>\/\?\s]+)/.source
+	];
+
+	languages.setLanguageConfiguration('php', {
+		wordPattern: new RegExp(wordPatternParts.join('|'), 'g')
+	});
+
 }
 
-function workspaceFilesIncludeGlob(){
+function workspaceFilesIncludeGlob() {
 	let settings = workspace.getConfiguration('files').get('associations');
-	let associations = Object.keys(settings).filter((x)=>{
+	let associations = Object.keys(settings).filter((x) => {
 		return settings[x] === phpLanguageId;
 	});
 
-	if(!associations.length){
+	if (!associations.length) {
 		associations.push('*.php');
 	}
 	return `**/{${associations.join(',')}}`;
