@@ -11,7 +11,7 @@ A high performance and feature rich PHP language server implemented in typescrip
 * Document symbol search.
 * Parse error diagnostics for open files via an error tolerant parser that can report on more than the first error encountered.
 
-This extension is currently in beta. Additional features are under development. Your feedback, bug reports and help are appreciated and can be filed in the repository found HERE. The PHP parser used in the extension can be found HERE. 
+This extension is currently in beta. Additional features are under development. Your feedback, bug reports and help are appreciated and can be filed in the repository found at https://github.com/bmewburn/intelephense. The PHP parser used in the extension can be found at https://github.com/bmewburn/php7parser. 
 
 Turn off vscode `php.suggest.basic` for best results. It is recomended to keep the vscode built-in php linter enabled as the Intelephense parser does not identify all compile time errors at present.
 
