@@ -1,6 +1,6 @@
 {
   "name": "vscode-intelephense-client",
-  "displayName": "Intelephense",
+  "displayName": "[PHP] Intelephense",
   "description": "PHP Language Server",
   "author": {
     "name": "Ben Mewburn",
