@@ -4,7 +4,7 @@ Welcome to Intelephense!
 
 A high performance and feature rich PHP language server implemented in typescript. This extension offers:
 
-* Fast fuzzy matching completion provider (Intellisense) offering suggestions found from within the workspace and from 11000+ built-in PHP symbols with associated documentation (PDO etc).
+* Fast fuzzy matching completion provider (Intellisense) offering suggestions found from within the workspace and from 11000+ built-in PHP symbols (PDO etc).
 * Signature help for workspace and built-in constructors, methods, and functions.
 * Workspace wide go to definition support.
 * Fast fuzzy workspace symbol search.
@@ -17,11 +17,11 @@ Turn off vscode `php.suggest.basic` for best results. It is recomended to keep t
 
 ## Acknowledgements
 
-* Microsoft vscode team for vscode and vscode-languageserver-node
+* The Microsoft vscode team for vscode and vscode-languageserver-node.
 
 ## FAQ
 
-_*How can I increase workspace symbol discovery time?*_
+_*How can I decrease workspace symbol discovery time?*_
 Intelephense workspace symbol discovery is fast, non-blocking and symbols become available as they are discovered. A fresh ZF3 project (~2700 files) can be scanned in under 10 seconds. The total discovery time will depend on the number of files processed and the size of each file. Check the contents of your dependencies folder and add any files you do not need intelligence on to `files.exclude` to reduce total discovery time.
 
 _*How can I get intelligence on php files with a non-standard file extension?*_

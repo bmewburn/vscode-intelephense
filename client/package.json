@@ -20,6 +20,7 @@
   ],
   "keywords": [
     "php",
+    "php7",
     "intellisense",
     "autocompletion",
     "completion",
@@ -30,6 +31,7 @@
     "help",
     "code"
   ],
+  "icon":"images/intelephant.png",
   "main": "./out/src/extension",
   "contributes": {
     "configuration": {
@@ -88,10 +90,11 @@
   "devDependencies": {
     "@types/mocha": "^2.2.40",
     "@types/node": "^6.0.52",
-    "typescript": "^2.2.1",
+    "typescript": "^2.2.2",
     "vscode": "^1.1.0"
   },
   "dependencies": {
     "vscode-languageclient": "^3.2.0"
-  }
+  },
+  "private": true
 }
