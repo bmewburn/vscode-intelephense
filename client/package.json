@@ -4,7 +4,7 @@
   "description": "PHP Language Server",
   "author": "Ben Mewburn <ben@mewburn.id.au>",
   "license": "ISC",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "publisher": "bmewburn",
   "engines": {
     "vscode": "^1.11.0"
