@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "vscode-languageserver": "^3.2.0",
-    "intelephense": "git+ssh://gituser@s1.funclab.net:/var/git/intelephant.git"
+    "intelephense": "^0.6.0"
   },
   "devDependencies": {
     "@types/node": "^6.0.52",
