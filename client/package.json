@@ -31,9 +31,15 @@
     "help",
     "code"
   ],
-  "icon":"images/intelephant.svg",
+  "icon": "images/intelephant.svg",
   "main": "./out/src/extension",
   "contributes": {
+    "languages": [
+      {
+        "id": "php",
+        "configuration": "./language-configuration.json"
+      }
+    ],
     "configuration": {
       "type": "object",
       "title": "intelephense",
@@ -63,10 +69,10 @@
           "default": 100,
           "description": "Maximum number of completion items."
         },
-        "intelephense.workspaceDiscovery.maxOpenFiles":{
-          "type":"number",
-          "default":10,
-          "description":"Maximum open files when discovering workspace symbols."
+        "intelephense.workspaceDiscovery.maxOpenFiles": {
+          "type": "number",
+          "default": 10,
+          "description": "Maximum open files when discovering workspace symbols."
         },
         "intelephense.trace.server": {
           "type": "string",
