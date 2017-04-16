@@ -22,12 +22,15 @@ Turn off vscode `php.suggest.basic` for best results. It is recomended to keep t
 ## FAQ
 
 _*How can I decrease workspace symbol discovery time?*_
+
 Intelephense workspace symbol discovery is fast, non-blocking and symbols become available as they are discovered. A fresh ZF3 project (~2700 files) can be scanned in under 10 seconds. The total discovery time will depend on the number of files processed and the size of each file. Check the contents of your dependencies folder and add any files you do not need intelligence on to `files.exclude` to reduce total discovery time.
 
 _*How can I get intelligence on php files with a non-standard file extension?*_
+
 Add your file extension to the vscode `files.associations` setting.
 
 _*Can I adjust the frequency of diagnostics?*_
+
 Yes, just adjust the `intelephense.diagnosticsProvider.debounce` setting. A higher number will reduce the frequency in which diagnostics are published. 
 
 
