@@ -2,7 +2,7 @@
 
 Welcome to Intelephense! 
 
-A high performance and feature rich PHP language server implemented in typescript. This extension offers:
+A high performance and feature rich PHP language server implemented in Typescript. This extension offers:
 
 * Fast fuzzy matching completion provider (Intellisense) offering suggestions found from within the workspace and from 11000+ built-in PHP symbols (PDO etc).
 * Signature help for workspace and built-in constructors, methods, and functions.
