@@ -31,7 +31,7 @@
     "help",
     "code"
   ],
-  "icon":"images/intelephant.png",
+  "icon":"images/intelephant.svg",
   "main": "./out/src/extension",
   "contributes": {
     "configuration": {
