@@ -5,7 +5,7 @@
 
 import * as path from 'path';
 
-import { workspace, Disposable, ExtensionContext, Uri, TextDocument, languages } from 'vscode';
+import { workspace, Disposable, ExtensionContext, Uri, TextDocument, languages, IndentAction } from 'vscode';
 import {
 	LanguageClient, LanguageClientOptions, SettingMonitor, ServerOptions,
 	TransportKind, TextDocumentItem
@@ -68,7 +68,33 @@ export function activate(context: ExtensionContext) {
 	];
 
 	languages.setLanguageConfiguration('php', {
-		wordPattern: new RegExp(wordPatternParts.join('|'), 'g')
+		wordPattern: new RegExp(wordPatternParts.join('|'), 'g'),
+		//https://github.com/Microsoft/vscode/blob/master/extensions/typescript/src/typescriptMain.ts
+		onEnterRules: [
+			{
+				// e.g. /** | */
+				beforeText: /^\s*\/\*\*(?!\/)([^\*]|\*(?!\/))*$/,
+				afterText: /^\s*\*\/$/,
+				action: { indentAction: IndentAction.IndentOutdent, appendText: ' * ' }
+			}, {
+				// e.g. /** ...|
+				beforeText: /^\s*\/\*\*(?!\/)([^\*]|\*(?!\/))*$/,
+				action: { indentAction: IndentAction.None, appendText: ' * ' }
+			}, {
+				// e.g.  * ...|
+				beforeText: /^(\t|(\ \ ))*\ \*(\ ([^\*]|\*(?!\/))*)?$/,
+				action: { indentAction: IndentAction.None, appendText: '* ' }
+			}, {
+				// e.g.  */|
+				beforeText: /^(\t|(\ \ ))*\ \*\/\s*$/,
+				action: { indentAction: IndentAction.None, removeText: 1 }
+			},
+			{
+				// e.g.  *-----*/|
+				beforeText: /^(\t|(\ \ ))*\ \*[^/]*\*\/\s*$/,
+				action: { indentAction: IndentAction.None, removeText: 1 }
+			}
+		]
 	});
 
 }
