@@ -7,7 +7,7 @@
     "email": "ben@mewburn.id.au"
   },
   "license": "ISC",
-  "version": "0.6.3",
+  "version": "0.6.4",
   "publisher": "bmewburn",
   "engines": {
     "vscode": "^1.11.0"
