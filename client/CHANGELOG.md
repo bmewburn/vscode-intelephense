@@ -1,5 +1,26 @@
 # Change Log
 
+## [0.6.6] - 2017-04-21
+### Added 
+* Sorting of fuzzy symbol matches
+### Fixed
+* Diagnostics being reported on wrong file.
+* Document becoming out of sync when applying multiple changes
+* Variable types not resolving in various contexts.
+### Dependencies
+* intelephense 0.6.6
+
+## [0.6.5] - 2017-04-20
+### Changed
+* Shortened name completion item labels to name without namespace prefix.
+* Shortened method override/implementation completion labels to just method name.
+* Reduced completion spam for extends and implements contexts.
+* Rolled back indexing on fqn parts.
+### Fixed
+* Use directives from other files showing as completion items
+### Dependencies
+* intelephense 0.6.5
+
 ## [0.6.4] - 2017-04-19
 ### Added
 * Detail on variable and constructor completion items.
