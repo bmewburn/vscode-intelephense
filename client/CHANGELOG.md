@@ -1,8 +1,16 @@
 # Change Log
 
+## [0.6.8] - 2017-04-21
+### Fixed
+* Crash when encountering parse error on namespace use
+* Traits mangling parse tree (php7parser)
+
+### Dependencies
+* intelephense 0.6.8
+
 ## [0.6.7] - 2017-04-21
 ### Dependencies
-* intelephense 0.6.7 - php7parser fix
+* intelephense 0.6.7 (php7parser)
 
 ## [0.6.6] - 2017-04-21
 ### Added 
