@@ -5,7 +5,7 @@
 
 import * as path from 'path';
 
-import { workspace, Disposable, ExtensionContext, Uri, TextDocument, languages, IndentAction } from 'vscode';
+import { workspace, Disposable, ExtensionContext, Uri, TextDocument, languages, IndentAction, window } from 'vscode';
 import {
 	LanguageClient, LanguageClientOptions, SettingMonitor, ServerOptions,
 	TransportKind, TextDocumentItem
@@ -155,49 +155,66 @@ function onWorkspaceFindFiles(uriArray: Uri[]) {
 
 	uriArray = uriArray.reverse();
 
-	let batchDiscover = () => {
+	let promise = new Promise<void>((resolve, reject) => {
 
-		let uri: Uri;
-		while (nActive < discoverMaxOpenFiles && (uri = uriArray.pop())) {
-			++nActive;
-			discoverRequest(uri, onSuccess, onFailure);
+		let batchDiscover = () => {
+
+			let uri: Uri;
+			while (nActive < discoverMaxOpenFiles && (uri = uriArray.pop())) {
+				++nActive;
+				discoverRequest(uri, onSuccess, onFailure);
+			}
+
 		}
 
-	}
+		let onAlways = () => {
 
-	let onAlways = () => {
+			--remaining;
+			--nActive;
 
-		--remaining;
-		--nActive;
+			if (remaining > 0) {
+				batchDiscover();
+				return;
+			}
 
-		if (remaining > 0) {
-			batchDiscover();
-			return;
-		}
-
-		let elapsed = process.hrtime(start);
-		languageClient.info(
-			[
-				'Workspace symbol discovery ended',
+			let elapsed = process.hrtime(start);
+			let info = [
 				`${discoveredFileCount}/${fileCount} files`,
 				`${discoveredSymbolsCount} symbols`,
-				`${elapsed[0]}.${Math.round(elapsed[1] / 1000000)} seconds`
-			].join(' | ')
-		);
-	}
+				`${elapsed[0]}.${Math.round(elapsed[1] / 1000000)} s`
+			];
 
-	let onSuccess = (nSymbols: number) => {
-		discoveredSymbolsCount += nSymbols;
-		++discoveredFileCount;
-		onAlways();
-	}
+			languageClient.info(
+				['Workspace symbol discovery ended', ...info].join(' | ')
+			);
 
-	let onFailure = () => {
-		onAlways();
-	}
+			window.setStatusBarMessage([
+					'$(check) intelephense indexing complete',
+					`$(file-code) ${discoveredFileCount}`,
+					`$(code) ${discoveredSymbolsCount}`,
+					`$(clock) ${elapsed[0]}.${Math.round(elapsed[1] / 100000000)}`
+				].join('   '), 30000);
+
+			resolve();
+		}
+
+		let onSuccess = (nSymbols: number) => {
+			discoveredSymbolsCount += nSymbols;
+			++discoveredFileCount;
+			onAlways();
+		}
+
+		let onFailure = () => {
+			onAlways();
+		}
+
+		batchDiscover();
+
+	});
 
 	languageClient.info('Workspace symbol discovery started.');
-	batchDiscover();
+	window.setStatusBarMessage('$(search) intelephense indexing ...', promise);
+
 
 }
 
@@ -217,7 +234,7 @@ function discoverRequest(
 		}
 
 		if (stats.size > maxFileSizeBytes) {
-			languageClient.warn(`${uri} larger than max file size. Symbol discovery aborted.`);
+			languageClient.warn(`${uri} exceeds maximum file size.`);
 			if (onFailure) {
 				onFailure();
 			}

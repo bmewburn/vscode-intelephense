@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "vscode-languageserver": "^3.2.0",
-    "intelephense": "^0.6.9"
+    "intelephense": "https://github.com/bmewburn/intelephense.git#v0.7.0"
   },
   "devDependencies": {
     "@types/node": "^6.0.52",
