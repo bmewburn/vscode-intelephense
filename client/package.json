@@ -74,6 +74,11 @@
           "default": 100,
           "description": "Maximum number of completion items."
         },
+        "intelephense.completionProvider.enableAutoUseDeclarations": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enables automatic addition of use declarations upon acceptance of completion items."
+        },
         "intelephense.workspaceDiscovery.maxOpenFiles": {
           "type": "number",
           "default": 10,

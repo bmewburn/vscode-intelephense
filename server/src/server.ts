@@ -12,7 +12,7 @@ import {
 	PublishDiagnosticsParams, SignatureHelp, DidChangeConfigurationParams
 } from 'vscode-languageserver';
 
-import { Intelephense } from 'intelephense';
+import { Intelephense, SymbolTableDto } from 'intelephense';
 
 // Create a connection for the server. The connection uses Node's IPC as a transport
 let connection: IConnection = createConnection(new IPCMessageReader(process), new IPCMessageWriter(process));
@@ -21,13 +21,15 @@ let initialisedAt: [number, number];
 const languageId = 'php';
 const discoverRequestName = 'discover';
 const forgetRequestName = 'forget';
+const addSymbolsRequestName = 'addSymbols';
 
 let config: IntelephenseConfig = {
 	debug: {
 		enable: false
 	},
 	completionProvider: {
-		maxItems: 100
+		maxItems: 100,
+		enableAutoUseDeclarations: false
 	},
 	diagnosticsProvider: {
 		debounce: 1000,
@@ -48,130 +50,6 @@ connection.onInitialize((params): InitializeResult => {
 	connection.console.info(`Initialised in ${elapsed(initialisedAt).toFixed()} ms`);
 	workspaceRoot = params.rootPath;
 
-
-	connection.onDidChangeConfiguration((params) => {
-
-		config = params.settings.intelephense as IntelephenseConfig;
-		Intelephense.setCompletionProviderMaxItems(config.completionProvider.maxItems);
-		Intelephense.setDiagnosticsProviderDebounce(config.diagnosticsProvider.debounce);
-		Intelephense.setDiagnosticsProviderMaxItems(config.diagnosticsProvider.maxItems);
-
-	});
-
-	connection.onDidOpenTextDocument((params) => {
-
-		if (params.textDocument.text.length > config.file.maxSize) {
-			connection.console.warn(`${params.textDocument.uri} not opened -- over max file size.`);
-			return;
-		}
-
-		handleRequest(() => {
-			Intelephense.openDocument(params.textDocument);
-		}, ['onDidOpenTextDocument', params.textDocument.uri]);
-	});
-
-	connection.onDidChangeTextDocument((params) => {
-		handleRequest(() => {
-			Intelephense.editDocument(params.textDocument, params.contentChanges);
-		}, ['onDidChangeTextDocument', params.textDocument.uri]);
-	});
-
-	connection.onDidCloseTextDocument((params) => {
-		handleRequest(() => {
-			Intelephense.closeDocument(params.textDocument);
-		}, ['onDidCloseTextDocument', params.textDocument.uri]);
-	});
-
-	connection.onDocumentSymbol((params) => {
-
-		let debugInfo = ['onDocumentSymbol', params.textDocument.uri];
-		return handleRequest(() => {
-			let symbols = Intelephense.documentSymbols(params.textDocument);
-			debugInfo.push(`${symbols.length} symbols`);
-			return symbols;
-		}, debugInfo);
-	});
-
-	connection.onWorkspaceSymbol((params) => {
-
-		let debugInfo = ['onWorkspaceSymbol', params.query];
-		return handleRequest(() => {
-			let symbols = Intelephense.workspaceSymbols(params.query);
-			debugInfo.push(`${symbols.length} symbols`);
-			return symbols;
-		}, debugInfo);
-	});
-
-	connection.onCompletion((params) => {
-
-		let debugInfo = ['onCompletion', params.textDocument.uri, JSON.stringify(params.position)];
-		return handleRequest(() => {
-			let completions = Intelephense.provideCompletions(params.textDocument, params.position);
-			debugInfo.push(`${completions.items.length} items`);
-			return completions;
-		}, debugInfo);
-	});
-
-	connection.onSignatureHelp((params) => {
-
-		let debugInfo = ['onSignatureHelp', params.textDocument.uri, JSON.stringify(params.position)];
-		return handleRequest(() => {
-			let sigHelp = Intelephense.provideSignatureHelp(params.textDocument, params.position);
-			debugInfo.push(`${sigHelp ? sigHelp.signatures.length : 0} signatures`);
-			return sigHelp;
-		}, debugInfo);
-	});
-
-	connection.onDefinition((params) => {
-
-		let debugInfo = ['onDefinition', params.textDocument.uri, JSON.stringify(params.position)];
-		return handleRequest(() => {
-			return Intelephense.provideDefinition(params.textDocument, params.position);
-		}, debugInfo);
-	});
-
-	let diagnosticsStartMap: { [index: string]: [number, number] } = {};
-	Intelephense.onDiagnosticsStart((uri) => {
-		diagnosticsStartMap[uri] = process.hrtime();
-	});
-
-	Intelephense.onPublishDiagnostics((args) => {
-
-		let uri = args.uri;
-		debug([
-			'sendDiagnostics', uri, `${elapsed(diagnosticsStartMap[uri]).toFixed(3)} ms`, `${memory().toFixed(1)} MB`
-		].join(' | '));
-
-		delete diagnosticsStartMap[uri];
-		connection.sendDiagnostics(args);
-	});
-
-	let discoverRequest = new RequestType<{ textDocument: TextDocumentItem }, number, void, void>(discoverRequestName);
-	connection.onRequest(discoverRequest, (params) => {
-
-		if (params.textDocument.text.length > config.file.maxSize) {
-			connection.console.warn(`${params.textDocument.uri} not discovered -- above max file size.`);
-			return;
-		}
-
-		let debugInfo = ['onDiscover', params.textDocument.uri];
-		return handleRequest(() => {
-			let nDiscovered = Intelephense.discover(params.textDocument);
-			debugInfo.push(`${nDiscovered} symbols`);
-			return nDiscovered;
-		}, debugInfo);
-	});
-
-	let forgetRequest = new RequestType<{ uri: string }, number, void, void>(forgetRequestName);
-	connection.onRequest(forgetRequest, (params) => {
-		let debugInfo = ['onForget', params.uri];
-		return handleRequest(() => {
-			let nForgot = Intelephense.forget(params.uri);
-			debugInfo.push(`${nForgot} symbols`);
-			return nForgot;
-		}, debugInfo);
-	});
-	
 	return {
 		capabilities: {
 			textDocumentSync: TextDocumentSyncKind.Incremental,
@@ -187,6 +65,137 @@ connection.onInitialize((params): InitializeResult => {
 		}
 	}
 });
+
+connection.onDidChangeConfiguration((params) => {
+
+	config = params.settings.intelephense as IntelephenseConfig;
+	Intelephense.setCompletionProviderConfig(config.completionProvider);
+	Intelephense.setDiagnosticsProviderDebounce(config.diagnosticsProvider.debounce);
+	Intelephense.setDiagnosticsProviderMaxItems(config.diagnosticsProvider.maxItems);
+
+});
+
+connection.onDidOpenTextDocument((params) => {
+
+	if (params.textDocument.text.length > config.file.maxSize) {
+		connection.console.warn(`${params.textDocument.uri} not opened -- over max file size.`);
+		return;
+	}
+
+	handleRequest(() => {
+		Intelephense.openDocument(params.textDocument);
+	}, ['onDidOpenTextDocument', params.textDocument.uri]);
+});
+
+connection.onDidChangeTextDocument((params) => {
+	handleRequest(() => {
+		Intelephense.editDocument(params.textDocument, params.contentChanges);
+	}, ['onDidChangeTextDocument', params.textDocument.uri]);
+});
+
+connection.onDidCloseTextDocument((params) => {
+	handleRequest(() => {
+		Intelephense.closeDocument(params.textDocument);
+	}, ['onDidCloseTextDocument', params.textDocument.uri]);
+});
+
+connection.onDocumentSymbol((params) => {
+
+	let debugInfo = ['onDocumentSymbol', params.textDocument.uri];
+	return handleRequest(() => {
+		let symbols = Intelephense.documentSymbols(params.textDocument);
+		debugInfo.push(`${symbols.length} symbols`);
+		return symbols;
+	}, debugInfo);
+});
+
+connection.onWorkspaceSymbol((params) => {
+
+	let debugInfo = ['onWorkspaceSymbol', params.query];
+	return handleRequest(() => {
+		let symbols = Intelephense.workspaceSymbols(params.query);
+		debugInfo.push(`${symbols.length} symbols`);
+		return symbols;
+	}, debugInfo);
+});
+
+connection.onCompletion((params) => {
+
+	let debugInfo = ['onCompletion', params.textDocument.uri, JSON.stringify(params.position)];
+	return handleRequest(() => {
+		let completions = Intelephense.provideCompletions(params.textDocument, params.position);
+		debugInfo.push(`${completions.items.length} items`);
+		return completions;
+	}, debugInfo);
+});
+
+connection.onSignatureHelp((params) => {
+
+	let debugInfo = ['onSignatureHelp', params.textDocument.uri, JSON.stringify(params.position)];
+	return handleRequest(() => {
+		let sigHelp = Intelephense.provideSignatureHelp(params.textDocument, params.position);
+		debugInfo.push(`${sigHelp ? sigHelp.signatures.length : 0} signatures`);
+		return sigHelp;
+	}, debugInfo);
+});
+
+connection.onDefinition((params) => {
+
+	let debugInfo = ['onDefinition', params.textDocument.uri, JSON.stringify(params.position)];
+	return handleRequest(() => {
+		return Intelephense.provideDefinition(params.textDocument, params.position);
+	}, debugInfo);
+});
+
+let diagnosticsStartMap: { [index: string]: [number, number] } = {};
+Intelephense.onDiagnosticsStart((uri) => {
+	diagnosticsStartMap[uri] = process.hrtime();
+});
+
+Intelephense.onPublishDiagnostics((args) => {
+
+	let uri = args.uri;
+	debug([
+		'sendDiagnostics', uri, `${elapsed(diagnosticsStartMap[uri]).toFixed(3)} ms`, `${memory().toFixed(1)} MB`
+	].join(' | '));
+
+	delete diagnosticsStartMap[uri];
+	connection.sendDiagnostics(args);
+});
+
+let discoverRequest = new RequestType<{ textDocument: TextDocumentItem }, SymbolTableDto, void, void>(discoverRequestName);
+connection.onRequest(discoverRequest, (params) => {
+
+	if (params.textDocument.text.length > config.file.maxSize) {
+		connection.console.warn(`${params.textDocument.uri} exceeds max file size.`);
+		return;
+	}
+
+	let debugInfo = ['onDiscover', params.textDocument.uri];
+	return handleRequest(() => {
+		let dto = Intelephense.discover(params.textDocument);
+		return dto;
+	}, debugInfo);
+});
+
+let forgetRequest = new RequestType<{ uri: string }, number, void, void>(forgetRequestName);
+connection.onRequest(forgetRequest, (params) => {
+	let debugInfo = ['onForget', params.uri];
+	return handleRequest(() => {
+		let nForgot = Intelephense.forget(params.uri);
+		debugInfo.push(`${nForgot} symbols`);
+		return nForgot;
+	}, debugInfo);
+});
+
+let addSymbolsRequest = new RequestType<SymbolTableDto, void, void, void>(addSymbolsRequestName);
+connection.onRequest(addSymbolsRequest, (params) => {
+	let debugInfo = ['onAddSymbols', params.uri];
+	return handleRequest(() => {
+		Intelephense.addSymbols(params);
+	}, debugInfo);
+});
+
 
 // Listen on the connection
 connection.listen();
@@ -251,7 +260,8 @@ interface IntelephenseConfig {
 		maxItems: number
 	},
 	completionProvider: {
-		maxItems: number
+		maxItems: number,
+		enableAutoUseDeclarations: boolean
 	},
 	file: {
 		maxSize: number
