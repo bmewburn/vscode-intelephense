@@ -15,6 +15,7 @@ import * as fs from 'fs';
 const phpLanguageId = 'php';
 const discoverRequestName = 'discover';
 const forgetRequestName = 'forget';
+const addSymbolsRequestName = 'addSymbols';
 
 let maxFileSizeBytes = 10000000;
 let discoverMaxOpenFiles = 10;
@@ -55,7 +56,16 @@ export function activate(context: ExtensionContext) {
 	// Create the language client and start the client.
 	languageClient = new LanguageClient('intelephense', 'intelephense', serverOptions, clientOptions);
 	let langClientDisposable = languageClient.start();
-	languageClient.onReady().then(onClientReady);
+	let ready = languageClient.onReady();
+
+	if (workspace.rootPath) {
+		ready.then(() => {
+			let includeGlob = workspaceFilesIncludeGlob();
+			return workspace.findFiles(includeGlob);
+		}).then((uriArray) => {
+			disoverWorkspace(uriArray, context);
+		});
+	}
 
 	//push disposables
 	context.subscriptions.push(langClientDisposable, fsWatcher);
@@ -111,15 +121,6 @@ function workspaceFilesIncludeGlob() {
 	return `**/{${associations.join(',')}}`;
 }
 
-function onClientReady() {
-
-	let includeGlob = workspaceFilesIncludeGlob();
-	if (workspace.rootPath) {
-		//discover workspace symbols
-		workspace.findFiles(includeGlob).then(onWorkspaceFindFiles);
-	}
-}
-
 function onDidDelete(uri: Uri) {
 	forgetRequest(uri);
 }
@@ -144,77 +145,115 @@ function forgetRequest(uri: Uri) {
 	).then(undefined, onFailure);
 }
 
-function onWorkspaceFindFiles(uriArray: Uri[]) {
+function disoverWorkspace(uriArray: Uri[], context: ExtensionContext) {
 
 	let fileCount = uriArray.length;
 	let remaining = fileCount;
 	let discoveredFileCount = 0;
-	let discoveredSymbolsCount = 0;
 	let start = process.hrtime();
 	let nActive = 0;
-
 	uriArray = uriArray.reverse();
 
-	let promise = new Promise<void>((resolve, reject) => {
+	let promise = loadCache(context).then((cache) => {
 
-		let batchDiscover = () => {
+		return new Promise<void>((resolve, reject) => {
 
-			let uri: Uri;
-			while (nActive < discoverMaxOpenFiles && (uri = uriArray.pop())) {
-				++nActive;
-				discoverRequest(uri, onSuccess, onFailure);
+			let batchDiscover = () => {
+
+				let uri: Uri;
+				let cachedTable:SymbolTable;
+				while (nActive < discoverMaxOpenFiles && (uri = uriArray.pop())) {
+					++nActive;
+					cacheLookup(uri.toString(), cache)
+					.then()
+					if () {
+
+					} else {
+						discoverRequest(uri, onSuccess, onFailure);
+					}
+
+				}
+
 			}
 
-		}
+			let onAlways = () => {
 
-		let onAlways = () => {
+				--remaining;
+				--nActive;
 
-			--remaining;
-			--nActive;
+				if (remaining > 0) {
+					batchDiscover();
+					return;
+				}
 
-			if (remaining > 0) {
-				batchDiscover();
-				return;
-			}
+				let elapsed = process.hrtime(start);
+				let info = [
+					`${discoveredFileCount}/${fileCount} files`,
+					`${elapsed[0]}.${Math.round(elapsed[1] / 1000000)} s`
+				];
 
-			let elapsed = process.hrtime(start);
-			let info = [
-				`${discoveredFileCount}/${fileCount} files`,
-				`${discoveredSymbolsCount} symbols`,
-				`${elapsed[0]}.${Math.round(elapsed[1] / 1000000)} s`
-			];
+				languageClient.info(
+					['Indexing ended', ...info].join(' | ')
+				);
 
-			languageClient.info(
-				['Workspace symbol discovery ended', ...info].join(' | ')
-			);
-
-			window.setStatusBarMessage([
+				window.setStatusBarMessage([
 					'$(check) intelephense indexing complete',
 					`$(file-code) ${discoveredFileCount}`,
-					`$(code) ${discoveredSymbolsCount}`,
 					`$(clock) ${elapsed[0]}.${Math.round(elapsed[1] / 100000000)}`
 				].join('   '), 30000);
 
-			resolve();
-		}
+				resolve();
+			}
 
-		let onSuccess = (nSymbols: number) => {
-			discoveredSymbolsCount += nSymbols;
-			++discoveredFileCount;
-			onAlways();
-		}
+			let onSuccess = (nSymbols: number) => {
+				++discoveredFileCount;
+				onAlways();
+			}
 
-		let onFailure = () => {
-			onAlways();
-		}
+			let onFailure = () => {
+				onAlways();
+			}
 
-		batchDiscover();
+			batchDiscover();
+
+		});
 
 	});
 
-	languageClient.info('Workspace symbol discovery started.');
+	languageClient.info('Indexing started.');
 	window.setStatusBarMessage('$(search) intelephense indexing ...', promise);
 
+}
+
+function cacheLookup(uri:string, cache:Cache){
+
+	return new Promise<SymbolTable>((resolve, reject)=>{
+
+		let item = cache[uri];
+
+		if(item === undefined){
+			reject();
+			return;
+		}
+
+		fs.stat(uri, (err, stats)=>{
+
+			if(err){
+				languageClient.error(err.message);
+				reject();
+				return;
+			}
+
+			if(stats.mtime.getTime() < item.time){
+				resolve(item.data);
+			} else {
+				delete cache[uri];
+				reject();
+			}
+
+		});
+
+	});
 
 }
 
@@ -272,6 +311,98 @@ function discoverRequest(
 
 		});
 	});
+
+}
+
+const cacheFileName = 'intelephense.cache.json';
+interface SymbolTable {
+	uri: string;
+	root: PhpSymbol;
+}
+interface PhpSymbol {
+
+}
+interface Cache {
+	[index: string]: CacheItem;
+}
+
+interface CacheItem {
+	key: string;
+	time: number;
+	data: any;
+}
+
+function loadCache(context: ExtensionContext) {
+	let filePath = path.join(context.storagePath, cacheFileName);
+
+	let promise = new Promise<Cache>((resolve, reject) => {
+
+		fs.readFile(filePath, (err, data) => {
+
+			if (err) {
+				resolve({});
+				return;
+			}
+
+			resolve(JSON.parse(data.toString()));
+
+		});
+
+	});
+
+	return promise;
+
+}
+
+
+function saveCache(context: ExtensionContext, data: Cache) {
+
+	let filePath = path.join(context.storagePath, cacheFileName);
+
+	let promise = new Promise((resolve, reject) => {
+		checkCacheDirectoryExists(context)
+			.then(() => {
+
+				fs.writeFile(filePath, JSON.stringify(data), (err) => {
+					if (err) {
+						languageClient.error(err.message);
+						reject();
+					} else {
+						resolve();
+					}
+				});
+
+			});
+
+	});
+
+	return promise;
+
+}
+
+function checkCacheDirectoryExists(context: ExtensionContext) {
+
+	let dir = context.storagePath;
+
+	return new Promise((resolve, reject) => {
+
+		fs.stat(dir, (err, stats) => {
+
+			if (err) {
+				fs.mkdir(dir, (mkdirErr) => {
+					if (mkdirErr) {
+						languageClient.error(mkdirErr.message);
+					} else {
+						resolve();
+					}
+				});
+			} else {
+				resolve();
+			}
+		});
+
+	});
+
 
 }
 
