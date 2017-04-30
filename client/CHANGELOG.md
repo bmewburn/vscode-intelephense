@@ -1,5 +1,9 @@
 # Change Log
 
+## [0.6.10] - 2017-0-30
+#### Fixed
+* Errors with variable completion inside anon.functions
+
 ## [0.6.9] - 2017-04-23
 #### Fixed
 * Use group declaration parse bug
