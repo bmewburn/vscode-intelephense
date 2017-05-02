@@ -63,7 +63,7 @@ export function activate(context: ExtensionContext) {
 			let includeGlob = workspaceFilesIncludeGlob();
 			return workspace.findFiles(includeGlob);
 		}).then((uriArray) => {
-			disoverWorkspace(uriArray, context);
+			indexWorkspace(uriArray, context);
 		});
 	}
 
@@ -126,7 +126,7 @@ function onDidDelete(uri: Uri) {
 }
 
 function onDidChange(uri: Uri) {
-	discoverRequest(uri);
+	readTextDocumentItem(uri).then(discoverRequest);
 }
 
 function onDidCreate(uri: Uri) {
@@ -145,110 +145,128 @@ function forgetRequest(uri: Uri) {
 	).then(undefined, onFailure);
 }
 
-function disoverWorkspace(uriArray: Uri[], context: ExtensionContext) {
+function indexWorkspace(uriArray: Uri[], context: ExtensionContext) {
 
 	let fileCount = uriArray.length;
 	let remaining = fileCount;
-	let discoveredFileCount = 0;
 	let start = process.hrtime();
 	let nActive = 0;
 	uriArray = uriArray.reverse();
 
-	let promise = loadCache(context).then((cache) => {
+	let indexPromise = loadSymbolCache(context)
+		.then((cache) => {
 
-		return new Promise<void>((resolve, reject) => {
+			return new Promise<void>((resolve, reject) => {
 
-			let batchDiscover = () => {
+				let batchIndexFn = () => {
 
-				let uri: Uri;
-				let cachedTable:SymbolTable;
-				while (nActive < discoverMaxOpenFiles && (uri = uriArray.pop())) {
-					++nActive;
-					cacheLookup(uri.toString(), cache)
-					.then()
-					if () {
-
-					} else {
-						discoverRequest(uri, onSuccess, onFailure);
+					let uri: Uri;
+					let cachedTable: SymbolTable;
+					while (nActive < discoverMaxOpenFiles && (uri = uriArray.pop())) {
+						++nActive;
+						indexSymbolsRequest(uri, cache)
+							.then(onRequestComplete);
 					}
 
 				}
 
-			}
+				let onRequestComplete = () => {
 
-			let onAlways = () => {
+					--remaining;
+					--nActive;
 
-				--remaining;
-				--nActive;
+					if (remaining > 0) {
+						batchIndexFn();
+						return;
+					}
 
-				if (remaining > 0) {
-					batchDiscover();
-					return;
+					indexingCompleteFeedback(start, fileCount);
+					saveCache(context, cache, symbolCacheFileName);
+					resolve();
 				}
 
-				let elapsed = process.hrtime(start);
-				let info = [
-					`${discoveredFileCount}/${fileCount} files`,
-					`${elapsed[0]}.${Math.round(elapsed[1] / 1000000)} s`
-				];
+				batchIndexFn();
 
-				languageClient.info(
-					['Indexing ended', ...info].join(' | ')
-				);
-
-				window.setStatusBarMessage([
-					'$(check) intelephense indexing complete',
-					`$(file-code) ${discoveredFileCount}`,
-					`$(clock) ${elapsed[0]}.${Math.round(elapsed[1] / 100000000)}`
-				].join('   '), 30000);
-
-				resolve();
-			}
-
-			let onSuccess = (nSymbols: number) => {
-				++discoveredFileCount;
-				onAlways();
-			}
-
-			let onFailure = () => {
-				onAlways();
-			}
-
-			batchDiscover();
+			});
 
 		});
 
-	});
-
 	languageClient.info('Indexing started.');
-	window.setStatusBarMessage('$(search) intelephense indexing ...', promise);
+	window.setStatusBarMessage('$(search) intelephense indexing ...', indexPromise);
 
 }
 
-function cacheLookup(uri:string, cache:Cache){
+function indexingCompleteFeedback(startHrtime: [number, number], fileCount: number) {
+	let elapsed = process.hrtime(startHrtime);
+	let info = [
+		`${fileCount} files`,
+		`${elapsed[0]}.${Math.round(elapsed[1] / 1000000)} s`
+	];
 
-	return new Promise<SymbolTable>((resolve, reject)=>{
+	languageClient.info(
+		['Indexing ended', ...info].join(' | ')
+	);
 
-		let item = cache[uri];
+	window.setStatusBarMessage([
+		'$(check) intelephense indexing complete',
+		`$(file-code) ${fileCount}`,
+		`$(clock) ${elapsed[0]}.${Math.round(elapsed[1] / 100000000)}`
+	].join('   '), 30000);
+}
 
-		if(item === undefined){
-			reject();
+function indexSymbolsRequest(uri: Uri, symbolCache: Cache) {
+
+	return symbolCacheFind(uri, symbolCache)
+		.then((cachedSymbolTable) => {
+			if (cachedSymbolTable) {
+				return addSymbolsRequest(cachedSymbolTable);
+			} else {
+				//no cached table
+				return readTextDocumentItem(uri)
+					.then(discoverRequest)
+					.then((symbolTable) => {
+						symbolCacheAdd(symbolTable, symbolCache);
+					});
+			}
+
+		});
+}
+
+function symbolCacheAdd(symbolTable: SymbolTable, symbolCache: Cache) {
+
+	symbolCache[symbolTable.uri] = {
+		key: symbolTable.uri,
+		time: Date.now(),
+		data: symbolTable
+	};
+
+}
+
+function symbolCacheFind(uri: Uri, symbolCache: Cache) {
+
+	return new Promise<SymbolTable>((resolve, reject) => {
+
+		let uriString = uri.toString();
+		let item = symbolCache[uriString];
+
+		if (!item) {
+			resolve(undefined);
 			return;
 		}
 
-		fs.stat(uri, (err, stats)=>{
+		fs.stat(uri.fsPath, (err, stats) => {
 
-			if(err){
+			if (err) {
 				languageClient.error(err.message);
-				reject();
+				resolve(undefined);
 				return;
 			}
 
-			if(stats.mtime.getTime() < item.time){
+			if (stats.mtime.getTime() < item.time) {
 				resolve(item.data);
 			} else {
-				delete cache[uri];
-				reject();
+				delete symbolCache[uriString];
+				resolve(undefined);
 			}
 
 		});
@@ -257,64 +275,53 @@ function cacheLookup(uri:string, cache:Cache){
 
 }
 
-function discoverRequest(
-	uri: Uri,
-	onSuccess?: (numberSymbolsDiscovered: number) => void,
-	onFailure?: () => void) {
+function readTextDocumentItem(uri: Uri) {
 
-	fs.stat(uri.fsPath, (statErr, stats) => {
-
-		if (statErr) {
-			languageClient.warn(statErr.message);
-			if (onFailure) {
-				onFailure();
-			}
-			return;
-		}
-
-		if (stats.size > maxFileSizeBytes) {
-			languageClient.warn(`${uri} exceeds maximum file size.`);
-			if (onFailure) {
-				onFailure();
-			}
-			return;
-		}
+	return new Promise<TextDocumentItem>((resolve, reject) => {
 
 		fs.readFile(uri.fsPath, (readErr, data) => {
 
 			if (readErr) {
 				languageClient.warn(readErr.message);
-				if (onFailure) {
-					onFailure();
-				}
+				resolve(undefined);
 				return;
 			}
 
-			let textDocument: TextDocumentItem = {
+			let doc: TextDocumentItem = {
 				uri: uri.toString(),
 				text: data.toString(),
 				languageId: phpLanguageId,
 				version: 0
 			}
 
-			let onRequestFailure = (r: any) => {
-				languageClient.warn(`${uri} discover request failed.`);
-				if (onFailure) {
-					onFailure();
-				}
+			if (doc.text.length > maxFileSizeBytes) {
+				languageClient.warn(`${uri} exceeds maximum file size.`);
+				resolve(undefined);
+				return;
 			}
 
-			languageClient.sendRequest<number>(
-				discoverRequestName,
-				{ textDocument: textDocument }
-			).then(onSuccess, onRequestFailure);
+			resolve(doc);
 
 		});
 	});
 
 }
 
-const cacheFileName = 'intelephense.cache.json';
+function discoverRequest(doc: TextDocumentItem) {
+	return languageClient.sendRequest<SymbolTable>(
+		discoverRequestName,
+		{ textDocument: doc }
+	);
+}
+
+function addSymbolsRequest(symbolTable: SymbolTable) {
+	return languageClient.sendRequest<void>(
+		addSymbolsRequestName,
+		{ symbolTable: symbolTable }
+	)
+}
+
+const symbolCacheFileName = 'intelephense.symbol.cache.json';
 interface SymbolTable {
 	uri: string;
 	root: PhpSymbol;
@@ -332,14 +339,15 @@ interface CacheItem {
 	data: any;
 }
 
-function loadCache(context: ExtensionContext) {
-	let filePath = path.join(context.storagePath, cacheFileName);
+function loadSymbolCache(context: ExtensionContext) {
+	let filePath = path.join(context.storagePath, symbolCacheFileName);
 
-	let promise = new Promise<Cache>((resolve, reject) => {
+	return new Promise<Cache>((resolve, reject) => {
 
 		fs.readFile(filePath, (err, data) => {
 
 			if (err) {
+				languageClient.warn(err.message);
 				resolve({});
 				return;
 			}
@@ -350,59 +358,44 @@ function loadCache(context: ExtensionContext) {
 
 	});
 
-	return promise;
-
 }
 
 
-function saveCache(context: ExtensionContext, data: Cache) {
+function saveCache(context: ExtensionContext, data: Cache, fileName: string) {
 
-	let filePath = path.join(context.storagePath, cacheFileName);
+	let filePath = path.join(context.storagePath, fileName);
 
-	let promise = new Promise((resolve, reject) => {
-		checkCacheDirectoryExists(context)
-			.then(() => {
-
+	return ensureCacheDirectoryExists(context)
+		.then(() => {
+			return new Promise((resolve, reject) => {
 				fs.writeFile(filePath, JSON.stringify(data), (err) => {
 					if (err) {
 						languageClient.error(err.message);
-						reject();
-					} else {
-						resolve();
 					}
+					resolve();
 				});
-
 			});
-
-	});
-
-	return promise;
+		});
 
 }
 
-function checkCacheDirectoryExists(context: ExtensionContext) {
+function ensureCacheDirectoryExists(context: ExtensionContext) {
 
 	let dir = context.storagePath;
 
 	return new Promise((resolve, reject) => {
 
-		fs.stat(dir, (err, stats) => {
-
+		fs.mkdir(dir, (err) => {
 			if (err) {
-				fs.mkdir(dir, (mkdirErr) => {
-					if (mkdirErr) {
-						languageClient.error(mkdirErr.message);
-					} else {
-						resolve();
-					}
-				});
-			} else {
-				resolve();
+				if (err.code !== 'EEXIST') {
+					languageClient.error(err.message);
+					reject();
+				}
 			}
+			resolve();
 		});
 
 	});
-
 
 }
 

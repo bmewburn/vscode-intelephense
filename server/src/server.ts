@@ -188,11 +188,11 @@ connection.onRequest(forgetRequest, (params) => {
 	}, debugInfo);
 });
 
-let addSymbolsRequest = new RequestType<SymbolTableDto, void, void, void>(addSymbolsRequestName);
+let addSymbolsRequest = new RequestType<{symbolTable: SymbolTableDto}, void, void, void>(addSymbolsRequestName);
 connection.onRequest(addSymbolsRequest, (params) => {
-	let debugInfo = ['onAddSymbols', params.uri];
+	let debugInfo = ['onAddSymbols', params.symbolTable.uri];
 	return handleRequest(() => {
-		Intelephense.addSymbols(params);
+		Intelephense.addSymbols(params.symbolTable);
 	}, debugInfo);
 });
 
