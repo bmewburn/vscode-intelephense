@@ -11,19 +11,22 @@ import {
 	TransportKind, TextDocumentItem
 } from 'vscode-languageclient';
 import * as fs from 'fs';
+import * as mkdirp from 'mkdirp';
 
 const phpLanguageId = 'php';
 const discoverRequestName = 'discover';
 const forgetRequestName = 'forget';
 const addSymbolsRequestName = 'addSymbols';
+const symbolCacheDir = 'symbols';
 
 let maxFileSizeBytes = 10000000;
 let discoverMaxOpenFiles = 10;
 let languageClient: LanguageClient;
+let symbolCache: FileCache;
 
 export function activate(context: ExtensionContext) {
 
-
+	symbolCache = new FileCache(path.join(context.storagePath, symbolCacheDir));
 
 	// The server is implemented in node
 	let serverModule = context.asAbsolutePath(path.join('server', 'server.js'));
@@ -153,19 +156,24 @@ function indexWorkspace(uriArray: Uri[], context: ExtensionContext) {
 	let nActive = 0;
 	uriArray = uriArray.reverse();
 
-	let indexPromise = loadSymbolCache(context)
-		.then((cache) => {
+	let indexPromise = symbolCache.init()
+		.then(() => {
 
 			return new Promise<void>((resolve, reject) => {
 
 				let batchIndexFn = () => {
 
 					let uri: Uri;
-					let cachedTable: SymbolTable;
 					while (nActive < discoverMaxOpenFiles && (uri = uriArray.pop())) {
 						++nActive;
-						indexSymbolsRequest(uri, cache)
-							.then(onRequestComplete);
+						indexSymbolsRequest(uri)
+							.then(onRequestComplete)
+							.catch((err:NodeJS.ErrnoException)=>{
+								if(err){
+									languageClient.error(err.message);
+								}
+								onRequestComplete();
+							});
 					}
 
 				}
@@ -181,7 +189,6 @@ function indexWorkspace(uriArray: Uri[], context: ExtensionContext) {
 					}
 
 					indexingCompleteFeedback(start, fileCount);
-					saveCache(context, cache, symbolCacheFileName);
 					resolve();
 				}
 
@@ -214,60 +221,42 @@ function indexingCompleteFeedback(startHrtime: [number, number], fileCount: numb
 	].join('   '), 30000);
 }
 
-function indexSymbolsRequest(uri: Uri, symbolCache: Cache) {
+function indexSymbolsRequest(uri: Uri) {
 
-	return symbolCacheFind(uri, symbolCache)
-		.then((cachedSymbolTable) => {
-			if (cachedSymbolTable) {
-				return addSymbolsRequest(cachedSymbolTable);
+	return fileModTime(uri).then((mTime) => {
+
+		return symbolCache.get(uri.toString(), mTime).then((data) => {
+			if (data) {
+				return addSymbolsRequest(<SymbolTable>data);
 			} else {
 				//no cached table
 				return readTextDocumentItem(uri)
 					.then(discoverRequest)
 					.then((symbolTable) => {
-						symbolCacheAdd(symbolTable, symbolCache);
+						return symbolCache.set(uri.toString(), symbolTable);
 					});
 			}
-
 		});
+
+	});
 }
 
-function symbolCacheAdd(symbolTable: SymbolTable, symbolCache: Cache) {
+function fileModTime(uri: Uri) {
 
-	symbolCache[symbolTable.uri] = {
-		key: symbolTable.uri,
-		time: Date.now(),
-		data: symbolTable
-	};
-
-}
-
-function symbolCacheFind(uri: Uri, symbolCache: Cache) {
-
-	return new Promise<SymbolTable>((resolve, reject) => {
-
-		let uriString = uri.toString();
-		let item = symbolCache[uriString];
-
-		if (!item) {
-			resolve(undefined);
-			return;
-		}
+	return new Promise<number>((resolve, reject) => {
 
 		fs.stat(uri.fsPath, (err, stats) => {
 
 			if (err) {
-				languageClient.error(err.message);
-				resolve(undefined);
-				return;
+				if (err.code === 'ENOENT') {
+					resolve(Infinity);
+					return;
+				} else {
+					throw err;
+				}
 			}
 
-			if (stats.mtime.getTime() < item.time) {
-				resolve(item.data);
-			} else {
-				delete symbolCache[uriString];
-				resolve(undefined);
-			}
+			resolve(stats.mtime.getTime());
 
 		});
 
@@ -318,10 +307,9 @@ function addSymbolsRequest(symbolTable: SymbolTable) {
 	return languageClient.sendRequest<void>(
 		addSymbolsRequestName,
 		{ symbolTable: symbolTable }
-	)
+	);
 }
 
-const symbolCacheFileName = 'intelephense.symbol.cache.json';
 interface SymbolTable {
 	uri: string;
 	root: PhpSymbol;
@@ -329,73 +317,154 @@ interface SymbolTable {
 interface PhpSymbol {
 
 }
-interface Cache {
-	[index: string]: CacheItem;
-}
-
-interface CacheItem {
-	key: string;
-	time: number;
-	data: any;
-}
-
-function loadSymbolCache(context: ExtensionContext) {
-	let filePath = path.join(context.storagePath, symbolCacheFileName);
-
-	return new Promise<Cache>((resolve, reject) => {
-
-		fs.readFile(filePath, (err, data) => {
-
-			if (err) {
-				languageClient.warn(err.message);
-				resolve({});
-				return;
-			}
-
-			resolve(JSON.parse(data.toString()));
-
-		});
-
-	});
-
-}
 
 
-function saveCache(context: ExtensionContext, data: Cache, fileName: string) {
+export class FileCache {
 
-	let filePath = path.join(context.storagePath, fileName);
+	private _dir: string;
 
-	return ensureCacheDirectoryExists(context)
-		.then(() => {
-			return new Promise((resolve, reject) => {
-				fs.writeFile(filePath, JSON.stringify(data), (err) => {
-					if (err) {
-						languageClient.error(err.message);
-					}
-					resolve();
-				});
-			});
-		});
+	constructor(dir: string) {
+		this._dir = dir;
+	}
 
-}
+	init() {
+		return new Promise<void>((resolve, reject) => {
 
-function ensureCacheDirectoryExists(context: ExtensionContext) {
-
-	let dir = context.storagePath;
-
-	return new Promise((resolve, reject) => {
-
-		fs.mkdir(dir, (err) => {
-			if (err) {
-				if (err.code !== 'EEXIST') {
-					languageClient.error(err.message);
-					reject();
+			mkdirp(this._dir, (err) => {
+				if (err && err.code !== 'EEXIST') {
+					throw err;
 				}
-			}
-			resolve();
+				resolve();
+			});
+
+		});
+	}
+
+	/**
+	 * 
+	 * @param key 
+	 * @param obj  pass undefined to delete
+	 */
+	set(key: string, obj: any) {
+
+		if (obj === undefined || obj === null) {
+			return this._remove(key);
+		}
+
+		return new Promise<void>((resolve, reject) => {
+
+			fs.writeFile(this._filePath(key), JSON.stringify(obj), (err) => {
+
+				if (err) {
+					throw err;
+				}
+
+				resolve();
+
+			});
+
 		});
 
-	});
+	}
+
+    /**
+     * 
+     * @param key 
+     * @param time number in ms that cached item needs to be greater than
+     */
+	get(key: string, time: number): Promise<any> {
+
+		let filePath = this._filePath(key);
+		let remove = this._remove;
+		return this._modTime(filePath).then((mTime) => {
+
+			if (time > mTime) {
+				remove(filePath);
+				return Promise.resolve(undefined);
+
+			} else {
+
+				return new Promise<any>((resolve, reject) => {
+
+					fs.readFile(filePath, (err, data) => {
+						if (err) {
+							if (err.code === 'ENOENT') {
+								return resolve(undefined);
+							} else {
+								return reject(err);
+							}
+						}
+						resolve(JSON.parse(data.toString()));
+					});
+
+				});
+
+			}
+
+		});
+
+	}
+
+
+	private _filePath(key: string) {
+		return path.join(this._dir, this._hash(key));
+	}
+
+	private _modTime(filePath: string) {
+
+		return new Promise<number>((resolve, reject) => {
+
+			fs.stat(filePath, (err, stats) => {
+
+				if (err) {
+					if (err.code === 'ENOENT') {
+						resolve(Infinity);
+						return;
+					} else {
+						throw err;
+					}
+				}
+
+				resolve(stats.mtime.getTime());
+
+			});
+
+		});
+
+	}
+
+	private _remove(filePath: string) {
+
+		return new Promise<void>((resolve, reject) => {
+
+			fs.unlink(filePath, (err) => {
+
+				if (err && err.code !== 'ENOENT') {
+					throw err;
+				}
+
+				resolve();
+
+			});
+
+		});
+
+	}
+
+
+    /**
+     * http://stackoverflow.com/a/7616484
+     */
+	private _hash(key: string) {
+		let hash = 0;
+		let chr: number;
+		for (let i = 0, l = key.length; i < l; ++i) {
+			chr = key.charCodeAt(i);
+			hash = ((hash << 5) - hash) + chr;
+			hash |= 0; // Convert to 32bit integer
+		}
+		return (hash >>> 0).toString(16); //positive int only
+	}
 
 }
 

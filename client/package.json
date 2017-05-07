@@ -110,7 +110,8 @@
     "vscode": "^1.1.0"
   },
   "dependencies": {
-    "vscode-languageclient": "^3.2.0"
+    "vscode-languageclient": "^3.2.0",
+    "mkdirp": "^0.5.1"
   },
   "private": true
 }
