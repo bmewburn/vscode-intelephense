@@ -61,7 +61,8 @@ connection.onInitialize((params): InitializeResult => {
 			signatureHelpProvider: {
 				triggerCharacters: ['(', ',']
 			},
-			definitionProvider: true
+			definitionProvider: true,
+			documentFormattingProvider: true
 		}
 	}
 });
@@ -151,6 +152,13 @@ let diagnosticsStartMap: { [index: string]: [number, number] } = {};
 Intelephense.onDiagnosticsStart((uri) => {
 	diagnosticsStartMap[uri] = process.hrtime();
 });
+
+connection.onDocumentFormatting((params)=>{
+	let debugInfo = ['onDocumentFormat', params.textDocument.uri];
+	return handleRequest(() => {
+		return Intelephense.provideDocumentFormattingEdits(params.textDocument, params.options);
+	}, debugInfo);
+});	
 
 Intelephense.onPublishDiagnostics((args) => {
 
