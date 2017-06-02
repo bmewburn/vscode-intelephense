@@ -17,7 +17,7 @@
     "Linters",
     "Formatters"
   ],
-  "preview": true,
+  "preview": false,
   "activationEvents": [
     "onLanguage:php",
     "workspaceContains:*.php"
