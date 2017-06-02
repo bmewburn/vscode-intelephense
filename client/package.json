@@ -1,13 +1,13 @@
 {
   "name": "vscode-intelephense-client",
-  "displayName": "[PHP] Intelephense",
-  "description": "PHP Language Server",
+  "displayName": "PHP | Intelephense",
+  "description": "Code Completion | Signature Help | Symbol Search | Format | Go to Definition",
   "author": {
     "name": "Ben Mewburn",
     "email": "ben@mewburn.id.au"
   },
   "license": "ISC",
-  "version": "0.6.9",
+  "version": "0.7.0",
   "publisher": "bmewburn",
   "engines": {
     "vscode": "^1.11.0"
@@ -15,18 +15,19 @@
   "categories": [
     "Languages",
     "Linters",
-    "Other"
+    "Formatters"
   ],
   "preview": true,
   "activationEvents": [
-    "onLanguage:php"
+    "onLanguage:php",
+    "workspaceContains:*.php"
   ],
   "keywords": [
     "php",
     "intellisense",
-    "diagnostics",
-    "signature",
-    "symbols"
+    "completion",
+    "suggest",
+    "format"
   ],
   "bugs": {
     "url": "https://github.com/bmewburn/intelephense/issues"
