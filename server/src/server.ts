@@ -62,7 +62,8 @@ connection.onInitialize((params): InitializeResult => {
 				triggerCharacters: ['(', ',']
 			},
 			definitionProvider: true,
-			documentFormattingProvider: true
+			documentFormattingProvider: true,
+			documentRangeFormattingProvider: true
 		}
 	}
 });
@@ -153,12 +154,19 @@ Intelephense.onDiagnosticsStart((uri) => {
 	diagnosticsStartMap[uri] = process.hrtime();
 });
 
-connection.onDocumentFormatting((params)=>{
+connection.onDocumentFormatting((params) => {
 	let debugInfo = ['onDocumentFormat', params.textDocument.uri];
 	return handleRequest(() => {
 		return Intelephense.provideDocumentFormattingEdits(params.textDocument, params.options);
 	}, debugInfo);
-});	
+});
+
+connection.onDocumentRangeFormatting((params) => {
+	let debugInfo = ['onDocumentFormat', params.textDocument.uri];
+	return handleRequest(() => {
+		return Intelephense.provideDocumentRangeFormattingEdits(params.textDocument, params.range, params.options);
+	}, debugInfo);
+});
 
 Intelephense.onPublishDiagnostics((args) => {
 
@@ -196,7 +204,7 @@ connection.onRequest(forgetRequest, (params) => {
 	}, debugInfo);
 });
 
-let addSymbolsRequest = new RequestType<{symbolTable: SymbolTableDto}, void, void, void>(addSymbolsRequestName);
+let addSymbolsRequest = new RequestType<{ symbolTable: SymbolTableDto }, void, void, void>(addSymbolsRequestName);
 connection.onRequest(addSymbolsRequest, (params) => {
 	let debugInfo = ['onAddSymbols', params.symbolTable.uri];
 	return handleRequest(() => {
