@@ -85,6 +85,11 @@
           "default": 10,
           "description": "Maximum open files when discovering workspace symbols."
         },
+        "intelephense.format.indentAfterOpenTag": {
+          "type":"boolean",
+          "default":false,
+          "description": "Increments indent level after open tag."
+        },
         "intelephense.trace.server": {
           "type": "string",
           "enum": [
