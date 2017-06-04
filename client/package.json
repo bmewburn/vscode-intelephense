@@ -1,6 +1,6 @@
 {
   "name": "vscode-intelephense-client",
-  "displayName": "PHP | Intelephense",
+  "displayName": "PHP Intelephense",
   "description": "Code Completion | Signature Help | Symbol Search | Format | Go to Definition",
   "author": {
     "name": "Ben Mewburn",
