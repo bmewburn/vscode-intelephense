@@ -82,32 +82,6 @@ export function activate(context: ExtensionContext) {
 
 	languages.setLanguageConfiguration('php', {
 		wordPattern: new RegExp(wordPatternParts.join('|'), 'g'),
-		//https://github.com/Microsoft/vscode/blob/master/extensions/typescript/src/typescriptMain.ts
-		onEnterRules: [
-			{
-				// e.g. /** | */
-				beforeText: /^\s*\/\*\*(?!\/)([^\*]|\*(?!\/))*$/,
-				afterText: /^\s*\*\/$/,
-				action: { indentAction: IndentAction.IndentOutdent, appendText: ' * ' }
-			}, {
-				// e.g. /** ...|
-				beforeText: /^\s*\/\*\*(?!\/)([^\*]|\*(?!\/))*$/,
-				action: { indentAction: IndentAction.None, appendText: ' * ' }
-			}, {
-				// e.g.  * ...|
-				beforeText: /^(\t|(\ \ ))*\ \*(\ ([^\*]|\*(?!\/))*)?$/,
-				action: { indentAction: IndentAction.None, appendText: '* ' }
-			}, {
-				// e.g.  */|
-				beforeText: /^(\t|(\ \ ))*\ \*\/\s*$/,
-				action: { indentAction: IndentAction.None, removeText: 1 }
-			},
-			{
-				// e.g.  *-----*/|
-				beforeText: /^(\t|(\ \ ))*\ \*[^/]*\*\/\s*$/,
-				action: { indentAction: IndentAction.None, removeText: 1 }
-			}
-		]
 	});
 
 }

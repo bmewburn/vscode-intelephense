@@ -42,8 +42,7 @@
   "contributes": {
     "languages": [
       {
-        "id": "php",
-        "configuration": "./language-configuration.json"
+        "id": "php"
       }
     ],
     "configuration": {
