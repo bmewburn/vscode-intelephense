@@ -1,5 +1,21 @@
 # Change Log
 
+## [0.7.0] - TBA
+#### Added
+* PSR2 compatible, lossless document and range formatting.
+* Index cache.
+* Add use declaration command.
+* Expand to fully qualified name command.
+* Indexing of constants declared with define(). 
+
+#### Changes
+* Various completion suggestion improvements
+
+#### Fixed
+* Conflicts with docBlocker extension
+* Complex string parsing
+* null coalesce expr type resolution
+
 ## [0.6.10] - 2017-0-30
 #### Fixed
 * Errors with variable completion inside anon.functions
