@@ -1,15 +1,17 @@
 # Intelephense
 
-Welcome to Intelephense! **[PREVIEW](https://github.com/bmewburn/intelephense/issues)**
+Welcome to Intelephense!
 
 A high performance and feature rich PHP language server implemented in Typescript. This extension offers:
 
-* Fast fuzzy matching completion (IntelliSense), offering detailed suggestions for document, workspace and built-in symbols and keywords.
+* Fast fuzzy matching code completion (IntelliSense), offering detailed suggestions for document, workspace and built-in symbols and keywords.
 * Detailed signature help for document, workspace and built-in constructors, methods, and functions.
 * Rapid workspace wide go to definition support.
 * Fast fuzzy workspace symbol search.
 * Full document symbol search.
 * Multiple parse error diagnostics for open files via an error tolerant parser.
+* PSR-2 compatible document and range formatting.
+* Convenient command to add use declarations and condense referenced names. 
 * [More to come ...](https://github.com/bmewburn/intelephense/issues)
 
 ## Configure
