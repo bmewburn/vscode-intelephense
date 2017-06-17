@@ -5,7 +5,10 @@
 
 import * as path from 'path';
 
-import { workspace, Disposable, ExtensionContext, Uri, TextDocument, languages, IndentAction, window } from 'vscode';
+import {
+	workspace, Disposable, ExtensionContext, Uri, TextDocument, languages,
+	IndentAction, window, commands, TextEditor, TextEditorEdit
+} from 'vscode';
 import {
 	LanguageClient, LanguageClientOptions, SettingMonitor, ServerOptions,
 	TransportKind, TextDocumentItem
@@ -70,8 +73,10 @@ export function activate(context: ExtensionContext) {
 		});
 	}
 
+	let importCommandDisposable = commands.registerTextEditorCommand('intelephense.import', importCommandHandler);
+
 	//push disposables
-	context.subscriptions.push(langClientDisposable, fsWatcher);
+	context.subscriptions.push(langClientDisposable, fsWatcher, importCommandDisposable);
 	discoverMaxOpenFiles = workspace.getConfiguration("intelephense.workspaceDiscovery").get('maxOpenFiles') as number;
 	maxFileSizeBytes = workspace.getConfiguration("intelephense.file").get('maxSize') as number;
 
@@ -84,6 +89,10 @@ export function activate(context: ExtensionContext) {
 		wordPattern: new RegExp(wordPatternParts.join('|'), 'g'),
 	});
 
+}
+
+function importCommandHandler(textEditor: TextEditor, edit:TextEditorEdit) {
+	window.showInputBox({value:"NAME"});
 }
 
 function workspaceFilesIncludeGlob() {
@@ -142,8 +151,8 @@ function indexWorkspace(uriArray: Uri[], context: ExtensionContext) {
 						++nActive;
 						indexSymbolsRequest(uri)
 							.then(onRequestComplete)
-							.catch((err:NodeJS.ErrnoException)=>{
-								if(err){
+							.catch((err: NodeJS.ErrnoException) => {
+								if (err) {
 									languageClient.error(err.message);
 								}
 								onRequestComplete();
