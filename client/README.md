@@ -11,7 +11,7 @@ A high performance and feature rich PHP language server implemented in Typescrip
 * Full document symbol search.
 * Multiple parse error diagnostics for open files via an error tolerant parser.
 * PSR-2 compatible document and range formatting.
-* Conveniently add use declarations and condense referenced names with a simple command. 
+* Convenient command to add use declarations and condense referenced names. 
 * [More to come ...](https://github.com/bmewburn/intelephense/issues)
 
 ## Configure
