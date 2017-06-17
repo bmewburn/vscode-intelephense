@@ -12,7 +12,7 @@ import {
 	PublishDiagnosticsParams, SignatureHelp, DidChangeConfigurationParams
 } from 'vscode-languageserver';
 
-import { Intelephense, SymbolTableDto } from 'intelephense';
+import { Intelephense, SymbolTableDto, ImportSymbolTextEdits } from 'intelephense';
 
 // Create a connection for the server. The connection uses Node's IPC as a transport
 let connection: IConnection = createConnection(new IPCMessageReader(process), new IPCMessageWriter(process));
@@ -22,14 +22,14 @@ const languageId = 'php';
 const discoverRequest = new RequestType<{ textDocument: TextDocumentItem }, SymbolTableDto, void, void>('discover');
 const forgetRequest = new RequestType<{ uri: string }, number, void, void>('forget');
 const addSymbolsRequest = new RequestType<{ symbolTable: SymbolTableDto }, void, void, void>('addSymbols');
+const importSymbolRequest = new RequestType<TextDocumentPositionParams, ImportSymbolTextEdits, void, void>('importSymbol');
 
 let config: IntelephenseConfig = {
 	debug: {
 		enable: false
 	},
 	completionProvider: {
-		maxItems: 100,
-		enableAutoUseDeclarations: false
+		maxItems: 100
 	},
 	diagnosticsProvider: {
 		debounce: 1000,
@@ -209,6 +209,13 @@ connection.onRequest(addSymbolsRequest, (params) => {
 	}, debugInfo);
 });
 
+connection.onRequest(importSymbolRequest, (params) => {
+	let debugInfo = ['onImportSymbol', params.textDocument.uri];
+	return handleRequest(() => {
+		Intelephense.importSymbol(params.textDocument, params.position);
+	}, debugInfo);
+});
+
 
 // Listen on the connection
 connection.listen();
@@ -273,8 +280,7 @@ interface IntelephenseConfig {
 		maxItems: number
 	},
 	completionProvider: {
-		maxItems: number,
-		enableAutoUseDeclarations: boolean
+		maxItems: number
 	},
 	file: {
 		maxSize: number
