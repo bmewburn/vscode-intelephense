@@ -1,131 +1,137 @@
 {
-  "name": "vscode-intelephense-client",
-  "displayName": "PHP Intelephense",
-  "description": "Code Completion | Signature Help | Symbol Search | Format | Go to Definition",
-  "author": {
-    "name": "Ben Mewburn",
-    "email": "ben@mewburn.id.au"
-  },
-  "license": "ISC",
-  "version": "0.7.0",
-  "publisher": "bmewburn",
-  "engines": {
-    "vscode": "^1.11.0"
-  },
-  "categories": [
-    "Languages",
-    "Linters",
-    "Formatters"
-  ],
-  "preview": false,
-  "activationEvents": [
-    "onLanguage:php",
-    "workspaceContains:**/*.php"
-  ],
-  "keywords": [
-    "php",
-    "intellisense",
-    "completion",
-    "suggest",
-    "format"
-  ],
-  "bugs": {
-    "url": "https://github.com/bmewburn/intelephense/issues"
-  },
-  "homepage": "https://github.com/bmewburn/intelephense",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/bmewburn/vscode-intelephense.git"
-  },
-  "icon": "images/elephpant.png",
-  "main": "./out/src/extension",
-  "contributes": {
-    "languages": [
-      {
-        "id": "php"
-      }
-    ],
-    "menus": {
-      "editor/context": [
-        {
-          "when": "editorTextFocus",
-          "command": "intelephense.import",
-          "group": "1_modification"
-        }
-      ]
+    "name": "vscode-intelephense-client",
+    "displayName": "PHP Intelephense",
+    "description": "Code Completion | Signature Help | Symbol Search | Format | Go to Definition",
+    "author": {
+        "name": "Ben Mewburn",
+        "email": "ben@mewburn.id.au"
     },
-    "configuration": {
-      "type": "object",
-      "title": "intelephense",
-      "properties": {
-        "intelephense.debug.enable": {
-          "type": "boolean",
-          "default": false,
-          "description": "Enable debug logging."
+    "license": "ISC",
+    "version": "0.7.0",
+    "publisher": "bmewburn",
+    "engines": {
+        "vscode": "^1.11.0"
+    },
+    "categories": [
+        "Languages",
+        "Linters",
+        "Formatters"
+    ],
+    "preview": false,
+    "activationEvents": [
+        "onLanguage:php",
+        "workspaceContains:**/*.php"
+    ],
+    "keywords": [
+        "php",
+        "intellisense",
+        "completion",
+        "suggest",
+        "format"
+    ],
+    "bugs": {
+        "url": "https://github.com/bmewburn/intelephense/issues"
+    },
+    "homepage": "https://github.com/bmewburn/intelephense",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/bmewburn/vscode-intelephense.git"
+    },
+    "icon": "images/elephpant.png",
+    "main": "./out/src/extension",
+    "contributes": {
+        "languages": [
+            {
+                "id": "php"
+            }
+        ],
+        "commands": [
+            {
+                "command": "intelephense.import",
+                "title": "Add Use Declaration"
+            }
+        ],
+        "menus": {
+            "editor/context": [
+                {
+                    "when": "editorTextFocus",
+                    "command": "intelephense.import",
+                    "group": "1_modification"
+                }
+            ]
         },
-        "intelephense.file.maxSize": {
-          "type": "number",
-          "default": 1000000,
-          "description": "Maximum file size in bytes."
-        },
-        "intelephense.diagnosticsProvider.debounce": {
-          "type": "number",
-          "default": 1000,
-          "description": "Diagnostics publish debounce wait time in ms."
-        },
-        "intelephense.diagnosticsProvider.maxItems": {
-          "type": "number",
-          "default": 100,
-          "description": "Maximum number of diagnostic items."
-        },
-        "intelephense.completionProvider.maxItems": {
-          "type": "number",
-          "default": 100,
-          "description": "Maximum number of completion items."
-        },
-        "intelephense.completionProvider.enableAutoUseDeclarations": {
-          "type": "boolean",
-          "default": false,
-          "description": "Enables automatic addition of use declarations upon acceptance of completion items."
-        },
-        "intelephense.workspaceDiscovery.maxOpenFiles": {
-          "type": "number",
-          "default": 10,
-          "description": "Maximum open files when discovering workspace symbols."
-        },
-        "intelephense.format.indentAfterOpenTag": {
-          "type":"boolean",
-          "default":false,
-          "description": "Increments indent level after open tag."
-        },
-        "intelephense.trace.server": {
-          "type": "string",
-          "enum": [
-            "off",
-            "messages",
-            "verbose"
-          ],
-          "default": "off",
-          "description": "Traces the communication between VSCode and the intelephense service."
+        "configuration": {
+            "type": "object",
+            "title": "intelephense",
+            "properties": {
+                "intelephense.debug.enable": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Enable debug logging."
+                },
+                "intelephense.file.maxSize": {
+                    "type": "number",
+                    "default": 1000000,
+                    "description": "Maximum file size in bytes."
+                },
+                "intelephense.diagnosticsProvider.debounce": {
+                    "type": "number",
+                    "default": 1000,
+                    "description": "Diagnostics publish debounce wait time in ms."
+                },
+                "intelephense.diagnosticsProvider.maxItems": {
+                    "type": "number",
+                    "default": 100,
+                    "description": "Maximum number of diagnostic items."
+                },
+                "intelephense.completionProvider.maxItems": {
+                    "type": "number",
+                    "default": 100,
+                    "description": "Maximum number of completion items."
+                },
+                "intelephense.completionProvider.enableAutoUseDeclarations": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Enables automatic addition of use declarations upon acceptance of completion items."
+                },
+                "intelephense.workspaceDiscovery.maxOpenFiles": {
+                    "type": "number",
+                    "default": 10,
+                    "description": "Maximum open files when discovering workspace symbols."
+                },
+                "intelephense.format.indentAfterOpenTag": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Increments indent level after open tag."
+                },
+                "intelephense.trace.server": {
+                    "type": "string",
+                    "enum": [
+                        "off",
+                        "messages",
+                        "verbose"
+                    ],
+                    "default": "off",
+                    "description": "Traces the communication between VSCode and the intelephense service."
+                }
+            }
         }
-      }
-    }
-  },
-  "scripts": {
-    "vscode:prepublish": "tsc -p ./",
-    "compile": "tsc -watch -p ./",
-    "update-vscode": "node ./node_modules/vscode/bin/install",
-    "postinstall": "node ./node_modules/vscode/bin/install"
-  },
-  "devDependencies": {
-    "@types/mocha": "^2.2.40",
-    "@types/node": "^6.0.52",
-    "typescript": "^2.3.2",
-    "vscode": "^1.1.0"
-  },
-  "dependencies": {
-    "vscode-languageclient": "^3.2.0",
-    "mkdirp": "^0.5.1"
-  },
-  "private": true
+    },
+    "scripts": {
+        "vscode:prepublish": "tsc -p ./",
+        "compile": "tsc -watch -p ./",
+        "update-vscode": "node ./node_modules/vscode/bin/install",
+        "postinstall": "node ./node_modules/vscode/bin/install"
+    },
+    "devDependencies": {
+        "@types/mocha": "^2.2.40",
+        "@types/node": "^6.0.52",
+        "typescript": "^2.3.2",
+        "vscode": "^1.1.0"
+    },
+    "dependencies": {
+        "vscode-languageclient": "^3.2.0",
+        "mkdirp": "^0.5.1"
+    },
+    "private": true
 }
