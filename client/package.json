@@ -37,7 +37,7 @@
     "type": "git",
     "url": "https://github.com/bmewburn/vscode-intelephense.git"
   },
-  "icon": "images/intelephant.svg",
+  "icon": "images/elephpant.png",
   "main": "./out/src/extension",
   "contributes": {
     "languages": [
