@@ -19,9 +19,9 @@ let connection: IConnection = createConnection(new IPCMessageReader(process), ne
 let initialisedAt: [number, number];
 
 const languageId = 'php';
-const discoverRequestName = 'discover';
-const forgetRequestName = 'forget';
-const addSymbolsRequestName = 'addSymbols';
+const discoverRequest = new RequestType<{ textDocument: TextDocumentItem }, SymbolTableDto, void, void>('discover');
+const forgetRequest = new RequestType<{ uri: string }, number, void, void>('forget');
+const addSymbolsRequest = new RequestType<{ symbolTable: SymbolTableDto }, void, void, void>('addSymbols');
 
 let config: IntelephenseConfig = {
 	debug: {
@@ -179,7 +179,6 @@ Intelephense.onPublishDiagnostics((args) => {
 	connection.sendDiagnostics(args);
 });
 
-let discoverRequest = new RequestType<{ textDocument: TextDocumentItem }, SymbolTableDto, void, void>(discoverRequestName);
 connection.onRequest(discoverRequest, (params) => {
 
 	if (params.textDocument.text.length > config.file.maxSize) {
@@ -194,7 +193,6 @@ connection.onRequest(discoverRequest, (params) => {
 	}, debugInfo);
 });
 
-let forgetRequest = new RequestType<{ uri: string }, number, void, void>(forgetRequestName);
 connection.onRequest(forgetRequest, (params) => {
 	let debugInfo = ['onForget', params.uri];
 	return handleRequest(() => {
@@ -204,7 +202,6 @@ connection.onRequest(forgetRequest, (params) => {
 	}, debugInfo);
 });
 
-let addSymbolsRequest = new RequestType<{ symbolTable: SymbolTableDto }, void, void, void>(addSymbolsRequestName);
 connection.onRequest(addSymbolsRequest, (params) => {
 	let debugInfo = ['onAddSymbols', params.symbolTable.uri];
 	return handleRequest(() => {
