@@ -7,7 +7,7 @@ import * as path from 'path';
 
 import {
 	workspace, Disposable, ExtensionContext, Uri, TextDocument, languages,
-	IndentAction, window, commands, TextEditor, TextEditorEdit
+	IndentAction, window, commands, TextEditor, TextEditorEdit, TextEdit
 } from 'vscode';
 import {
 	LanguageClient, LanguageClientOptions, SettingMonitor, ServerOptions,
@@ -91,8 +91,39 @@ export function activate(context: ExtensionContext) {
 
 }
 
-function importCommandHandler(textEditor: TextEditor, edit:TextEditorEdit) {
-	window.showInputBox({value:"NAME"});
+interface ImportSymbolTextEdits {
+	edits: TextEdit[],
+	aliasRequired: boolean
+}
+
+function importCommandHandler(textEditor: TextEditor, edit: TextEditorEdit) {
+	let pos = textEditor.selection.active;
+	let promise = languageClient.sendRequest<ImportSymbolTextEdits>(
+		'importSymbol',
+		{ textDocument: { uri: textEditor.document.uri }, position: pos }
+	);
+
+	let applyImportSymbolEdits = (edits: TextEdit[]) => {
+		edits.forEach((e) => {
+			edit.replace(e.range, e.newText);
+		});
+	};
+
+	promise.then((params) => {
+		if (params.aliasRequired) {
+			let inputPromise = window.showInputBox({ placeHolder: 'Enter an alias' });
+			inputPromise.then((text) => {
+				if (text) {
+					params.edits.forEach((e) => {
+						e.newText += text;
+					});
+					applyImportSymbolEdits(params.edits);
+				}
+			});
+		} else {
+			applyImportSymbolEdits(params.edits);
+		}
+	});
 }
 
 function workspaceFilesIncludeGlob() {
