@@ -74,9 +74,10 @@ export function activate(context: ExtensionContext) {
 	}
 
 	let importCommandDisposable = commands.registerTextEditorCommand('intelephense.import', importCommandHandler);
+	let clearCacheDisposable = commands.registerCommand('intelephense.clear.cache', clearCacheCommandHandler);
 
 	//push disposables
-	context.subscriptions.push(langClientDisposable, fsWatcher, importCommandDisposable);
+	context.subscriptions.push(langClientDisposable, fsWatcher, importCommandDisposable, clearCacheDisposable);
 	discoverMaxOpenFiles = workspace.getConfiguration("intelephense.workspaceDiscovery").get('maxOpenFiles') as number;
 	maxFileSizeBytes = workspace.getConfiguration("intelephense.file").get('maxSize') as number;
 
@@ -122,6 +123,16 @@ function importCommandHandler(textEditor: TextEditor, edit: TextEditorEdit) {
 			});
 		} else {
 			applyImportSymbolEdits(params.edits);
+		}
+	});
+}
+
+function clearCacheCommandHandler(){
+	fs.unlink(symbolCache.dir, (err)=>{
+		if(err){
+			languageClient.error(err.message);
+		} else {
+			commands.executeCommand('workbench.action.reloadWindow');
 		}
 	});
 }
@@ -229,7 +240,7 @@ function indexingCompleteFeedback(startHrtime: [number, number], fileCount: numb
 	);
 
 	window.setStatusBarMessage([
-		'$(check) intelephense indexing complete',
+		'$(search) intelephense indexing complete',
 		`$(file-code) ${fileCount}`,
 		`$(clock) ${elapsed[0]}.${Math.round(elapsed[1] / 100000000)}`
 	].join('   '), 30000);
@@ -339,6 +350,10 @@ export class FileCache {
 
 	constructor(dir: string) {
 		this._dir = dir;
+	}
+
+	get dir() {
+		return this._dir; 
 	}
 
 	init() {
