@@ -26,7 +26,7 @@
         "php",
         "intellisense",
         "completion",
-        "suggest",
+        "help",
         "format"
     ],
     "bugs": {
@@ -120,11 +120,11 @@
     "devDependencies": {
         "@types/mocha": "^2.2.40",
         "@types/node": "^6.0.52",
-        "typescript": "^2.3.2",
+        "typescript": "^2.3.4",
         "vscode": "^1.1.0"
     },
     "dependencies": {
-        "vscode-languageclient": "^3.2.0",
+        "vscode-languageclient": "^3.3.0",
         "mkdirp": "^0.5.1"
     },
     "private": true
