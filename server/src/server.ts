@@ -212,7 +212,7 @@ connection.onRequest(addSymbolsRequest, (params) => {
 connection.onRequest(importSymbolRequest, (params) => {
 	let debugInfo = ['onImportSymbol', params.textDocument.uri];
 	return handleRequest(() => {
-		Intelephense.importSymbol(params.textDocument, params.position);
+		return Intelephense.importSymbol(params.textDocument, params.position);
 	}, debugInfo);
 });
 
