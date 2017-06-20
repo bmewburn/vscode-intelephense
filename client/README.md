@@ -10,7 +10,7 @@ A high performance and feature rich PHP language server implemented in Typescrip
 * Fast fuzzy workspace symbol search.
 * Full document symbol search.
 * Multiple parse error diagnostics for open files via an error tolerant parser.
-* Lossless, PSR-2 compatible document and range formatting.
+* Lossless PSR-2 compatible document and range formatting.
 * Convenient command to add use declarations and condense referenced names. 
 * [More to come ...](https://github.com/bmewburn/intelephense/issues)
 
