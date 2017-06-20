@@ -127,9 +127,9 @@ function importCommandHandler(textEditor: TextEditor, edit: TextEditorEdit) {
 	});
 }
 
-function clearCacheCommandHandler(){
-	fs.unlink(symbolCache.dir, (err)=>{
-		if(err){
+function clearCacheCommandHandler() {
+	fs.unlink(symbolCache.dir, (err) => {
+		if (err) {
 			languageClient.error(err.message);
 		} else {
 			commands.executeCommand('workbench.action.reloadWindow');
@@ -182,6 +182,9 @@ function indexWorkspace(uriArray: Uri[], context: ExtensionContext) {
 	uriArray = uriArray.reverse();
 
 	let indexPromise = symbolCache.init()
+		.then(() => {
+			return symbolCache.purge(uriArray.map((u) => { return u.toString() }));
+		})
 		.then(() => {
 
 			return new Promise<void>((resolve, reject) => {
@@ -353,7 +356,7 @@ export class FileCache {
 	}
 
 	get dir() {
-		return this._dir; 
+		return this._dir;
 	}
 
 	init() {
@@ -434,6 +437,42 @@ export class FileCache {
 
 	}
 
+	purge(exclude: string[]) {
+
+		let keyMap: { [index: string]: boolean } = {};
+		for (let n = 0, l = exclude.length; n < l; ++n) {
+			keyMap[this._hash(exclude[n])] = true;
+		}
+		let dir = this._dir;
+
+		return new Promise<void>((resolve, reject) => {
+
+			fs.readdir(this._dir, (err, files) => {
+				if (err) {
+					throw err;
+				}
+
+				let name: string;
+				let count = 0;
+				for (let n = 0, l = files.length; n < l; ++n) {
+					name = files[n];
+					if (keyMap[name]) {
+						if (++count === l) {
+							resolve();
+						}
+						continue;
+					}
+
+					fs.unlink(path.join(dir, name), (unlinkErr) => {
+						if (++count === l) {
+							resolve();
+						}
+					});
+				}
+			});
+		});
+
+	}
 
 	private _filePath(key: string) {
 		return path.join(this._dir, this._hash(key));

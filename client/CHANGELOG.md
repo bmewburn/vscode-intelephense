@@ -15,6 +15,7 @@
 * Conflicts with docBlocker extension
 * Complex string parsing
 * null coalesce expr type resolution
+* Cleaned up built-in symbol definitions
 
 ## [0.6.10] - 2017-0-30
 #### Fixed
