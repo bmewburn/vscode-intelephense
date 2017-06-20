@@ -51,7 +51,7 @@
                 "title": "Add Use Declaration"
             },
             {
-                "command":"intelephense.clear.cache",
+                "command": "intelephense.clear.cache",
                 "title": "Clear Cache and Reload"
             }
         ],
