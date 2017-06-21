@@ -7,7 +7,8 @@ import * as path from 'path';
 
 import {
 	workspace, Disposable, ExtensionContext, Uri, TextDocument, languages,
-	IndentAction, window, commands, TextEditor, TextEditorEdit, TextEdit
+	IndentAction, window, commands, TextEditor, TextEditorEdit, TextEdit,
+	Range, Position
 } from 'vscode';
 import {
 	LanguageClient, LanguageClientOptions, SettingMonitor, ServerOptions,
@@ -99,14 +100,19 @@ interface ImportSymbolTextEdits {
 
 function importCommandHandler(textEditor: TextEditor, edit: TextEditorEdit) {
 	let inputPromise = window.showInputBox({ placeHolder: 'Enter an alias (optional)' });
-	return inputPromise.then((text) => {
+	inputPromise.then((text) => {
 		return languageClient.sendRequest<TextEdit[]>(
 			'importSymbol',
-			{ uri: textEditor.document.uri, position: textEditor.selection.active, alias: text }
+			{ uri: textEditor.document.uri.toString(), position: textEditor.selection.active, alias: text }
 		);
 	}).then((edits) => {
-		edits.forEach((e) => {
-			edit.replace(e.range, e.newText);
+		textEditor.edit((eb) => {
+			edits.forEach((e) => {
+				eb.replace(
+					new Range(new Position(e.range.start.line, e.range.start.character), new Position(e.range.end.line, e.range.end.character)),
+					e.newText
+				);
+			});
 		});
 	});
 }
