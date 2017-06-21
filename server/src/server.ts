@@ -9,10 +9,11 @@ import {
 	TextDocuments, TextDocument, Diagnostic, DiagnosticSeverity,
 	InitializeParams, InitializeResult, TextDocumentPositionParams,
 	CompletionItem, CompletionItemKind, RequestType, TextDocumentItem,
-	PublishDiagnosticsParams, SignatureHelp, DidChangeConfigurationParams
+	PublishDiagnosticsParams, SignatureHelp, DidChangeConfigurationParams,
+	Position, TextEdit
 } from 'vscode-languageserver';
 
-import { Intelephense, SymbolTableDto, ImportSymbolTextEdits } from 'intelephense';
+import { Intelephense, SymbolTableDto } from 'intelephense';
 
 // Create a connection for the server. The connection uses Node's IPC as a transport
 let connection: IConnection = createConnection(new IPCMessageReader(process), new IPCMessageWriter(process));
@@ -22,7 +23,7 @@ const languageId = 'php';
 const discoverRequest = new RequestType<{ textDocument: TextDocumentItem }, SymbolTableDto, void, void>('discover');
 const forgetRequest = new RequestType<{ uri: string }, number, void, void>('forget');
 const addSymbolsRequest = new RequestType<{ symbolTable: SymbolTableDto }, void, void, void>('addSymbols');
-const importSymbolRequest = new RequestType<TextDocumentPositionParams, ImportSymbolTextEdits, void, void>('importSymbol');
+const importSymbolRequest = new RequestType<{ uri: string, position: Position, alias?: string }, TextEdit[], void, void>('importSymbol');
 
 let config: IntelephenseConfig = {
 	debug: {
@@ -210,9 +211,9 @@ connection.onRequest(addSymbolsRequest, (params) => {
 });
 
 connection.onRequest(importSymbolRequest, (params) => {
-	let debugInfo = ['onImportSymbol', params.textDocument.uri];
+	let debugInfo = ['onImportSymbol', params.uri];
 	return handleRequest(() => {
-		return Intelephense.importSymbol(params.textDocument, params.position);
+		return Intelephense.importSymbol(params.uri, params.position, params.alias);
 	}, debugInfo);
 });
 
