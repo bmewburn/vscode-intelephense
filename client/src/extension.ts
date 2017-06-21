@@ -102,7 +102,7 @@ function importCommandHandler(textEditor: TextEditor, edit: TextEditorEdit) {
 	return inputPromise.then((text) => {
 		return languageClient.sendRequest<TextEdit[]>(
 			'importSymbol',
-			{ textDocument: { uri: textEditor.document.uri }, position: textEditor.selection.active, alias: text }
+			{ uri: textEditor.document.uri, position: textEditor.selection.active, alias: text }
 		);
 	}).then((edits) => {
 		edits.forEach((e) => {
