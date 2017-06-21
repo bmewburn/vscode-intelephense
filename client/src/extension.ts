@@ -98,32 +98,16 @@ interface ImportSymbolTextEdits {
 }
 
 function importCommandHandler(textEditor: TextEditor, edit: TextEditorEdit) {
-	let pos = textEditor.selection.active;
-	let promise = languageClient.sendRequest<ImportSymbolTextEdits>(
-		'importSymbol',
-		{ textDocument: { uri: textEditor.document.uri }, position: pos }
-	);
-
-	let applyImportSymbolEdits = (edits: TextEdit[]) => {
+	let inputPromise = window.showInputBox({ placeHolder: 'Enter an alias (optional)' });
+	return inputPromise.then((text) => {
+		return languageClient.sendRequest<TextEdit[]>(
+			'importSymbol',
+			{ textDocument: { uri: textEditor.document.uri }, position: textEditor.selection.active, alias: text }
+		);
+	}).then((edits) => {
 		edits.forEach((e) => {
 			edit.replace(e.range, e.newText);
 		});
-	};
-
-	promise.then((params) => {
-		if (params.aliasRequired) {
-			let inputPromise = window.showInputBox({ placeHolder: 'Enter an alias' });
-			inputPromise.then((text) => {
-				if (text) {
-					params.edits.forEach((e) => {
-						e.newText += text;
-					});
-					applyImportSymbolEdits(params.edits);
-				}
-			});
-		} else {
-			applyImportSymbolEdits(params.edits);
-		}
 	});
 }
 
