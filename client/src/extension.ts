@@ -118,12 +118,8 @@ function importCommandHandler(textEditor: TextEditor, edit: TextEditorEdit) {
 }
 
 function clearCacheCommandHandler() {
-	fs.unlink(symbolCache.dir, (err) => {
-		if (err) {
-			languageClient.error(err.message);
-		} else {
-			commands.executeCommand('workbench.action.reloadWindow');
-		}
+	symbolCache.purge([]).then(()=>{
+		commands.executeCommand('workbench.action.reloadWindow');
 	});
 }
 
