@@ -5,11 +5,10 @@
 * PSR2 compatible, lossless document and range formatting.
 * Index cache.
 * Add use declaration command.
-* Expand to fully qualified name command.
 * Indexing of constants declared with define(). 
 
-#### Changes
-* Various completion suggestion improvements
+#### Changed
+* Improved completions when a use declaration is available.
 
 #### Fixed
 * Conflicts with docBlocker extension
