@@ -169,7 +169,7 @@ function indexWorkspace(uriArray: Uri[], context: ExtensionContext) {
 
 	let indexPromise = symbolCache.init()
 		.then(() => {
-			return symbolCache.purge(uriArray.map((u) => { return u.toString() }));
+			return symbolCache.purge(uriArray.map((u) => { return u.toString(); }));
 		})
 		.then(() => {
 
@@ -440,6 +440,12 @@ export class FileCache {
 
 				let name: string;
 				let count = 0;
+
+				if(files.length < 1) {
+					resolve();
+					return;
+				}
+
 				for (let n = 0, l = files.length; n < l; ++n) {
 					name = files[n];
 					if (keyMap[name]) {
