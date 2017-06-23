@@ -48,11 +48,11 @@
         "commands": [
             {
                 "command": "intelephense.import",
-                "title": "Add Use Declaration"
+                "title": "Intelephense: Add Use Declaration"
             },
             {
                 "command": "intelephense.clear.cache",
-                "title": "Clear Cache and Reload"
+                "title": "Intelephense: Clear Cache and Reload"
             }
         ],
         "menus": {
