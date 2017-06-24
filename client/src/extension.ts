@@ -12,12 +12,14 @@ import {
 } from 'vscode';
 import {
 	LanguageClient, LanguageClientOptions, SettingMonitor, ServerOptions,
-	TransportKind, TextDocumentItem
+	TransportKind, TextDocumentItem, DocumentSelectorFactory, DocumentFormattingRequest,
+	DocumentRangeFormattingRequest
 } from 'vscode-languageclient';
 import * as fs from 'fs';
 import * as mkdirp from 'mkdirp';
 
 const phpLanguageId = 'php';
+const htmlLanguageId = 'html';
 const discoverRequestName = 'discover';
 const forgetRequestName = 'forget';
 const addSymbolsRequestName = 'addSymbols';
@@ -44,14 +46,30 @@ export function activate(context: ExtensionContext) {
 		debug: { module: serverModule, transport: TransportKind.ipc, options: debugOptions }
 	}
 
+	let documentSelectorFactory:DocumentSelectorFactory = (method) => {
+		switch(method) {
+			case DocumentFormattingRequest.type.method:
+			case DocumentRangeFormattingRequest.type.method:
+				return [{language: phpLanguageId, scheme: 'file'}]
+			default:
+				return [
+					{language: phpLanguageId, scheme: 'file'},
+					{language: htmlLanguageId, scheme: 'file'}
+				];
+		}
+	}
+
 	// Options to control the language client
 	let clientOptions: LanguageClientOptions = {
-		documentSelector: [phpLanguageId],
+		documentSelector: [
+			{language: phpLanguageId, scheme: 'file'},
+		],
+		documentSelectorFactory: documentSelectorFactory,
 		synchronize: {
 			// Synchronize the setting section 'intelephense' to the server
 			configurationSection: 'intelephense',
 			// Notify the server about file changes to php in the workspace
-			fileEvents: workspace.createFileSystemWatcher('**/*.php')
+			//fileEvents: workspace.createFileSystemWatcher('**/*.php')
 		}
 	}
 
