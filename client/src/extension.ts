@@ -105,8 +105,18 @@ export function activate(context: ExtensionContext) {
 		/([^\$\-\`\~\!\@\#\%\^\&\*\(\)\=\+\[\{\]\}\\\|\;\:\'\"\,\.\<\>\/\?\s]+)/.source
 	];
 
-	languages.setLanguageConfiguration('php', {
+	let htmlWordPatternParts = [
+		/([$a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff\\]*)/.source,
+		/(-?\d*\.\d\w*)/.source,
+		/([^\`\~\!\@\$\^\&\*\(\)\=\+\[\{\]\}\\\|\;\:\'\"\,\.\<\>\/\s]+)/.source
+	];
+
+	languages.setLanguageConfiguration(phpLanguageId, {
 		wordPattern: new RegExp(wordPatternParts.join('|'), 'g'),
+	});
+
+	languages.setLanguageConfiguration(htmlLanguageId, {
+		wordPattern: new RegExp(htmlWordPatternParts.join('|'), 'g')
 	});
 
 }

@@ -18,7 +18,7 @@ A high performance and feature rich PHP language server implemented in Typescrip
 Intelephense is under active development. [Contributions](https://github.com/bmewburn/intelephense/blob/master/CONTRIBUTING.md) in the form of bug reports, feature requests and pull requests are most welcome.
 
 ##### HTML Language Mode
-Intelephense works in HTML language mode so you get a great development experience when editing your HTML/JS/CSS/PHP view files. There are a still a few quirks to be addressed. PHP syntax colouring whilst in HTML mode is not available and formatting is a multi-step process (format HTML -> switch to PHP mode -> format PHP).
+Intelephense works in HTML language mode as well so you get a great development experience when editing your HTML/JS/CSS/PHP view files. There are a still a few quirks to be addressed. PHP syntax colouring whilst in HTML mode is not available and formatting is a multi-step process (format HTML -> switch to PHP mode -> format PHP).
 
 ## Configuring
 
