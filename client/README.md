@@ -11,10 +11,14 @@ A high performance and feature rich PHP language server implemented in Typescrip
 * Full document symbol search.
 * Multiple parse error diagnostics for open files via an error tolerant parser.
 * Lossless PSR-2 compatible document and range formatting.
-* Convenient command to add use declarations and condense referenced names. 
+* Convenient command to add use declarations and condense referenced names.
+* HTML language mode support allowing for a full HTML/Javascript/CSS/PHP development experience.
 * [More to come ...](https://github.com/bmewburn/intelephense/issues)
 
 Intelephense is under active development. [Contributions](https://github.com/bmewburn/intelephense/blob/master/CONTRIBUTING.md) in the form of bug reports, feature requests and pull requests are most welcome.
+
+##### HTML Language Mode
+Intelephense works in HTML language mode so you get a great development experience when editing your HTML/JS/CSS/PHP view files. There are a still a few quirks to be addressed. PHP syntax colouring whilst in HTML mode is not available and formatting is a multi-step process (format HTML -> switch to PHP mode -> format PHP).
 
 ## Configuring
 

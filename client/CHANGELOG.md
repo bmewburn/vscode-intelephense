@@ -5,7 +5,8 @@
 * PSR2 compatible, lossless document and range formatting.
 * Index cache.
 * Add use declaration command.
-* Indexing of constants declared with define(). 
+* Indexing of constants declared with define().
+* HTML language mode support allowing full HTML/Javascript/CSS/PHP dev experience.
 
 #### Changed
 * Improved completions when a use declaration is available.
