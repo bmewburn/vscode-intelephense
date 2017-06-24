@@ -1,6 +1,6 @@
 # Change Log
 
-## [0.7.0] - TBA
+## [0.7.0] - 2017-06-24
 #### Added
 * PSR2 compatible, lossless document and range formatting.
 * Index cache.
@@ -13,11 +13,12 @@
 
 #### Fixed
 * Conflicts with docBlocker extension
+* Conflicts with local history extension
 * Complex string parsing
 * null coalesce expr type resolution
 * Cleaned up built-in symbol definitions
 
-## [0.6.10] - 2017-0-30
+## [0.6.10] - 2017-04-30
 #### Fixed
 * Errors with variable completion inside anon.functions
 
