@@ -1,5 +1,12 @@
 # Change Log
 
+## [0.7.1] - 2017-06-25
+#### Fixed
+* Crash when reading anon. classes.
+
+#### Dependencies
+* Intelephense 0.7.0 
+
 ## [0.7.0] - 2017-06-24
 #### Added
 * PSR2 compatible, lossless document and range formatting.
@@ -17,6 +24,9 @@
 * Complex string parsing
 * null coalesce expr type resolution
 * Cleaned up built-in symbol definitions
+
+#### Dependencies
+* Intelephense 0.7.0
 
 ## [0.6.10] - 2017-04-30
 #### Fixed
