@@ -1,7 +1,7 @@
 {
   "name": "vscode-intelephense-server",
   "description": "PHP Language Server",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "author": "Ben Mewburn <ben@mewburn.id.au>",
   "license": "ISC",
   "engines": {
@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "vscode-languageserver": "^3.3.0",
-    "intelephense": "^0.7.0"
+    "intelephense": "^0.7.1"
   },
   "devDependencies": {
     "@types/node": "^6.0.52",
