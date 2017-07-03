@@ -339,6 +339,11 @@ function readTextDocumentItem(uri: Uri) {
 }
 
 function discoverRequest(doc: TextDocumentItem) {
+
+	if(!doc) {
+		return Promise.resolve<SymbolTable>(null);
+	}
+
 	return languageClient.sendRequest<SymbolTable>(
 		discoverRequestName,
 		{ textDocument: doc }
@@ -346,6 +351,11 @@ function discoverRequest(doc: TextDocumentItem) {
 }
 
 function addSymbolsRequest(symbolTable: SymbolTable) {
+
+	if(!symbolTable) {
+		return Promise.resolve();
+	}
+
 	return languageClient.sendRequest<void>(
 		addSymbolsRequestName,
 		{ symbolTable: symbolTable }
