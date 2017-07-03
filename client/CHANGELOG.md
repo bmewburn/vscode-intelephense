@@ -1,5 +1,15 @@
 # Change Log
 
+## [0.7.2] - 2017-07-03
+#### Fixed
+* Error on signature help for function with no params
+* Format weirdness after comments
+* Parse error on unset cast
+* Workspace discover errors when textDocument is undefined.
+
+#### Dependencies
+* Intelephense 0.7.2
+
 ## [0.7.1] - 2017-06-25
 #### Fixed
 * Crash when reading anon. classes.
