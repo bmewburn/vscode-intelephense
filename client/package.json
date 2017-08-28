@@ -1,13 +1,13 @@
 {
     "name": "vscode-intelephense-client",
     "displayName": "PHP Intelephense",
-    "description": "Code Completion | Signature Help | Symbol Search | Format | Go to Definition",
+    "description": "PHP Autocomplete | Param Hints | Symbols | References | Format | Go to",
     "author": {
         "name": "Ben Mewburn",
         "email": "ben@mewburn.id.au"
     },
     "license": "ISC",
-    "version": "0.7.2",
+    "version": "0.8.0",
     "publisher": "bmewburn",
     "engines": {
         "vscode": "^1.11.0"
