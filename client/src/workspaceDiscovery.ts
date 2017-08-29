@@ -12,11 +12,12 @@ const discoverReferencesRequestName = 'discoverReferences';
 const forgetRequestName = 'forget';
 const phpLanguageId = 'php';
 
-export class WorkspaceDiscovery {
+export namespace WorkspaceDiscovery {
 
-    constructor(public client: LanguageClient, public maxFileSizeBytes: number) { }
+    export var client: LanguageClient;
+    export var maxFileSizeBytes: number;
 
-    modTime(uri: Uri) {
+    export function modTime(uri: Uri) {
 
         return new Promise<number>((resolve, reject) => {
             fs.stat(uri.fsPath, (err, stats) => {
@@ -30,56 +31,63 @@ export class WorkspaceDiscovery {
 
     }
 
-    forget(uri:Uri) {
-        return this.forgetRequest(uri);
+    export function forget(uri: Uri) {
+        return forgetRequest(uri);
     }
 
-    discoverSymbols(uri: Uri) {
-        return this.readTextDocumentItem(uri).then(this.discoverSymbolsRequest);
+    export function discoverSymbols(uri: Uri) {
+        return readTextDocumentItem(uri).then(discoverSymbolsRequest);
     }
 
-    discoverSymbolsMany(uriArray:Uri[]) {
+    export function discoverSymbolsMany(uriArray: Uri[]) {
+        return discoverMany(discoverSymbols, uriArray);
+    }
 
-        let remaining = uriArray.length;
-        let items = uriArray.slice(0);
-        let item:Uri;
-        let counter = 0;
-        let langClient = this.client;
-        let discover = this.discoverSymbols;
+    export function discoverReferences(uri: Uri) {
+        return readTextDocumentItem(uri).then(discoverReferencesRequest);
+    }
 
-        let onAlways = () => {
-            --remaining;
-            let uri = items.pop();
-            if(uri) {
+    export function discoverReferencesMany(uriArray: Uri[]) {
+        return discoverMany(discoverReferences, uriArray);
+    }
 
+    function discoverMany(discoverFn: (uri: Uri) => Promise<number>, uriArray: Uri[]) {
+
+        return new Promise((resolve, reject) => {
+            let remaining = uriArray.length;
+            let items = uriArray.slice(0);
+            let item: Uri;
+            let maxOpenFiles = 16;
+
+            let onAlways = () => {
+                --remaining;
+                let uri = items.pop();
+                if (uri) {
+                    discoverFn(uri).then(onResolve).catch(onReject);
+                } else if (!remaining) {
+                    resolve();
+                }
             }
-        }
 
-        let onResolve = () => {
-            --remaining;
-        };
+            let onResolve = (n: number) => {
+                onAlways();
+            };
 
-        let onReject = (errMsg:string) => {
-            --remaining;
+            let onReject = (errMsg: string) => {
+                client.warn(errMsg);
+                onAlways();
+            };
 
-        };
-
-        while((item = items.pop())) {
-            
-            if(++counter === 10) {
-                break;
+            while (maxOpenFiles > 0 && (item = items.pop())) {
+                discoverFn(item).then(onResolve).catch(onReject);
+                --maxOpenFiles;
             }
-        }
-
+        });
 
     }
 
-    discoverReferences(uri:Uri) {
-        return this.readTextDocumentItem(uri).then(this.discoverReferencesRequest);
-    }
+    function readTextDocumentItem(uri: Uri) {
 
-    private readTextDocumentItem(uri: Uri) {
-        let maxSize = this.maxFileSizeBytes;
         return new Promise<TextDocumentItem>((resolve, reject) => {
 
             fs.readFile(uri.fsPath, (readErr, data) => {
@@ -96,7 +104,7 @@ export class WorkspaceDiscovery {
                     version: 0
                 }
 
-                if (doc.text.length > maxSize) {
+                if (doc.text.length > maxFileSizeBytes) {
                     reject(`${uri} exceeds maximum file size.`);
                     return;
                 }
@@ -108,27 +116,25 @@ export class WorkspaceDiscovery {
 
     }
 
-    private forgetRequest = (uri: Uri) => {
-        return this.client.sendRequest<void>(
+    function forgetRequest(uri: Uri) {
+        return client.sendRequest<void>(
             forgetRequestName,
             { uri: uri.toString() }
         );
     }
 
-    private discoverSymbolsRequest = (doc: TextDocumentItem) => {
-        return this.client.sendRequest<number>(
+    function discoverSymbolsRequest(doc: TextDocumentItem) {
+        return client.sendRequest<number>(
             discoverSymbolsRequestName,
             { textDocument: doc }
         );
     }
 
-    private discoverReferencesRequest = (doc: TextDocumentItem) => {
-        return this.client.sendRequest<number>(
+    function discoverReferencesRequest(doc: TextDocumentItem) {
+        return client.sendRequest<number>(
             discoverReferencesRequestName,
             { textDocument: doc }
         );
     }
-
-
 
 }
