@@ -17,6 +17,33 @@ export namespace WorkspaceDiscovery {
     export var client: LanguageClient;
     export var maxFileSizeBytes: number;
 
+    const delayedDiscoverDebounceTime = 500;
+    var delayedDiscoverUriArray:Uri[] = [];
+    var delayedDiscoverTimer:NodeJS.Timer;
+
+    export function discover(uriArray:Uri[]) {
+        return discoverSymbolsMany(uriArray).then(() => { discoverReferencesMany(uriArray) });
+    }
+
+    export function delayedDiscover(uri:Uri) {
+        clearTimeout(delayedDiscoverTimer);
+        delayedDiscoverTimer = undefined;
+        if(delayedDiscoverUriArray.indexOf(uri) < 0) {
+            delayedDiscoverUriArray.push(uri);
+        }
+		delayedDiscoverTimer = setTimeout(delayedDiscoverFlush, delayedDiscoverDebounceTime);
+    }
+
+    export function delayedDiscoverFlush() {
+        if(!delayedDiscoverTimer) {
+            return;
+        }
+        clearTimeout(delayedDiscoverTimer);
+        delayedDiscoverTimer = undefined;
+        discover(delayedDiscoverUriArray);
+        delayedDiscoverUriArray = [];
+    }
+
     export function modTime(uri: Uri) {
 
         return new Promise<number>((resolve, reject) => {
@@ -35,19 +62,19 @@ export namespace WorkspaceDiscovery {
         return forgetRequest(uri);
     }
 
-    export function discoverSymbols(uri: Uri) {
+    function discoverSymbols(uri: Uri) {
         return readTextDocumentItem(uri).then(discoverSymbolsRequest);
     }
 
-    export function discoverSymbolsMany(uriArray: Uri[]) {
+    function discoverSymbolsMany(uriArray: Uri[]) {
         return discoverMany(discoverSymbols, uriArray);
     }
 
-    export function discoverReferences(uri: Uri) {
+    function discoverReferences(uri: Uri) {
         return readTextDocumentItem(uri).then(discoverReferencesRequest);
     }
 
-    export function discoverReferencesMany(uriArray: Uri[]) {
+    function discoverReferencesMany(uriArray: Uri[]) {
         return discoverMany(discoverReferences, uriArray);
     }
 
@@ -58,13 +85,14 @@ export namespace WorkspaceDiscovery {
             let items = uriArray.slice(0);
             let item: Uri;
             let maxOpenFiles = 16;
+            let discovered
 
             let onAlways = () => {
                 --remaining;
                 let uri = items.pop();
                 if (uri) {
                     discoverFn(uri).then(onResolve).catch(onReject);
-                } else if (!remaining) {
+                } else if (remaining < 1) {
                     resolve();
                 }
             }
