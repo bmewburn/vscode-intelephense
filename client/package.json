@@ -19,8 +19,7 @@
     ],
     "preview": false,
     "activationEvents": [
-        "onLanguage:php",
-        "workspaceContains:**/*.php"
+        "onLanguage:php"
     ],
     "keywords": [
         "php",
