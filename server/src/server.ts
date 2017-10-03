@@ -13,16 +13,16 @@ import {
 	Position, TextEdit
 } from 'vscode-languageserver';
 
-import { Intelephense, SymbolTableDto } from 'intelephense';
+import { Intelephense } from 'intelephense';
 
 // Create a connection for the server. The connection uses Node's IPC as a transport
 let connection: IConnection = createConnection(new IPCMessageReader(process), new IPCMessageWriter(process));
 let initialisedAt: [number, number];
 
 const languageId = 'php';
-const discoverRequest = new RequestType<{ textDocument: TextDocumentItem }, SymbolTableDto, void, void>('discover');
+const discoverSymbolsRequest = new RequestType<{ textDocument: TextDocumentItem }, number, void, void>('discoverSymbols');
+const discoverReferencesRequest = new RequestType<{ textDocument: TextDocumentItem }, number, void, void>('discoverReferences');
 const forgetRequest = new RequestType<{ uri: string }, number, void, void>('forget');
-const addSymbolsRequest = new RequestType<{ symbolTable: SymbolTableDto }, void, void, void>('addSymbols');
 const importSymbolRequest = new RequestType<{ uri: string, position: Position, alias?: string }, TextEdit[], void, void>('importSymbol');
 
 let config: IntelephenseConfig = {
@@ -64,7 +64,8 @@ connection.onInitialize((params): InitializeResult => {
 			},
 			definitionProvider: true,
 			documentFormattingProvider: true,
-			documentRangeFormattingProvider: true
+			documentRangeFormattingProvider: true,
+			referencesProvider: true
 		}
 	}
 });
@@ -119,6 +120,15 @@ connection.onWorkspaceSymbol((params) => {
 		let symbols = Intelephense.workspaceSymbols(params.query);
 		debugInfo.push(`${symbols.length} symbols`);
 		return symbols;
+	}, debugInfo);
+});
+
+connection.onReferences((params) => {
+	let debugInfo = ['onReferences', params.textDocument.uri, JSON.stringify(params.position)];
+	return handleRequest(() => {
+		let refs = Intelephense.provideReferences(params.textDocument, params.position, params.context);
+		debugInfo.push(`${refs.length} items`);
+		return refs;
 	}, debugInfo);
 });
 
@@ -180,17 +190,31 @@ Intelephense.onPublishDiagnostics((args) => {
 	connection.sendDiagnostics(args);
 });
 
-connection.onRequest(discoverRequest, (params) => {
+connection.onRequest(discoverSymbolsRequest, (params) => {
 
 	if (params.textDocument.text.length > config.file.maxSize) {
 		connection.console.warn(`${params.textDocument.uri} exceeds max file size.`);
-		return;
+		return 0;
 	}
 
-	let debugInfo = ['onDiscover', params.textDocument.uri];
+	let debugInfo = ['onDiscoverSymbols', params.textDocument.uri];
 	return handleRequest(() => {
-		let dto = Intelephense.discover(params.textDocument);
-		return dto;
+		let symbolCount = Intelephense.discoverSymbols(params.textDocument);
+		return symbolCount;
+	}, debugInfo);
+});
+
+connection.onRequest(discoverReferencesRequest, (params) => {
+
+	if (params.textDocument.text.length > config.file.maxSize) {
+		connection.console.warn(`${params.textDocument.uri} exceeds max file size.`);
+		return 0;
+	}
+
+	let debugInfo = ['onDiscoverReferences', params.textDocument.uri];
+	return handleRequest(() => {
+		let refCount = Intelephense.discoverReferences(params.textDocument);
+		return refCount;
 	}, debugInfo);
 });
 
@@ -203,17 +227,10 @@ connection.onRequest(forgetRequest, (params) => {
 	}, debugInfo);
 });
 
-connection.onRequest(addSymbolsRequest, (params) => {
-	let debugInfo = ['onAddSymbols', params.symbolTable.uri];
-	return handleRequest(() => {
-		Intelephense.addSymbols(params.symbolTable);
-	}, debugInfo);
-});
-
 connection.onRequest(importSymbolRequest, (params) => {
 	let debugInfo = ['onImportSymbol', params.uri];
 	return handleRequest(() => {
-		return Intelephense.importSymbol(params.uri, params.position, params.alias);
+		return Intelephense.provideContractFqnTextEdits(params.uri, params.position, params.alias);
 	}, debugInfo);
 });
 
