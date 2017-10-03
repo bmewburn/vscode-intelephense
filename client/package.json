@@ -92,10 +92,15 @@
                     "default": 100,
                     "description": "Maximum number of completion items."
                 },
-                "intelephense.workspaceDiscovery.maxOpenFiles": {
-                    "type": "number",
-                    "default": 10,
-                    "description": "Maximum open files when discovering workspace symbols."
+                "intelephense.completionProvider.addUseDeclaration": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Use declarations will be automatically added on completion for namespaced classes, functions, and constants."
+                },
+                "intelephense.completionProvider.backslashPrefix": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Built in constants and functions will be prefixed with a backslash"
                 },
                 "intelephense.trace.server": {
                     "type": "string",

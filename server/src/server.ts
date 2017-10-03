@@ -13,7 +13,7 @@ import {
 	Position, TextEdit
 } from 'vscode-languageserver';
 
-import { Intelephense } from 'intelephense';
+import { Intelephense, IntelephenseConfig } from 'intelephense';
 
 // Create a connection for the server. The connection uses Node's IPC as a transport
 let connection: IConnection = createConnection(new IPCMessageReader(process), new IPCMessageWriter(process));
@@ -30,7 +30,9 @@ let config: IntelephenseConfig = {
 		enable: false
 	},
 	completionProvider: {
-		maxItems: 100
+		maxItems: 100,
+		addUseDeclaration:true,
+        backslashPrefix:true
 	},
 	diagnosticsProvider: {
 		debounce: 1000,
@@ -73,9 +75,7 @@ connection.onInitialize((params): InitializeResult => {
 connection.onDidChangeConfiguration((params) => {
 
 	config = params.settings.intelephense as IntelephenseConfig;
-	Intelephense.setCompletionProviderConfig(config.completionProvider);
-	Intelephense.setDiagnosticsProviderDebounce(config.diagnosticsProvider.debounce);
-	Intelephense.setDiagnosticsProviderMaxItems(config.diagnosticsProvider.maxItems);
+	Intelephense.setConfig(config);
 
 });
 
@@ -287,20 +287,4 @@ function elapsed(start: [number, number]) {
 
 function memory() {
 	return process.memoryUsage().heapUsed / 1000000;
-}
-
-interface IntelephenseConfig {
-	debug: {
-		enable: boolean;
-	},
-	diagnosticsProvider: {
-		debounce: number,
-		maxItems: number
-	},
-	completionProvider: {
-		maxItems: number
-	},
-	file: {
-		maxSize: number
-	}
 }
