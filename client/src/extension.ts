@@ -171,8 +171,13 @@ function onDidCreate(uri: Uri) {
 
 function indexWorkspace(uriArray: Uri[]) {
 
+	let indexingStartHrtime = process.hrtime();
 	languageClient.info('Indexing started.');
-	window.setStatusBarMessage('$(search) intelephense indexing ...', WorkspaceDiscovery.discover(uriArray));
+	let completedPromise = WorkspaceDiscovery.discover(uriArray).then(()=>{
+		indexingCompleteFeedback(indexingStartHrtime, uriArray.length);
+		return Promise.resolve();
+	});
+	window.setStatusBarMessage('$(search) intelephense indexing ...', completedPromise);
 
 }
 
