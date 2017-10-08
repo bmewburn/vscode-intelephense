@@ -22,7 +22,7 @@ export namespace WorkspaceDiscovery {
     var delayedDiscoverTimer:NodeJS.Timer;
 
     export function discover(uriArray:Uri[]) {
-        return discoverSymbolsMany(uriArray).then(() => { discoverReferencesMany(uriArray) });
+        return discoverSymbolsMany(uriArray).then(() => { return discoverReferencesMany(uriArray); });
     }
 
     export function delayedDiscover(uri:Uri) {
