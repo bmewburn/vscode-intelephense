@@ -10,7 +10,8 @@ import {
 	InitializeParams, InitializeResult, TextDocumentPositionParams,
 	CompletionItem, CompletionItemKind, RequestType, TextDocumentItem,
 	PublishDiagnosticsParams, SignatureHelp, DidChangeConfigurationParams,
-	Position, TextEdit
+	Position, TextEdit, Disposable, DocumentRangeFormattingRequest, 
+	DocumentFormattingRequest, DocumentSelector
 } from 'vscode-languageserver';
 
 import { Intelephense, IntelephenseConfig } from 'intelephense';
@@ -25,7 +26,11 @@ const discoverReferencesRequest = new RequestType<{ textDocument: TextDocumentIt
 const forgetRequest = new RequestType<{ uri: string }, number, void, void>('forget');
 const importSymbolRequest = new RequestType<{ uri: string, position: Position, alias?: string }, TextEdit[], void, void>('importSymbol');
 
-let config: IntelephenseConfig = {
+interface VscodeConfig extends IntelephenseConfig {
+	format: {enable:boolean}
+}
+
+let config: VscodeConfig = {
 	debug: {
 		enable: false
 	},
@@ -40,8 +45,13 @@ let config: IntelephenseConfig = {
 	},
 	file: {
 		maxSize: 1000000
+	},
+	format: {
+		enable: true
 	}
 };
+
+
 
 // After the server has started the client sends an initialize request. The server receives
 // in the passed params the rootPath of the workspace plus the client capabilities. 
@@ -72,10 +82,37 @@ connection.onInitialize((params): InitializeResult => {
 	}
 });
 
+let docFormatRegister:Thenable<Disposable> = null;
+let rangeFormatRegister:Thenable<Disposable> = null;
+
 connection.onDidChangeConfiguration((params) => {
 
-	config = params.settings.intelephense as IntelephenseConfig;
+	let settings = params.settings.intelephense as VscodeConfig;
+	if(!settings) {
+		return;
+	}
+	config = settings;
 	Intelephense.setConfig(config);
+
+	let enableFormatter = config.format && config.format.enable;
+	if (enableFormatter) {
+		let documentSelector: DocumentSelector = [{ language: languageId }];
+		if (!docFormatRegister) {
+			docFormatRegister = connection.client.register(DocumentFormattingRequest.type, { documentSelector });
+		}
+		if(!rangeFormatRegister) {
+			rangeFormatRegister = connection.client.register(DocumentRangeFormattingRequest.type, { documentSelector });
+		}
+	} else {
+		if(docFormatRegister) {
+			docFormatRegister.then(r => r.dispose());
+			docFormatRegister = null;
+		}
+		if(rangeFormatRegister) {
+			rangeFormatRegister.then(r => r.dispose());
+			rangeFormatRegister = null;
+		}
+	}
 
 });
 

@@ -102,6 +102,11 @@
                     "default": true,
                     "description": "Built in constants and functions will be prefixed with a backslash"
                 },
+                "intelephense.formatProvider.enable": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enables formatting"
+                },
                 "intelephense.trace.server": {
                     "type": "string",
                     "enum": [
