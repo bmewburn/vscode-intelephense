@@ -1,5 +1,25 @@
 # Change Log
 
+## [0.8.0] - TBA
+#### Added
+* Reference provider
+* Config to enable/disable addition of use declarations on completion
+* Config to enable/disable formatting
+* Config to enable/disable backslash prefix of global functions and constants
+* Invoke param hints on method/function completion
+* phpdoc inheritance
+
+#### Changed
+* Up to 4 fold improvement in parsing speeds
+* Return multiple locations for go to defintion when applicable
+* Improved type resolution for phpdoc static and $this
+
+#### Fixed
+* Extra lines repeatedly added after comment when formatting
+* Various PSR2 format fixes
+* Completions within closures
+* Got to defintion for defines
+
 ## [0.7.2] - 2017-07-03
 #### Fixed
 * Error on signature help for function with no params
