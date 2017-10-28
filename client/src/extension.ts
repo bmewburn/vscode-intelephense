@@ -27,8 +27,8 @@ let languageClient: LanguageClient;
 
 export function activate(context: ExtensionContext) {
 
-	let versionMemento = context.workspaceState.get('version');
-	let clearCache = context.workspaceState.get('clearCache');
+	let versionMemento = context.workspaceState.get<string>('version');
+	let clearCache = context.workspaceState.get<boolean>('clearCache');
 	context.workspaceState.update('clearCache', undefined);
 	context.workspaceState.update('version', version);
 	
@@ -73,6 +73,10 @@ export function activate(context: ExtensionContext) {
 			configurationSection: 'intelephense',
 			// Notify the server about file changes to php in the workspace
 			//fileEvents: workspace.createFileSystemWatcher('**/*.php')
+		},
+		initializationOptions: {
+			storagePath:context.storagePath,
+			clearCache:clearCache
 		}
 	}
 
