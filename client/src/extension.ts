@@ -192,8 +192,8 @@ function indexWorkspace(uriArray: Uri[], timestamp:number) {
 
 	let indexingStartHrtime = process.hrtime();
 	languageClient.info('Indexing started.');
-	let completedPromise = WorkspaceDiscovery.checkCacheThenDiscover(uriArray, timestamp).then(()=>{
-		indexingCompleteFeedback(indexingStartHrtime, uriArray.length);
+	let completedPromise = WorkspaceDiscovery.checkCacheThenDiscover(uriArray, timestamp).then((count)=>{
+		indexingCompleteFeedback(indexingStartHrtime, count);
 	});
 	window.setStatusBarMessage('$(search) intelephense indexing ...', completedPromise);
 

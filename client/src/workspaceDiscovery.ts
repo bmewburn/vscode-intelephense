@@ -3,7 +3,7 @@
  */
 'use strict';
 
-import * as fs from 'fs';
+import * as fs from 'fs-extra';
 import { LanguageClient, TextDocumentItem } from 'vscode-languageclient';
 import { Uri } from 'vscode'
 
@@ -19,56 +19,151 @@ export namespace WorkspaceDiscovery {
     export var maxFileSizeBytes: number;
 
     const delayedDiscoverDebounceTime = 500;
-    var delayedDiscoverUriArray:Uri[] = [];
-    var delayedDiscoverTimer:NodeJS.Timer;
+    var delayedDiscoverUriArray: Uri[] = [];
+    var delayedDiscoverTimer: NodeJS.Timer;
 
-    export function checkCacheThenDiscover(uriArray:Uri[], timestamp:number) {
-        return cachedDocumentsRequest().then((cachedUris)=>{
-            
+    export function checkCacheThenDiscover(uriArray: Uri[], timestamp: number) {
+        return cachedDocumentsRequest().then((cachedUris) => {
+
+            let cachedUriSet = new Set<string>(cachedUris);
+            let notKnown: Uri[] = [];
+            let known: Uri[] = [];
+            let uri: Uri;
+            let uriString: string;
+
+            for (let n = 0, l = uriArray.length; n < l; ++n) {
+                uri = uriArray[n];
+                uriString = uri.toString();
+                if (cachedUriSet.has(uriString)) {
+                    known.push(uri);
+                    cachedUriSet.delete(uriString);
+                } else {
+                    notKnown.push(uri);
+                }
+            }
+
+            return forgetMany(uriArray).then(() => {
+                return filterKnownByModtime(known, timestamp);
+            }).then((filteredUri)=>{
+                Array.prototype.push.apply(notKnown, filteredUri);
+                return discover(notKnown);
+            });
+
         });
     }
 
-    function binUris(uriArray:Uri[], cached:string[]) {
+    function modTime(uri:Uri):Promise<[Uri, number]> {
 
-        
+        return fs.stat(uri.fsPath).then((stats)=>{
+            return <[Uri, number]>[uri, stats.mtime.getTime()];
+        }).catch((err)=>{
+            if(err && err.message) {
+                client.warn(err.message);
+            }
+            return <[Uri, number]>[uri, 0];
+        });
 
     }
 
-    export function discover(uriArray:Uri[]) {
+    function filterKnownByModtime(knownUriArray: Uri[], timestamp) {
+
+        return new Promise<Uri[]>((resolve, reject) => {
+
+            if (!timestamp || knownUriArray.length < 1) {
+                resolve(knownUriArray);
+            }
+
+            let filtered:Uri[] = [];
+
+            let onResolved = (result:[Uri, number]) => {
+                
+                if(result[1] > timestamp) {
+                    //was modified since last shutdown
+                    filtered.push(result[0]);
+                }
+                --count;
+                if(count < 1) {
+                    resolve(filtered);
+                } else {
+                    let uri = knownUriArray.pop();
+                    if(uri){
+                        modTime(uri).then(onResolved);
+                    }
+                }
+            }     
+
+            let count = knownUriArray.length;
+            knownUriArray = knownUriArray.slice(0);
+            let batchSize = Math.min(8, count);
+            let uri:Uri;
+
+            while(batchSize-- > 0 && (uri = knownUriArray.pop())) {
+                modTime(uri).then(onResolved);
+            }
+
+        });
+
+    }
+
+    function forgetMany(uriArray: (Uri | string)[]) {
+
+        return new Promise<void>((resolve, reject) => {
+
+            if (uriArray.length < 1) {
+                resolve();
+            }
+
+            uriArray = uriArray.slice(0);
+            let count = uriArray.length;
+            let batchSize = Math.min(8, count);
+
+            let onFulfilled = () => {
+                --count;
+                if (count < 1) {
+                    resolve();
+                } else {
+                    let uri = uriArray.pop();
+                    if (uri) {
+                        forgetRequest(uri).then(onFulfilled, onFailed);
+                    }
+                }
+            }
+
+            let onFailed = (msg) => {
+                client.warn(msg);
+                onFulfilled();
+            }
+
+            let uri: Uri | string;
+            while (batchSize-- > 0 && (uri = uriArray.pop())) {
+                forgetRequest(uri).then(onFulfilled, onFailed);
+            }
+
+        });
+
+    }
+
+    export function discover(uriArray: Uri[]) {
         return discoverSymbolsMany(uriArray).then(() => { return discoverReferencesMany(uriArray); });
     }
 
-    export function delayedDiscover(uri:Uri) {
+    export function delayedDiscover(uri: Uri) {
         clearTimeout(delayedDiscoverTimer);
         delayedDiscoverTimer = undefined;
-        if(delayedDiscoverUriArray.indexOf(uri) < 0) {
+        if (delayedDiscoverUriArray.indexOf(uri) < 0) {
             delayedDiscoverUriArray.push(uri);
         }
-		delayedDiscoverTimer = setTimeout(delayedDiscoverFlush, delayedDiscoverDebounceTime);
+        delayedDiscoverTimer = setTimeout(delayedDiscoverFlush, delayedDiscoverDebounceTime);
     }
 
     export function delayedDiscoverFlush() {
-        if(!delayedDiscoverTimer) {
+        if (!delayedDiscoverTimer) {
             return;
         }
         clearTimeout(delayedDiscoverTimer);
         delayedDiscoverTimer = undefined;
         discover(delayedDiscoverUriArray);
         delayedDiscoverUriArray = [];
-    }
-
-    export function modTime(uri: Uri) {
-
-        return new Promise<number>((resolve, reject) => {
-            fs.stat(uri.fsPath, (err, stats) => {
-                if (err) {
-                    reject(err.message);
-                    return;
-                }
-                resolve(stats.mtime.getTime());
-            });
-        });
-
     }
 
     export function forget(uri: Uri) {
@@ -93,7 +188,7 @@ export namespace WorkspaceDiscovery {
 
     function discoverMany(discoverFn: (uri: Uri) => Promise<number>, uriArray: Uri[]) {
 
-        return new Promise((resolve, reject) => {
+        return new Promise<number>((resolve, reject) => {
             let remaining = uriArray.length;
             let items = uriArray.slice(0);
             let item: Uri;
@@ -106,7 +201,7 @@ export namespace WorkspaceDiscovery {
                 if (uri) {
                     discoverFn(uri).then(onResolve).catch(onReject);
                 } else if (remaining < 1) {
-                    resolve();
+                    resolve(uriArray.length);
                 }
             }
 
@@ -157,7 +252,7 @@ export namespace WorkspaceDiscovery {
 
     }
 
-    function forgetRequest(uri: Uri) {
+    function forgetRequest(uri: Uri | string) {
         return client.sendRequest<void>(
             forgetRequestName,
             { uri: uri.toString() }
