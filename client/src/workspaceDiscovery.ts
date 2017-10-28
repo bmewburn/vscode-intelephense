@@ -10,6 +10,7 @@ import { Uri } from 'vscode'
 const discoverSymbolsRequestName = 'discoverSymbols';
 const discoverReferencesRequestName = 'discoverReferences';
 const forgetRequestName = 'forget';
+const cachedDocumentsRequestName = 'cachedDocuments';
 const phpLanguageId = 'php';
 
 export namespace WorkspaceDiscovery {

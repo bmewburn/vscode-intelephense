@@ -170,7 +170,9 @@ function workspaceFilesIncludeGlob() {
 
 function workspaceFilesToIndex() {
 	let includeGlob = workspaceFilesIncludeGlob();
-	return workspace.findFiles(includeGlob);
+	return workspace.findFiles(includeGlob).then((uris)=>{
+		let deactivateTime = 
+	});
 }
 
 function onDidDelete(uri: Uri) {
@@ -191,7 +193,6 @@ function indexWorkspace(uriArray: Uri[]) {
 	languageClient.info('Indexing started.');
 	let completedPromise = WorkspaceDiscovery.discover(uriArray).then(()=>{
 		indexingCompleteFeedback(indexingStartHrtime, uriArray.length);
-		return Promise.resolve();
 	});
 	window.setStatusBarMessage('$(search) intelephense indexing ...', completedPromise);
 
