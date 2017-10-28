@@ -24,9 +24,11 @@ const version = 'v0.8.0';
 
 let maxFileSizeBytes = 10000000;
 let languageClient: LanguageClient;
+let extensionContext:ExtensionContext;
 
 export function activate(context: ExtensionContext) {
 
+	extensionContext = context;
 	let versionMemento = context.workspaceState.get<string>('version');
 	let clearCache = context.workspaceState.get<boolean>('clearCache');
 	context.workspaceState.update('clearCache', undefined);
@@ -149,7 +151,9 @@ function importCommandHandler(textEditor: TextEditor, edit: TextEditorEdit) {
 }
 
 function clearCacheCommandHandler() {
-	
+	return extensionContext.workspaceState.update('clearCache', true).then(()=>{
+		commands.executeCommand('workbench.action.reloadWindow');
+	});
 }
 
 function workspaceFilesIncludeGlob() {
