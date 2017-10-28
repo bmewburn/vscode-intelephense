@@ -4,6 +4,7 @@
 'use strict';
 
 import * as path from 'path';
+import * as fs from 'fs-extra';
 
 import {
 	workspace, Disposable, ExtensionContext, Uri, TextDocument, languages,
@@ -19,15 +20,22 @@ import { WorkspaceDiscovery } from './workspaceDiscovery';
 
 const phpLanguageId = 'php';
 const htmlLanguageId = 'html';
-const discoverRequestName = 'discover';
-const forgetRequestName = 'forget';
-const addSymbolsRequestName = 'addSymbols';
-const symbolCacheDir = 'symbols';
+const version = 'v0.8.0';
 
 let maxFileSizeBytes = 10000000;
 let languageClient: LanguageClient;
 
 export function activate(context: ExtensionContext) {
+
+	let versionMemento = context.workspaceState.get('version');
+	let clearCache = context.workspaceState.get('clearCache');
+	context.workspaceState.update('clearCache', undefined);
+	context.workspaceState.update('version', version);
+	
+	if(!versionMemento) {
+		//cleanup old symbol cache when updating to v0.8.0
+		fs.remove(path.join(context.storagePath, 'symbols')).catch((err)=>{});
+	}
 
 	// The server is implemented in node
 	let serverModule = context.asAbsolutePath(path.join('server', 'server.js'));
