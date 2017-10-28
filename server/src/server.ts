@@ -14,7 +14,7 @@ import {
 	DocumentFormattingRequest, DocumentSelector
 } from 'vscode-languageserver';
 
-import { Intelephense, IntelephenseConfig } from 'intelephense';
+import { Intelephense, IntelephenseConfig, InitialisationOptions } from 'intelephense';
 
 // Create a connection for the server. The connection uses Node's IPC as a transport
 let connection: IConnection = createConnection(new IPCMessageReader(process), new IPCMessageWriter(process));
@@ -23,8 +23,9 @@ let initialisedAt: [number, number];
 const languageId = 'php';
 const discoverSymbolsRequest = new RequestType<{ textDocument: TextDocumentItem }, number, void, void>('discoverSymbols');
 const discoverReferencesRequest = new RequestType<{ textDocument: TextDocumentItem }, number, void, void>('discoverReferences');
-const forgetRequest = new RequestType<{ uri: string }, number, void, void>('forget');
+const forgetRequest = new RequestType<{ uri: string }, void, void, void>('forget');
 const importSymbolRequest = new RequestType<{ uri: string, position: Position, alias?: string }, TextEdit[], void, void>('importSymbol');
+const cachedDocumentsRequest = new RequestType<void, string[], void, void>('cachedDocuments');
 
 interface VscodeConfig extends IntelephenseConfig {
 	format: {enable:boolean}
@@ -59,7 +60,16 @@ let workspaceRoot: string;
 connection.onInitialize((params): InitializeResult => {
 	initialisedAt = process.hrtime();
 	connection.console.info('Initialising');
-	Intelephense.initialise();
+	let initOptions = <InitialisationOptions>{
+		storagePath:params.initializationOptions.storagePath,
+		logWriter:{
+			info: connection.console.info,
+			warn: connection.console.warn,
+			error:connection.console.error
+		},
+		clearCache:params.initializationOptions.clearCache
+	}
+	Intelephense.initialise(initOptions);
 	connection.console.info(`Initialised in ${elapsed(initialisedAt).toFixed()} ms`);
 	workspaceRoot = params.rootPath;
 
@@ -163,9 +173,7 @@ connection.onWorkspaceSymbol((params) => {
 connection.onReferences((params) => {
 	let debugInfo = ['onReferences', params.textDocument.uri, JSON.stringify(params.position)];
 	return handleRequest(() => {
-		let refs = Intelephense.provideReferences(params.textDocument, params.position, params.context);
-		debugInfo.push(`${refs.length} items`);
-		return refs;
+		return Intelephense.provideReferences(params.textDocument, params.position, params.context);
 	}, debugInfo);
 });
 
@@ -197,11 +205,6 @@ connection.onDefinition((params) => {
 	}, debugInfo);
 });
 
-let diagnosticsStartMap: { [index: string]: [number, number] } = {};
-Intelephense.onDiagnosticsStart((uri) => {
-	diagnosticsStartMap[uri] = process.hrtime();
-});
-
 connection.onDocumentFormatting((params) => {
 	let debugInfo = ['onDocumentFormat', params.textDocument.uri];
 	return handleRequest(() => {
@@ -217,13 +220,6 @@ connection.onDocumentRangeFormatting((params) => {
 });
 
 Intelephense.onPublishDiagnostics((args) => {
-
-	let uri = args.uri;
-	debug([
-		'sendDiagnostics', uri, `${elapsed(diagnosticsStartMap[uri]).toFixed(3)} ms`, `${memory().toFixed(1)} MB`
-	].join(' | '));
-
-	delete diagnosticsStartMap[uri];
 	connection.sendDiagnostics(args);
 });
 
@@ -268,6 +264,13 @@ connection.onRequest(importSymbolRequest, (params) => {
 	let debugInfo = ['onImportSymbol', params.uri];
 	return handleRequest(() => {
 		return Intelephense.provideContractFqnTextEdits(params.uri, params.position, params.alias);
+	}, debugInfo);
+});
+
+connection.onRequest(cachedDocumentsRequest, () => {
+	let debugInfo = ['onCachedDocument'];
+	return handleRequest(() => {
+		return Intelephense.cachedDocuments();
 	}, debugInfo);
 });
 
