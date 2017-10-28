@@ -22,6 +22,18 @@ export namespace WorkspaceDiscovery {
     var delayedDiscoverUriArray:Uri[] = [];
     var delayedDiscoverTimer:NodeJS.Timer;
 
+    export function checkCacheThenDiscover(uriArray:Uri[], timestamp:number) {
+        return cachedDocumentsRequest().then((cachedUris)=>{
+            
+        });
+    }
+
+    function binUris(uriArray:Uri[], cached:string[]) {
+
+        
+
+    }
+
     export function discover(uriArray:Uri[]) {
         return discoverSymbolsMany(uriArray).then(() => { return discoverReferencesMany(uriArray); });
     }
@@ -85,7 +97,7 @@ export namespace WorkspaceDiscovery {
             let remaining = uriArray.length;
             let items = uriArray.slice(0);
             let item: Uri;
-            let maxOpenFiles = 16;
+            let maxOpenFiles = 8;
             let discovered
 
             let onAlways = () => {
@@ -163,6 +175,12 @@ export namespace WorkspaceDiscovery {
         return client.sendRequest<number>(
             discoverReferencesRequestName,
             { textDocument: doc }
+        );
+    }
+
+    function cachedDocumentsRequest() {
+        return client.sendRequest<string[]>(
+            cachedDocumentsRequestName
         );
     }
 

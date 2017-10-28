@@ -96,7 +96,11 @@ export function activate(context: ExtensionContext) {
 	WorkspaceDiscovery.maxFileSizeBytes = workspace.getConfiguration("intelephense.file").get('maxSize') as number;
 
 	if (workspace.rootPath) {
-		ready.then(workspaceFilesToIndex).then(indexWorkspace);
+		ready.then(()=>{
+			return workspace.findFiles(workspaceFilesIncludeGlob());
+		}).then((uriArray) => {
+			indexWorkspace(uriArray, context.workspaceState.get<number>('deactivated'));
+		});
 	}
 
 	let importCommandDisposable = commands.registerTextEditorCommand('intelephense.import', importCommandHandler);
@@ -124,6 +128,10 @@ export function activate(context: ExtensionContext) {
 		wordPattern: new RegExp(htmlWordPatternParts.join('|'), 'g')
 	});
 
+}
+
+export function deactivate() {
+	return extensionContext.workspaceState.update('deactivated', Date.now());
 }
 
 interface ImportSymbolTextEdits {
@@ -168,13 +176,6 @@ function workspaceFilesIncludeGlob() {
 	return `**/{${associations.join(',')}}`;
 }
 
-function workspaceFilesToIndex() {
-	let includeGlob = workspaceFilesIncludeGlob();
-	return workspace.findFiles(includeGlob).then((uris)=>{
-		let deactivateTime = 
-	});
-}
-
 function onDidDelete(uri: Uri) {
 	WorkspaceDiscovery.forget(uri);
 }
@@ -187,11 +188,11 @@ function onDidCreate(uri: Uri) {
 	onDidChange(uri);
 }
 
-function indexWorkspace(uriArray: Uri[]) {
+function indexWorkspace(uriArray: Uri[], timestamp:number) {
 
 	let indexingStartHrtime = process.hrtime();
 	languageClient.info('Indexing started.');
-	let completedPromise = WorkspaceDiscovery.discover(uriArray).then(()=>{
+	let completedPromise = WorkspaceDiscovery.checkCacheThenDiscover(uriArray, timestamp).then(()=>{
 		indexingCompleteFeedback(indexingStartHrtime, uriArray.length);
 	});
 	window.setStatusBarMessage('$(search) intelephense indexing ...', completedPromise);
