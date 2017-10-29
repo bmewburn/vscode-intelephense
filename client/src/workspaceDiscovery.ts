@@ -77,7 +77,6 @@ export namespace WorkspaceDiscovery {
             let filtered:Uri[] = [];
 
             let onResolved = (result:[Uri, number]) => {
-                client.info(JSON.stringify([timestamp, ...result]));
                 if(result[1] > timestamp) {
                     //was modified since last shutdown
                     filtered.push(result[0]);
@@ -95,7 +94,7 @@ export namespace WorkspaceDiscovery {
 
             let count = knownUriArray.length;
             knownUriArray = knownUriArray.slice(0);
-            let batchSize = Math.min(8, count);
+            let batchSize = Math.min(4, count);
             let uri:Uri;
 
             while(batchSize-- > 0 && (uri = knownUriArray.pop())) {
@@ -116,7 +115,7 @@ export namespace WorkspaceDiscovery {
 
             uriArray = uriArray.slice(0);
             let count = uriArray.length;
-            let batchSize = Math.min(8, count);
+            let batchSize = Math.min(4, count);
 
             let onFulfilled = () => {
                 --count;

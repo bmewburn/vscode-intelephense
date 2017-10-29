@@ -57,7 +57,7 @@ let config: VscodeConfig = {
 // After the server has started the client sends an initialize request. The server receives
 // in the passed params the rootPath of the workspace plus the client capabilities. 
 let workspaceRoot: string;
-connection.onInitialize((params): InitializeResult => {
+connection.onInitialize((params) => {
 	initialisedAt = process.hrtime();
 	connection.console.info('Initialising');
 	let initOptions = <InitialisationOptions>{
@@ -69,30 +69,32 @@ connection.onInitialize((params): InitializeResult => {
 		},
 		clearCache:params.initializationOptions.clearCache
 	}
-	Intelephense.initialise(initOptions);
-	Intelephense.onPublishDiagnostics((args) => {
-		connection.sendDiagnostics(args);
-	});
-	connection.console.info(`Initialised in ${elapsed(initialisedAt).toFixed()} ms`);
 	workspaceRoot = params.rootPath;
-
-	return {
-		capabilities: {
-			textDocumentSync: TextDocumentSyncKind.Incremental,
-			documentSymbolProvider: true,
-			workspaceSymbolProvider: true,
-			completionProvider: {
-				triggerCharacters: ['$', '>', ':']
-			},
-			signatureHelpProvider: {
-				triggerCharacters: ['(', ',']
-			},
-			definitionProvider: true,
-			documentFormattingProvider: true,
-			documentRangeFormattingProvider: true,
-			referencesProvider: true
+	return Intelephense.initialise(initOptions).then(()=>{
+		Intelephense.onPublishDiagnostics((args) => {
+			connection.sendDiagnostics(args);
+		});
+		connection.console.info(`Initialised in ${elapsed(initialisedAt).toFixed()} ms`);
+		
+		return <InitializeResult>{
+			capabilities: {
+				textDocumentSync: TextDocumentSyncKind.Incremental,
+				documentSymbolProvider: true,
+				workspaceSymbolProvider: true,
+				completionProvider: {
+					triggerCharacters: ['$', '>', ':']
+				},
+				signatureHelpProvider: {
+					triggerCharacters: ['(', ',']
+				},
+				definitionProvider: true,
+				documentFormattingProvider: true,
+				documentRangeFormattingProvider: true,
+				referencesProvider: true
+			}
 		}
-	}
+	});
+	
 });
 
 let docFormatRegister:Thenable<Disposable> = null;
