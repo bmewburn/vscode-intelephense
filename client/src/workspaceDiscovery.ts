@@ -22,10 +22,11 @@ export namespace WorkspaceDiscovery {
     var delayedDiscoverUriArray: Uri[] = [];
     var delayedDiscoverTimer: NodeJS.Timer;
 
-    export function checkCacheThenDiscover(uriArray: Uri[], timestamp: number) {
-        return cachedDocumentsRequest().then((cachedUris) => {
+    export function checkCacheThenDiscover(uriArray: Uri[]) {
+        return cachedDocumentsRequest().then((status) => {
 
-            let cachedUriSet = new Set<string>(cachedUris);
+            let timestamp = status.timestamp;
+            let cachedUriSet = new Set<string>(status.documents);
             let notKnown: Uri[] = [];
             let known: Uri[] = [];
             let uri: Uri;
@@ -42,10 +43,10 @@ export namespace WorkspaceDiscovery {
                 }
             }
 
-            return forgetMany(uriArray).then(() => {
+            return forgetMany(Array.from(cachedUriSet)).then(() => {
                 return filterKnownByModtime(known, timestamp);
-            }).then((filteredUri)=>{
-                Array.prototype.push.apply(notKnown, filteredUri);
+            }).then((filteredUriArray)=>{
+                Array.prototype.push.apply(notKnown, filteredUriArray);
                 return discover(notKnown);
             });
 
@@ -76,7 +77,7 @@ export namespace WorkspaceDiscovery {
             let filtered:Uri[] = [];
 
             let onResolved = (result:[Uri, number]) => {
-                
+                client.info(JSON.stringify([timestamp, ...result]));
                 if(result[1] > timestamp) {
                     //was modified since last shutdown
                     filtered.push(result[0]);
@@ -188,6 +189,10 @@ export namespace WorkspaceDiscovery {
 
     function discoverMany(discoverFn: (uri: Uri) => Promise<number>, uriArray: Uri[]) {
 
+        if(uriArray.length < 1) {
+            return Promise.resolve<number>(0);
+        }
+
         return new Promise<number>((resolve, reject) => {
             let remaining = uriArray.length;
             let items = uriArray.slice(0);
@@ -274,7 +279,7 @@ export namespace WorkspaceDiscovery {
     }
 
     function cachedDocumentsRequest() {
-        return client.sendRequest<string[]>(
+        return client.sendRequest<{timestamp:number, documents:string[]}>(
             cachedDocumentsRequestName
         );
     }

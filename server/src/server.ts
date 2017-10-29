@@ -25,7 +25,7 @@ const discoverSymbolsRequest = new RequestType<{ textDocument: TextDocumentItem 
 const discoverReferencesRequest = new RequestType<{ textDocument: TextDocumentItem }, number, void, void>('discoverReferences');
 const forgetRequest = new RequestType<{ uri: string }, void, void, void>('forget');
 const importSymbolRequest = new RequestType<{ uri: string, position: Position, alias?: string }, TextEdit[], void, void>('importSymbol');
-const cachedDocumentsRequest = new RequestType<void, string[], void, void>('cachedDocuments');
+const cachedDocumentsRequest = new RequestType<void, {timestamp:number, documents:string[]}, void, void>('cachedDocuments');
 
 interface VscodeConfig extends IntelephenseConfig {
 	format: {enable:boolean}
@@ -70,6 +70,9 @@ connection.onInitialize((params): InitializeResult => {
 		clearCache:params.initializationOptions.clearCache
 	}
 	Intelephense.initialise(initOptions);
+	Intelephense.onPublishDiagnostics((args) => {
+		connection.sendDiagnostics(args);
+	});
 	connection.console.info(`Initialised in ${elapsed(initialisedAt).toFixed()} ms`);
 	workspaceRoot = params.rootPath;
 
@@ -219,9 +222,7 @@ connection.onDocumentRangeFormatting((params) => {
 	}, debugInfo);
 });
 
-Intelephense.onPublishDiagnostics((args) => {
-	connection.sendDiagnostics(args);
-});
+connection.onShutdown(Intelephense.shutdown);
 
 connection.onRequest(discoverSymbolsRequest, (params) => {
 

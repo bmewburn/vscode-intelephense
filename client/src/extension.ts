@@ -99,7 +99,7 @@ export function activate(context: ExtensionContext) {
 		ready.then(()=>{
 			return workspace.findFiles(workspaceFilesIncludeGlob());
 		}).then((uriArray) => {
-			indexWorkspace(uriArray, context.workspaceState.get<number>('deactivated'));
+			indexWorkspace(uriArray);
 		});
 	}
 
@@ -128,10 +128,6 @@ export function activate(context: ExtensionContext) {
 		wordPattern: new RegExp(htmlWordPatternParts.join('|'), 'g')
 	});
 
-}
-
-export function deactivate() {
-	return extensionContext.workspaceState.update('deactivated', Date.now());
 }
 
 interface ImportSymbolTextEdits {
@@ -188,11 +184,11 @@ function onDidCreate(uri: Uri) {
 	onDidChange(uri);
 }
 
-function indexWorkspace(uriArray: Uri[], timestamp:number) {
+function indexWorkspace(uriArray: Uri[]) {
 
 	let indexingStartHrtime = process.hrtime();
 	languageClient.info('Indexing started.');
-	let completedPromise = WorkspaceDiscovery.checkCacheThenDiscover(uriArray, timestamp).then((count)=>{
+	let completedPromise = WorkspaceDiscovery.checkCacheThenDiscover(uriArray).then((count)=>{
 		indexingCompleteFeedback(indexingStartHrtime, count);
 	});
 	window.setStatusBarMessage('$(search) intelephense indexing ...', completedPromise);
