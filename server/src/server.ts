@@ -291,7 +291,7 @@ function handleRequest<T>(handler: () => T, debugMsgArray: string[]): T {
 		debug(debugMsgArray.join(' | '));
 		return t;
 	} catch (err) {
-		connection.console.error(err.stack);
+		connection.console.error(debugMsgArray.join(' | ') + '\n' + err.stack);
 		return null;
 	}
 
