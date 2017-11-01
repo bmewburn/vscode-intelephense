@@ -3,22 +3,27 @@
 ## [0.8.0] - TBA
 #### Added
 * Reference provider
-* Config to enable/disable addition of use declarations on completion
+* Auto add use declarations on completion and associated config option
 * Config to enable/disable formatting
 * Config to enable/disable backslash prefix of global functions and constants
 * Invoke param hints on method/function completion
 * phpdoc inheritance
+* multi root workspace support
 
 #### Changed
 * Up to 4 fold improvement in parsing speeds
 * Return multiple locations for go to defintion when applicable
 * Improved type resolution for phpdoc static and $this
+* Caching moved from client to server
 
 #### Fixed
-* Extra lines repeatedly added after comment when formatting
+* Extra lines and spaces repeatedly added when formatting
 * Various PSR2 format fixes
 * Completions within closures
-* Got to defintion for defines
+* Go to defintion for defines
+
+#### Dependencies
+* Intelephense 0.8.0
 
 ## [0.7.2] - 2017-07-03
 #### Fixed
