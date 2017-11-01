@@ -95,7 +95,7 @@ export function activate(context: ExtensionContext) {
 	WorkspaceDiscovery.client = languageClient;
 	WorkspaceDiscovery.maxFileSizeBytes = workspace.getConfiguration("intelephense.file").get('maxSize') as number;
 
-	if (workspace.rootPath) {
+	if (workspace.workspaceFolders && workspace.workspaceFolders.length > 0) {
 		ready.then(()=>{
 			return workspace.findFiles(workspaceFilesIncludeGlob());
 		}).then((uriArray) => {

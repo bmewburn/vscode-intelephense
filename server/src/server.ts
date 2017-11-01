@@ -53,10 +53,6 @@ let config: VscodeConfig = {
 };
 
 
-
-// After the server has started the client sends an initialize request. The server receives
-// in the passed params the rootPath of the workspace plus the client capabilities. 
-let workspaceRoot: string;
 connection.onInitialize((params) => {
 	initialisedAt = process.hrtime();
 	connection.console.info('Initialising');
@@ -69,7 +65,7 @@ connection.onInitialize((params) => {
 		},
 		clearCache:params.initializationOptions.clearCache
 	}
-	workspaceRoot = params.rootPath;
+
 	return Intelephense.initialise(initOptions).then(()=>{
 		Intelephense.onPublishDiagnostics((args) => {
 			connection.sendDiagnostics(args);
