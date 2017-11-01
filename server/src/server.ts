@@ -14,7 +14,7 @@ import {
 	DocumentFormattingRequest, DocumentSelector
 } from 'vscode-languageserver';
 
-import { Intelephense, IntelephenseConfig, InitialisationOptions } from 'intelephense';
+import { Intelephense, IntelephenseConfig, InitialisationOptions, LanguageRange } from 'intelephense';
 
 // Create a connection for the server. The connection uses Node's IPC as a transport
 let connection: IConnection = createConnection(new IPCMessageReader(process), new IPCMessageWriter(process));
@@ -26,6 +26,7 @@ const discoverReferencesRequest = new RequestType<{ textDocument: TextDocumentIt
 const forgetRequest = new RequestType<{ uri: string }, void, void, void>('forget');
 const importSymbolRequest = new RequestType<{ uri: string, position: Position, alias?: string }, TextEdit[], void, void>('importSymbol');
 const cachedDocumentsRequest = new RequestType<void, {timestamp:number, documents:string[]}, void, void>('cachedDocuments');
+const documentLanguageRangesRequest = new RequestType<{ textDocument: TextDocumentItem }, LanguageRange[], void, void>('documentLanguageRanges');
 
 interface VscodeConfig extends IntelephenseConfig {
 	format: {enable:boolean}
@@ -274,6 +275,13 @@ connection.onRequest(cachedDocumentsRequest, () => {
 	let debugInfo = ['onCachedDocument'];
 	return handleRequest(() => {
 		return Intelephense.cachedDocuments();
+	}, debugInfo);
+});
+
+connection.onRequest(documentLanguageRangesRequest, (params) => {
+	let debugInfo = ['onDocumentLanguageRanges'];
+	return handleRequest(() => {
+		return Intelephense.documentLanguageRanges(params.textDocument);
 	}, debugInfo);
 });
 
