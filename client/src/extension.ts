@@ -103,11 +103,15 @@ export function activate(context: ExtensionContext) {
 		});
 	}
 
+	let onDidChangeWorkspaceFoldersDisposable = workspace.onDidChangeWorkspaceFolders((e)=>{
+		//handle folder add/remove
+	});
+
 	let importCommandDisposable = commands.registerTextEditorCommand('intelephense.import', importCommandHandler);
 	let clearCacheDisposable = commands.registerCommand('intelephense.clear.cache', clearCacheCommandHandler);
 
 	//push disposables
-	context.subscriptions.push(langClientDisposable, fsWatcher, importCommandDisposable, clearCacheDisposable);
+	context.subscriptions.push(langClientDisposable, fsWatcher, importCommandDisposable, clearCacheDisposable, onDidChangeWorkspaceFoldersDisposable);
 
 	let wordPatternParts = [
 		/([$a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff\\]*)/.source,
