@@ -26,7 +26,8 @@
         "intellisense",
         "completion",
         "help",
-        "format"
+        "format",
+        "multi-root ready"
     ],
     "bugs": {
         "url": "https://github.com/bmewburn/intelephense/issues"
