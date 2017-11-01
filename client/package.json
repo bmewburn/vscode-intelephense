@@ -136,7 +136,6 @@
     },
     "dependencies": {
         "fs-extra": "^4.0.2",
-        "mkdirp": "^0.5.1",
         "vscode-languageclient": "https://github.com/bmewburn/vscode-languageclient.git"
     },
     "private": true
