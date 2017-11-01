@@ -11,7 +11,7 @@ import {
 	CompletionItem, CompletionItemKind, RequestType, TextDocumentItem,
 	PublishDiagnosticsParams, SignatureHelp, DidChangeConfigurationParams,
 	Position, TextEdit, Disposable, DocumentRangeFormattingRequest, 
-	DocumentFormattingRequest, DocumentSelector
+	DocumentFormattingRequest, DocumentSelector, TextDocumentIdentifier
 } from 'vscode-languageserver';
 
 import { Intelephense, IntelephenseConfig, InitialisationOptions, LanguageRange } from 'intelephense';
@@ -26,7 +26,7 @@ const discoverReferencesRequest = new RequestType<{ textDocument: TextDocumentIt
 const forgetRequest = new RequestType<{ uri: string }, void, void, void>('forget');
 const importSymbolRequest = new RequestType<{ uri: string, position: Position, alias?: string }, TextEdit[], void, void>('importSymbol');
 const cachedDocumentsRequest = new RequestType<void, {timestamp:number, documents:string[]}, void, void>('cachedDocuments');
-const documentLanguageRangesRequest = new RequestType<{ textDocument: TextDocumentItem }, LanguageRange[], void, void>('documentLanguageRanges');
+const documentLanguageRangesRequest = new RequestType<{ textDocument: TextDocumentIdentifier }, LanguageRange[], void, void>('documentLanguageRanges');
 
 interface VscodeConfig extends IntelephenseConfig {
 	format: {enable:boolean}
