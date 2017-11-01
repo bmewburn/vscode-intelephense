@@ -8,8 +8,8 @@
     "node": "*"
   },
   "dependencies": {
-    "vscode-languageserver": "^3.3.0",
-    "intelephense": "https://github.com/bmewburn/intelephense#v0.8.0"
+    "intelephense": "git+https://github.com/bmewburn/intelephense.git#v0.8.0",
+    "vscode-languageserver": "^3.3.0"
   },
   "devDependencies": {
     "@types/node": "^6.0.52",
