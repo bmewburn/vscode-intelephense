@@ -25,7 +25,7 @@ const discoverSymbolsRequest = new RequestType<{ textDocument: TextDocumentItem 
 const discoverReferencesRequest = new RequestType<{ textDocument: TextDocumentItem }, number, void, void>('discoverReferences');
 const forgetRequest = new RequestType<{ uri: string }, void, void, void>('forget');
 const importSymbolRequest = new RequestType<{ uri: string, position: Position, alias?: string }, TextEdit[], void, void>('importSymbol');
-const cachedDocumentsRequest = new RequestType<void, {timestamp:number, documents:string[]}, void, void>('cachedDocuments');
+const knownDocumentsRequest = new RequestType<void, {timestamp:number, documents:string[]}, void, void>('knownDocuments');
 
 interface VscodeConfig extends IntelephenseConfig {
 	format: {enable:boolean}
@@ -266,10 +266,10 @@ connection.onRequest(importSymbolRequest, (params) => {
 	}, debugInfo);
 });
 
-connection.onRequest(cachedDocumentsRequest, () => {
+connection.onRequest(knownDocumentsRequest, () => {
 	let debugInfo = ['onCachedDocument'];
 	return handleRequest(() => {
-		return Intelephense.cachedDocuments();
+		return Intelephense.knownDocuments();
 	}, debugInfo);
 });
 

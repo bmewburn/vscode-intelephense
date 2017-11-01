@@ -9,7 +9,7 @@ import * as fs from 'fs-extra';
 import {
 	workspace, Disposable, ExtensionContext, Uri, TextDocument, languages,
 	IndentAction, window, commands, TextEditor, TextEditorEdit, TextEdit,
-	Range, Position
+	Range, Position, CancellationToken, CancellationTokenSource
 } from 'vscode';
 import {
 	LanguageClient, LanguageClientOptions, SettingMonitor, ServerOptions,
@@ -95,16 +95,26 @@ export function activate(context: ExtensionContext) {
 	WorkspaceDiscovery.client = languageClient;
 	WorkspaceDiscovery.maxFileSizeBytes = workspace.getConfiguration("intelephense.file").get('maxSize') as number;
 
+
+	let cancelWorkspaceDiscoveryController:CancellationTokenSource;
+
 	if (workspace.workspaceFolders && workspace.workspaceFolders.length > 0) {
 		ready.then(()=>{
-			return workspace.findFiles(workspaceFilesIncludeGlob());
+			if(cancelWorkspaceDiscoveryController) {
+				cancelWorkspaceDiscoveryController.dispose();
+			}
+			cancelWorkspaceDiscoveryController = new CancellationTokenSource();
+			return workspace.findFiles(workspaceFilesIncludeGlob(), undefined, undefined, cancelWorkspaceDiscoveryController.token);
 		}).then((uriArray) => {
-			indexWorkspace(uriArray);
+			indexWorkspace(uriArray, true, cancelWorkspaceDiscoveryController.token);
 		});
 	}
 
 	let onDidChangeWorkspaceFoldersDisposable = workspace.onDidChangeWorkspaceFolders((e)=>{
 		//handle folder add/remove
+		return workspace.findFiles(workspaceFilesIncludeGlob()).then((uriArray) => {
+			indexWorkspace(uriArray, false);
+		});
 	});
 
 	let importCommandDisposable = commands.registerTextEditorCommand('intelephense.import', importCommandHandler);
@@ -188,11 +198,15 @@ function onDidCreate(uri: Uri) {
 	onDidChange(uri);
 }
 
-function indexWorkspace(uriArray: Uri[]) {
+function indexWorkspace(uriArray: Uri[], checkModTime:boolean, token:CancellationToken) {
+
+	if(token.isCancellationRequested) {
+		return;
+	}
 
 	let indexingStartHrtime = process.hrtime();
 	languageClient.info('Indexing started.');
-	let completedPromise = WorkspaceDiscovery.checkCacheThenDiscover(uriArray).then((count)=>{
+	let completedPromise = WorkspaceDiscovery.checkCacheThenDiscover(uriArray, checkModTime, token).then((count)=>{
 		indexingCompleteFeedback(indexingStartHrtime, count);
 	});
 	window.setStatusBarMessage('$(search) intelephense indexing ...', completedPromise);
