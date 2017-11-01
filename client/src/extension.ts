@@ -13,13 +13,12 @@ import {
 } from 'vscode';
 import {
 	LanguageClient, LanguageClientOptions, SettingMonitor, ServerOptions,
-	TransportKind, TextDocumentItem, DocumentSelectorFactory, DocumentFormattingRequest,
+	TransportKind, TextDocumentItem, DocumentFormattingRequest,
 	DocumentRangeFormattingRequest
 } from 'vscode-languageclient';
 import { WorkspaceDiscovery } from './workspaceDiscovery';
 
 const phpLanguageId = 'php';
-const htmlLanguageId = 'html';
 const version = 'v0.8.0';
 
 let maxFileSizeBytes = 10000000;
@@ -51,25 +50,11 @@ export function activate(context: ExtensionContext) {
 		debug: { module: serverModule, transport: TransportKind.ipc, options: debugOptions }
 	}
 
-	let documentSelectorFactory: DocumentSelectorFactory = (method) => {
-		switch (method) {
-			case DocumentFormattingRequest.type.method:
-			case DocumentRangeFormattingRequest.type.method:
-				return [{ language: phpLanguageId, scheme: 'file' }]
-			default:
-				return [
-					{ language: phpLanguageId, scheme: 'file' },
-					{ language: htmlLanguageId, scheme: 'file' }
-				];
-		}
-	}
-
 	// Options to control the language client
 	let clientOptions: LanguageClientOptions = {
 		documentSelector: [
 			{ language: phpLanguageId, scheme: 'file' },
 		],
-		documentSelectorFactory: documentSelectorFactory,
 		synchronize: {
 			// Synchronize the setting section 'intelephense' to the server
 			configurationSection: 'intelephense',
@@ -114,18 +99,8 @@ export function activate(context: ExtensionContext) {
 		/([^\$\-\`\~\!\@\#\%\^\&\*\(\)\=\+\[\{\]\}\\\|\;\:\'\"\,\.\<\>\/\?\s]+)/.source
 	];
 
-	let htmlWordPatternParts = [
-		/([$a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff\\]*)/.source,
-		/(-?\d*\.\d\w*)/.source,
-		/([^\`\~\!\@\$\^\&\*\(\)\=\+\[\{\]\}\\\|\;\:\'\"\,\.\<\>\/\s]+)/.source
-	];
-
 	languages.setLanguageConfiguration(phpLanguageId, {
 		wordPattern: new RegExp(wordPatternParts.join('|'), 'g'),
-	});
-
-	languages.setLanguageConfiguration(htmlLanguageId, {
-		wordPattern: new RegExp(htmlWordPatternParts.join('|'), 'g')
 	});
 
 }
