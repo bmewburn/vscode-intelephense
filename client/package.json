@@ -53,6 +53,10 @@
             {
                 "command": "intelephense.clear.cache",
                 "title": "Intelephense: Clear Cache and Reload"
+            },
+            {
+                "command": "intelephense.cancel.indexing",
+                "title": "Intelephense: Cancel indexing"
             }
         ],
         "menus": {

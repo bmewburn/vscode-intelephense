@@ -179,15 +179,15 @@ export namespace WorkspaceDiscovery {
     }
 
     function discoverSymbolsMany(uriArray: Uri[], token?:CancellationToken) {
-        return discoverMany(discoverSymbols, uriArray);
+        return discoverMany(discoverSymbols, uriArray, token);
     }
 
     function discoverReferences(uri: Uri) {
         return readTextDocumentItem(uri).then(discoverReferencesRequest);
     }
 
-    function discoverReferencesMany(uriArray: Uri[]) {
-        return discoverMany(discoverReferences, uriArray);
+    function discoverReferencesMany(uriArray: Uri[], token?:CancellationToken) {
+        return discoverMany(discoverReferences, uriArray, token);
     }
 
     function discoverMany(discoverFn: (uri: Uri, token?:CancellationToken) => Promise<number>, uriArray: Uri[], token?:CancellationToken) {
