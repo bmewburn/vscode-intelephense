@@ -205,14 +205,17 @@ export namespace WorkspaceDiscovery {
 
             let onAlways = () => {
                 --remaining;
-                let uri = items.pop();
-                if (uri) {
-                    discoverFn(uri, token).then(onResolve).catch(onReject);
+                let uri:Uri;
+                
+                if(cancelled) {
+                    return;
                 } else if (remaining < 1 || (token.isCancellationRequested && !cancelled)) {
                     if(token.isCancellationRequested) {
                         cancelled = true;
                     }
                     resolve(uriArray.length);
+                } else if (uri = items.pop()) {
+                    discoverFn(uri, token).then(onResolve).catch(onReject);
                 }
             }
 
