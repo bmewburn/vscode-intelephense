@@ -89,7 +89,7 @@ connection.onInitialize((params) => {
 					triggerCharacters: ['(', ',']
 				},
 				definitionProvider: true,
-				documentFormattingProvider: true,
+				//documentFormattingProvider: true,
 				documentRangeFormattingProvider: true,
 				referencesProvider: true
 			}
@@ -211,12 +211,14 @@ connection.onDefinition((params) => {
 	}, debugInfo);
 });
 
+/*
 connection.onDocumentFormatting((params) => {
 	let debugInfo = ['onDocumentFormat', params.textDocument.uri];
 	return handleRequest(() => {
 		return Intelephense.provideDocumentFormattingEdits(params.textDocument, params.options);
 	}, debugInfo);
 });
+*/
 
 connection.onDocumentRangeFormatting((params) => {
 	let debugInfo = ['onDocumentFormat', params.textDocument.uri];
@@ -274,7 +276,7 @@ connection.onRequest(importSymbolRequest, (params) => {
 connection.onRequest(cachedDocumentsRequest, () => {
 	let debugInfo = ['onCachedDocument'];
 	return handleRequest(() => {
-		return Intelephense.cachedDocuments();
+		return Intelephense.knownDocuments();
 	}, debugInfo);
 });
 
