@@ -129,7 +129,7 @@ connection.onDocumentLinks((params) => {
 });
 
 connection.onHover((params) => {
-	return undefined;
+	return Intelephense.provideHover(params.textDocument.uri, params.position);
 });
 
 connection.onDocumentHighlight((params) => {
