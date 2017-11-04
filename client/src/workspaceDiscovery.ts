@@ -209,8 +209,8 @@ export namespace WorkspaceDiscovery {
                 
                 if(cancelled) {
                     return;
-                } else if (remaining < 1 || (token.isCancellationRequested && !cancelled)) {
-                    if(token.isCancellationRequested) {
+                } else if (remaining < 1 || (token && token.isCancellationRequested && !cancelled)) {
+                    if(token && token.isCancellationRequested) {
                         cancelled = true;
                     }
                     resolve(uriArray.length);
