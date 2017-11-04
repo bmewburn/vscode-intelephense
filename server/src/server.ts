@@ -98,7 +98,6 @@ connection.onInitialize((params) => {
 });
 
 let docFormatRegister:Thenable<Disposable> = null;
-let rangeFormatRegister:Thenable<Disposable> = null;
 
 connection.onDidChangeConfiguration((params) => {
 
@@ -111,21 +110,14 @@ connection.onDidChangeConfiguration((params) => {
 
 	let enableFormatter = config.format && config.format.enable;
 	if (enableFormatter) {
-		let documentSelector: DocumentSelector = [{ language: languageId }];
+		let documentSelector: DocumentSelector = [{ language: languageId, scheme:'file' }];
 		if (!docFormatRegister) {
-			docFormatRegister = connection.client.register(DocumentFormattingRequest.type, { documentSelector });
-		}
-		if(!rangeFormatRegister) {
-			rangeFormatRegister = connection.client.register(DocumentRangeFormattingRequest.type, { documentSelector });
+			docFormatRegister = connection.client.register(DocumentRangeFormattingRequest.type, { documentSelector });
 		}
 	} else {
 		if(docFormatRegister) {
 			docFormatRegister.then(r => r.dispose());
 			docFormatRegister = null;
-		}
-		if(rangeFormatRegister) {
-			rangeFormatRegister.then(r => r.dispose());
-			rangeFormatRegister = null;
 		}
 	}
 
@@ -234,8 +226,11 @@ connection.onDocumentFormatting((params) => {
 
 connection.onDocumentRangeFormatting((params) => {
 	let debugInfo = ['onDocumentFormat', params.textDocument.uri];
+	connection.console.log(JSON.stringify(params));
 	return handleRequest(() => {
-		return Intelephense.provideDocumentRangeFormattingEdits(params.textDocument, params.range, params.options);
+		let r = Intelephense.provideDocumentRangeFormattingEdits(params.textDocument, params.range, params.options);
+		connection.console.log(JSON.stringify(r));
+		return r;
 	}, debugInfo);
 });
 

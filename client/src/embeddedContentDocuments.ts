@@ -366,35 +366,6 @@ export function initializeEmbeddedContentDocuments(getClient:() => LanguageClien
                     return h.shift();
                 });
             }, undefined, token);
-        },
-
-        provideDocumentRangeFormattingEdits: (document: TextDocument, range: Range, options: FormattingOptions, token: CancellationToken, next: ProvideDocumentRangeFormattingEditsSignature) => {
-
-            let vdocUri = getEmbeddedContentUri(document.uri.toString(), htmlLanguageId);
-            return openEmbeddedContentDocument(vdocUri, document.version).then((vdoc) => {
-                if (isRangePhpOnly(vdocUri, range)) {
-                    return next(document, range, options, token);
-                }
-
-                //does applying a workspaceedit cancel a format request?
-                //assuming it does so using another execute command to get php formats
-
-                commands.executeCommand<TextEdit[]>('vscode.executeFormatRangeProvider', vdoc.uri, range, options).then((edits) => {
-                    let workspaceEdit = new WorkspaceEdit();
-                    workspaceEdit.set(document.uri, edits);
-                    return workspace.applyEdit(workspaceEdit);
-                }).then((v)=>{
-                    return commands.executeCommand<TextEdit[]>('vscode.executeFormatRangeProvider', document.uri, range, options);
-                }).then((edits) => {
-                    let workspaceEdit = new WorkspaceEdit();
-                    workspaceEdit.set(document.uri, edits);
-                    return workspace.applyEdit(workspaceEdit);
-                }).then((v) => {
-                    return [];
-                });
-
-            });
-
         }
 
     }
