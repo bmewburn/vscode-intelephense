@@ -29,7 +29,7 @@ const documentLanguageRangesRequest = new RequestType<{ textDocument: TextDocume
 const knownDocumentsRequest = new RequestType<void, {timestamp:number, documents:string[]}, void, void>('knownDocuments');
 
 interface VscodeConfig extends IntelephenseConfig {
-	format: {enable:boolean}
+	formatProvider: {enable:boolean}
 }
 
 let config: VscodeConfig = {
@@ -48,7 +48,7 @@ let config: VscodeConfig = {
 	file: {
 		maxSize: 1000000
 	},
-	format: {
+	formatProvider: {
 		enable: true
 	}
 };
@@ -86,7 +86,7 @@ connection.onInitialize((params) => {
 				},
 				definitionProvider: true,
 				//documentFormattingProvider: true,
-				documentRangeFormattingProvider: true,
+				documentRangeFormattingProvider: false,
 				referencesProvider: true,
 				documentLinkProvider: { resolveProvider:false },
 				hoverProvider:true,
@@ -108,7 +108,7 @@ connection.onDidChangeConfiguration((params) => {
 	config = settings;
 	Intelephense.setConfig(config);
 
-	let enableFormatter = config.format && config.format.enable;
+	let enableFormatter = config.formatProvider && config.formatProvider.enable;
 	if (enableFormatter) {
 		let documentSelector: DocumentSelector = [{ language: languageId, scheme:'file' }];
 		if (!docFormatRegister) {
@@ -133,7 +133,7 @@ connection.onHover((params) => {
 });
 
 connection.onDocumentHighlight((params) => {
-	return [];
+	return Intelephense.provideHighlights(params.textDocument.uri, params.position);
 })
 
 connection.onDidOpenTextDocument((params) => {
@@ -226,10 +226,8 @@ connection.onDocumentFormatting((params) => {
 
 connection.onDocumentRangeFormatting((params) => {
 	let debugInfo = ['onDocumentFormat', params.textDocument.uri];
-	connection.console.log(JSON.stringify(params));
 	return handleRequest(() => {
 		let r = Intelephense.provideDocumentRangeFormattingEdits(params.textDocument, params.range, params.options);
-		connection.console.log(JSON.stringify(r));
 		return r;
 	}, debugInfo);
 });

@@ -60,6 +60,12 @@ export function initializeEmbeddedContentDocuments(getClient: () => LanguageClie
     toDispose.push(workspace.onDidCloseTextDocument(d => {
         if (isEmbeddedContentUri(d.uri)) {
             delete openVirtualDocuments[d.uri.toString()];
+            delete documentLanguageRanges[d.uri.toString()];
+        } else {
+            let vdocUri = getEmbeddedContentUri(d.uri.toString(), htmlLanguageId);
+            if(openVirtualDocuments[vdocUri.toString()]) {
+                ensureContentUpdated(vdocUri, -1);
+            }
         }
     }));
 
@@ -96,7 +102,7 @@ export function initializeEmbeddedContentDocuments(getClient: () => LanguageClie
             r = ranges[n];
             part = doc.getText(r.range);
             if (part && r.languageId === phpLanguageId) {
-                part = '<' + part.slice(1, -1).replace(replacePattern, ' ') + '>';
+                part = part.replace(replacePattern, ' ');
             }
             text += part;
         }
@@ -148,6 +154,7 @@ export function initializeEmbeddedContentDocuments(getClient: () => LanguageClie
                     }
                 });
                 delete documentLanguageRanges[virtualURIString];
+                delete openVirtualDocuments[virtualURIString];
                 embeddedContentChanged.fire(virtualURI);
             });
         }

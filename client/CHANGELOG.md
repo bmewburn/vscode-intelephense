@@ -3,12 +3,15 @@
 ## [0.8.0] - TBA
 #### Added
 * Reference provider
+* hover provider
+* highlight provider
 * Auto add use declarations on completion and associated config option
 * Config to enable/disable formatting
 * Config to enable/disable backslash prefix of global functions and constants
 * Invoke param hints on method/function completion
 * phpdoc inheritance
 * multi root workspace support
+* html request forwarding
 
 #### Changed
 * Up to 4 fold improvement in parsing speeds
