@@ -25,8 +25,8 @@ const discoverSymbolsRequest = new RequestType<{ textDocument: TextDocumentItem 
 const discoverReferencesRequest = new RequestType<{ textDocument: TextDocumentItem }, number, void, void>('discoverReferences');
 const forgetRequest = new RequestType<{ uri: string }, void, void, void>('forget');
 const importSymbolRequest = new RequestType<{ uri: string, position: Position, alias?: string }, TextEdit[], void, void>('importSymbol');
-const cachedDocumentsRequest = new RequestType<void, {timestamp:number, documents:string[]}, void, void>('cachedDocuments');
 const documentLanguageRangesRequest = new RequestType<{ textDocument: TextDocumentIdentifier }, LanguageRange[], void, void>('documentLanguageRanges');
+const knownDocumentsRequest = new RequestType<void, {timestamp:number, documents:string[]}, void, void>('knownDocuments');
 
 interface VscodeConfig extends IntelephenseConfig {
 	format: {enable:boolean}
@@ -54,10 +54,6 @@ let config: VscodeConfig = {
 };
 
 
-
-// After the server has started the client sends an initialize request. The server receives
-// in the passed params the rootPath of the workspace plus the client capabilities. 
-let workspaceRoot: string;
 connection.onInitialize((params) => {
 	initialisedAt = process.hrtime();
 	connection.console.info('Initialising');
@@ -70,7 +66,7 @@ connection.onInitialize((params) => {
 		},
 		clearCache:params.initializationOptions.clearCache
 	}
-	workspaceRoot = params.rootPath;
+
 	return Intelephense.initialise(initOptions).then(()=>{
 		Intelephense.onPublishDiagnostics((args) => {
 			connection.sendDiagnostics(args);
@@ -273,7 +269,7 @@ connection.onRequest(importSymbolRequest, (params) => {
 	}, debugInfo);
 });
 
-connection.onRequest(cachedDocumentsRequest, () => {
+connection.onRequest(knownDocumentsRequest, () => {
 	let debugInfo = ['onCachedDocument'];
 	return handleRequest(() => {
 		return Intelephense.knownDocuments();

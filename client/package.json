@@ -10,7 +10,7 @@
     "version": "0.8.0",
     "publisher": "bmewburn",
     "engines": {
-        "vscode": "^1.11.0"
+        "vscode": "^1.16.0"
     },
     "categories": [
         "Languages",
@@ -26,7 +26,8 @@
         "intellisense",
         "completion",
         "help",
-        "format"
+        "format",
+        "multi-root ready"
     ],
     "bugs": {
         "url": "https://github.com/bmewburn/intelephense/issues"
@@ -52,6 +53,10 @@
             {
                 "command": "intelephense.clear.cache",
                 "title": "Intelephense: Clear Cache and Reload"
+            },
+            {
+                "command": "intelephense.cancel.indexing",
+                "title": "Intelephense: Cancel indexing"
             }
         ],
         "menus": {
@@ -130,12 +135,11 @@
         "@types/fs-extra": "^4.0.3",
         "@types/mocha": "^2.2.40",
         "@types/node": "^6.0.52",
-        "typescript": "^2.3.4",
-        "vscode": "^1.1.0"
+        "typescript": "^2.5.3",
+        "vscode": "^1.1.6"
     },
     "dependencies": {
         "fs-extra": "^4.0.2",
-        "mkdirp": "^0.5.1",
         "vscode-languageclient": "3.4.5"
     },
     "private": true

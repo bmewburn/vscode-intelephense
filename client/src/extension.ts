@@ -9,7 +9,7 @@ import * as fs from 'fs-extra';
 import {
 	workspace, Disposable, ExtensionContext, Uri, TextDocument, languages,
 	IndentAction, window, commands, TextEditor, TextEditorEdit, TextEdit,
-	Range, Position
+	Range, Position, CancellationToken, CancellationTokenSource
 } from 'vscode';
 import {
 	LanguageClient, LanguageClientOptions, SettingMonitor, ServerOptions,
@@ -24,6 +24,7 @@ const version = 'v0.8.0';
 let maxFileSizeBytes = 10000000;
 let languageClient: LanguageClient;
 let extensionContext:ExtensionContext;
+let cancelWorkspaceDiscoveryController:CancellationTokenSource;
 
 export function activate(context: ExtensionContext) {
 
@@ -80,19 +81,38 @@ export function activate(context: ExtensionContext) {
 	WorkspaceDiscovery.client = languageClient;
 	WorkspaceDiscovery.maxFileSizeBytes = workspace.getConfiguration("intelephense.file").get('maxSize') as number;
 
-	if (workspace.rootPath) {
+	if (workspace.workspaceFolders && workspace.workspaceFolders.length > 0) {
+		let token:CancellationToken;
 		ready.then(()=>{
-			return workspace.findFiles(workspaceFilesIncludeGlob());
+			if(cancelWorkspaceDiscoveryController) {
+				cancelWorkspaceDiscoveryController.dispose();
+			}
+			cancelWorkspaceDiscoveryController = new CancellationTokenSource();
+			token = cancelWorkspaceDiscoveryController.token;
+			return workspace.findFiles(workspaceFilesIncludeGlob(), undefined, undefined, token);
 		}).then((uriArray) => {
-			indexWorkspace(uriArray);
+			indexWorkspace(uriArray, true, token);
 		});
 	}
 
+	let onDidChangeWorkspaceFoldersDisposable = workspace.onDidChangeWorkspaceFolders((e)=>{
+		//handle folder add/remove
+		if(cancelWorkspaceDiscoveryController) {
+			cancelWorkspaceDiscoveryController.dispose();
+		}
+		cancelWorkspaceDiscoveryController = new CancellationTokenSource();
+		let token = cancelWorkspaceDiscoveryController.token;
+		return workspace.findFiles(workspaceFilesIncludeGlob()).then((uriArray) => {
+			indexWorkspace(uriArray, false, token);
+		});
+	});
+
 	let importCommandDisposable = commands.registerTextEditorCommand('intelephense.import', importCommandHandler);
 	let clearCacheDisposable = commands.registerCommand('intelephense.clear.cache', clearCacheCommandHandler);
+	let cancelIndexingDisposable = commands.registerCommand('intelephense.cancel.indexing', cancelWorkspaceDiscoveryHandler);
 
 	//push disposables
-	context.subscriptions.push(langClientDisposable, fsWatcher, importCommandDisposable, clearCacheDisposable);
+	context.subscriptions.push(langClientDisposable, fsWatcher, importCommandDisposable, clearCacheDisposable, onDidChangeWorkspaceFoldersDisposable, cancelIndexingDisposable);
 
 	let wordPatternParts = [
 		/([$a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff\\]*)/.source,
@@ -135,6 +155,13 @@ function clearCacheCommandHandler() {
 	});
 }
 
+function cancelWorkspaceDiscoveryHandler() {
+	if(cancelWorkspaceDiscoveryController) {
+		cancelWorkspaceDiscoveryController.dispose();
+		cancelWorkspaceDiscoveryController = undefined;
+	}
+}
+
 function workspaceFilesIncludeGlob() {
 	let settings = workspace.getConfiguration('files').get('associations');
 	let associations = Object.keys(settings).filter((x) => {
@@ -159,18 +186,22 @@ function onDidCreate(uri: Uri) {
 	onDidChange(uri);
 }
 
-function indexWorkspace(uriArray: Uri[]) {
+function indexWorkspace(uriArray: Uri[], checkModTime:boolean, token:CancellationToken) {
+
+	if(token.isCancellationRequested) {
+		return;
+	}
 
 	let indexingStartHrtime = process.hrtime();
 	languageClient.info('Indexing started.');
-	let completedPromise = WorkspaceDiscovery.checkCacheThenDiscover(uriArray).then((count)=>{
-		indexingCompleteFeedback(indexingStartHrtime, count);
+	let completedPromise = WorkspaceDiscovery.checkCacheThenDiscover(uriArray, checkModTime, token).then((count)=>{
+		indexingCompleteFeedback(indexingStartHrtime, count, token);
 	});
 	window.setStatusBarMessage('$(search) intelephense indexing ...', completedPromise);
 
 }
 
-function indexingCompleteFeedback(startHrtime: [number, number], fileCount: number) {
+function indexingCompleteFeedback(startHrtime: [number, number], fileCount: number, token:CancellationToken) {
 	let elapsed = process.hrtime(startHrtime);
 	let info = [
 		`${fileCount} files`,
@@ -178,11 +209,11 @@ function indexingCompleteFeedback(startHrtime: [number, number], fileCount: numb
 	];
 
 	languageClient.info(
-		['Indexing ended', ...info].join(' | ')
+		[token.isCancellationRequested ? 'Indexing cancelled' : 'Indexing ended', ...info].join(' | ')
 	);
 
 	window.setStatusBarMessage([
-		'$(search) intelephense indexing complete',
+		'$(search) intelephense indexing ' + (token.isCancellationRequested ? 'cancelled' : 'complete'),
 		`$(file-code) ${fileCount}`,
 		`$(clock) ${elapsed[0]}.${Math.round(elapsed[1] / 100000000)}`
 	].join('   '), 30000);

@@ -5,12 +5,12 @@
 
 import * as fs from 'fs-extra';
 import { LanguageClient, TextDocumentItem } from 'vscode-languageclient';
-import { Uri } from 'vscode'
+import { Uri, CancellationToken, CancellationTokenSource } from 'vscode';
 
 const discoverSymbolsRequestName = 'discoverSymbols';
 const discoverReferencesRequestName = 'discoverReferences';
 const forgetRequestName = 'forget';
-const cachedDocumentsRequestName = 'cachedDocuments';
+const knownDocumentsRequestName = 'knownDocuments';
 const phpLanguageId = 'php';
 
 export namespace WorkspaceDiscovery {
@@ -22,8 +22,12 @@ export namespace WorkspaceDiscovery {
     var delayedDiscoverUriArray: Uri[] = [];
     var delayedDiscoverTimer: NodeJS.Timer;
 
-    export function checkCacheThenDiscover(uriArray: Uri[]) {
-        return cachedDocumentsRequest().then((status) => {
+    export function checkCacheThenDiscover(uriArray: Uri[], checkModTime:boolean, token:CancellationToken) {
+        return knownDocumentsRequest(token).then((status) => {
+
+            if(token.isCancellationRequested) {
+                return Promise.resolve(0);
+            }
 
             let timestamp = status.timestamp;
             let cachedUriSet = new Set<string>(status.documents);
@@ -44,10 +48,10 @@ export namespace WorkspaceDiscovery {
             }
 
             return forgetMany(Array.from(cachedUriSet)).then(() => {
-                return filterKnownByModtime(known, timestamp);
+                return checkModTime && !token.isCancellationRequested ? filterKnownByModtime(known, timestamp) : Promise.resolve([]);
             }).then((filteredUriArray)=>{
                 Array.prototype.push.apply(notKnown, filteredUriArray);
-                return discover(notKnown);
+                return discover(notKnown, token);
             });
 
         });
@@ -143,8 +147,8 @@ export namespace WorkspaceDiscovery {
 
     }
 
-    export function discover(uriArray: Uri[]) {
-        return discoverSymbolsMany(uriArray).then(() => { return discoverReferencesMany(uriArray); });
+    export function discover(uriArray: Uri[], token?:CancellationToken) {
+        return discoverSymbolsMany(uriArray, token).then(() => { return discoverReferencesMany(uriArray, token); });
     }
 
     export function delayedDiscover(uri: Uri) {
@@ -174,21 +178,21 @@ export namespace WorkspaceDiscovery {
         return readTextDocumentItem(uri).then(discoverSymbolsRequest);
     }
 
-    function discoverSymbolsMany(uriArray: Uri[]) {
-        return discoverMany(discoverSymbols, uriArray);
+    function discoverSymbolsMany(uriArray: Uri[], token?:CancellationToken) {
+        return discoverMany(discoverSymbols, uriArray, token);
     }
 
     function discoverReferences(uri: Uri) {
         return readTextDocumentItem(uri).then(discoverReferencesRequest);
     }
 
-    function discoverReferencesMany(uriArray: Uri[]) {
-        return discoverMany(discoverReferences, uriArray);
+    function discoverReferencesMany(uriArray: Uri[], token?:CancellationToken) {
+        return discoverMany(discoverReferences, uriArray, token);
     }
 
-    function discoverMany(discoverFn: (uri: Uri) => Promise<number>, uriArray: Uri[]) {
+    function discoverMany(discoverFn: (uri: Uri, token?:CancellationToken) => Promise<number>, uriArray: Uri[], token?:CancellationToken) {
 
-        if(uriArray.length < 1) {
+        if(uriArray.length < 1 || (token && token.isCancellationRequested)) {
             return Promise.resolve<number>(0);
         }
 
@@ -197,15 +201,21 @@ export namespace WorkspaceDiscovery {
             let items = uriArray.slice(0);
             let item: Uri;
             let maxOpenFiles = 8;
-            let discovered
+            let cancelled = false;
 
             let onAlways = () => {
                 --remaining;
-                let uri = items.pop();
-                if (uri) {
-                    discoverFn(uri).then(onResolve).catch(onReject);
-                } else if (remaining < 1) {
+                let uri:Uri;
+                
+                if(cancelled) {
+                    return;
+                } else if (remaining < 1 || (token.isCancellationRequested && !cancelled)) {
+                    if(token.isCancellationRequested) {
+                        cancelled = true;
+                    }
                     resolve(uriArray.length);
+                } else if (uri = items.pop()) {
+                    discoverFn(uri, token).then(onResolve).catch(onReject);
                 }
             }
 
@@ -219,7 +229,7 @@ export namespace WorkspaceDiscovery {
             };
 
             while (maxOpenFiles > 0 && (item = items.pop())) {
-                discoverFn(item).then(onResolve).catch(onReject);
+                discoverFn(item, token).then(onResolve).catch(onReject);
                 --maxOpenFiles;
             }
         });
@@ -277,9 +287,10 @@ export namespace WorkspaceDiscovery {
         );
     }
 
-    function cachedDocumentsRequest() {
+    function knownDocumentsRequest(token:CancellationToken) {
         return client.sendRequest<{timestamp:number, documents:string[]}>(
-            cachedDocumentsRequestName
+            knownDocumentsRequestName,
+            token
         );
     }
 
