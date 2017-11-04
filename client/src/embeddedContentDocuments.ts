@@ -12,12 +12,14 @@
 import {
     Middleware, ProvideCompletionItemsSignature, LanguageClient, TextDocumentIdentifier,
     Range as RangeDto, ProvideSignatureHelpSignature, ProvideDefinitionSignature,
-    ProvideReferencesSignature, ProvideDocumentSymbolsSignature
+    ProvideReferencesSignature, ProvideDocumentSymbolsSignature, ProvideDocumentLinksSignature,
+    ProvideDocumentHighlightsSignature, ProvideHoverSignature
 } from 'vscode-languageclient';
 import {
     TextDocument, Position, CancellationToken, Range, workspace,
     EventEmitter, Disposable, Uri, commands, ProviderResult, CompletionItem, CompletionList,
-    SignatureHelp, Definition, Location, SymbolInformation
+    SignatureHelp, Definition, Location, SymbolInformation, DocumentLink, DocumentHighlight,
+    Hover
 } from 'vscode';
 import {
     getEmbeddedContentUri, getEmbeddedLanguageId, getHostDocumentUri,
@@ -177,7 +179,8 @@ export function initializeEmbeddedContentDocuments(client: LanguageClient): Embe
         first: () => ProviderResult<R>,
         isFalseyResult: (v: any) => boolean,
         next: (virtualDoc: TextDocument) => ProviderResult<R>,
-        defaultResult: ProviderResult<R>
+        defaultResult: ProviderResult<R>,
+        token:CancellationToken
     ): ProviderResult<R> {
 
         let result = first();
@@ -186,13 +189,13 @@ export function initializeEmbeddedContentDocuments(client: LanguageClient): Embe
         }
 
         return (<Thenable<R>>result).then((value): ProviderResult<R> => {
-            if (!isFalseyResult(value)) {
+            if (!isFalseyResult(value) || token.isCancellationRequested) {
                 return value;
             }
 
             let embeddedContentUri = getEmbeddedContentUri(doc.uri.toString(), htmlLanguageId);
             return openEmbeddedContentDocument(embeddedContentUri, doc.version).then((vdoc) => {
-                if (isPositionOutsidePhpLanguageRange(doc.uri, position)) {
+                if (isPositionOutsidePhpLanguageRange(doc.uri, position) && !token.isCancellationRequested) {
                     return next(vdoc);
                 } else {
                     return defaultResult;
@@ -212,7 +215,7 @@ export function initializeEmbeddedContentDocuments(client: LanguageClient): Embe
                 return next(document, position, token);
             }, isFalseyCompletionResult, (vdoc) => {
                 return commands.executeCommand<CompletionList>('vscode.executeCompletionItemProvider', vdoc.uri, position);
-            }, new CompletionList([], false));
+            }, new CompletionList([], false), token);
 
         },
 
@@ -221,7 +224,7 @@ export function initializeEmbeddedContentDocuments(client: LanguageClient): Embe
                 return next(document, position, token);
             }, (r) => { return !r; }, (vdoc) => {
                 return commands.executeCommand<SignatureHelp>('vscode.executeSignatureHelpProvider', vdoc.uri, position);
-            }, undefined);
+            }, undefined, token);
         },
 
         provideDefinition: (document: TextDocument, position: Position, token: CancellationToken, next: ProvideDefinitionSignature) => {
@@ -229,7 +232,7 @@ export function initializeEmbeddedContentDocuments(client: LanguageClient): Embe
                 return next(document, position, token);
             }, (r) => { return !r || (Array.isArray(r) && r.length < 1); }, (vdoc) => {
                 return commands.executeCommand<Definition>('vscode.executeDefinitionProvider', vdoc.uri, position);
-            }, []);
+            }, [], token);
         },
 
         provideReferences: (document: TextDocument, position: Position, options: {
@@ -240,7 +243,7 @@ export function initializeEmbeddedContentDocuments(client: LanguageClient): Embe
                 return next(document, position, options, token);
             }, (r) => { return !r || (Array.isArray(r) && r.length < 1); }, (vdoc) => {
                 return commands.executeCommand<Location[]>('vscode.executeReferenceProvider', vdoc.uri, position);
-            }, []);
+            }, [], token);
 
         },
 
@@ -278,7 +281,36 @@ export function initializeEmbeddedContentDocuments(client: LanguageClient): Embe
 
             });
 
-        }
+        },
+
+        provideDocumentLinks: (document: TextDocument, token: CancellationToken, next: ProvideDocumentLinksSignature) => {
+            let vdocUri = getEmbeddedContentUri(document.uri.toString(), htmlLanguageId);
+            return openEmbeddedContentDocument(vdocUri, document.version).then((vdoc) => {
+                if(token.isCancellationRequested) {
+                    return [];
+                }
+                return commands.executeCommand<DocumentLink[]>('vscode.executeLinkProvider', vdoc.uri);
+            });
+        },
+
+        provideDocumentHighlights: (document: TextDocument, position: Position, token: CancellationToken, next: ProvideDocumentHighlightsSignature) => {
+            return middleWarePositionalRequest<DocumentHighlight[]>(document, position, () => {
+                return next(document, position, token);
+            }, (r) => { return !r || (Array.isArray(r) && r.length < 1); }, (vdoc) => {
+                return commands.executeCommand<DocumentHighlight[]>('vscode.executeDocumentHighlights', vdoc.uri, position);
+            }, [], token);
+
+        },
+
+        provideHover: (document: TextDocument, position: Position, token: CancellationToken, next: ProvideHoverSignature) => {
+            return middleWarePositionalRequest<Hover>(document, position, () => {
+                return next(document, position, token);
+            }, (r) => { return !r || (Array.isArray(r) && r.length < 1); }, (vdoc) => {
+                return commands.executeCommand<Hover>('vscode.executeHoverProvider', vdoc.uri, position);
+            }, undefined, token);
+        },
+
+        
 
 
     }
