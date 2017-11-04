@@ -1,7 +1,7 @@
 {
     "name": "vscode-intelephense-client",
     "displayName": "PHP Intelephense",
-    "description": "PHP Autocomplete | Param Hints | Symbols | References | Format | Go to",
+    "description": "PHP Autocomplete | Param Hints | Symbols | References | Format | Go to | Hover | Highlight",
     "author": {
         "name": "Ben Mewburn",
         "email": "ben@mewburn.id.au"
