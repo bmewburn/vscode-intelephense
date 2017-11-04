@@ -25,7 +25,7 @@ const discoverSymbolsRequest = new RequestType<{ textDocument: TextDocumentItem 
 const discoverReferencesRequest = new RequestType<{ textDocument: TextDocumentItem }, number, void, void>('discoverReferences');
 const forgetRequest = new RequestType<{ uri: string }, void, void, void>('forget');
 const importSymbolRequest = new RequestType<{ uri: string, position: Position, alias?: string }, TextEdit[], void, void>('importSymbol');
-const documentLanguageRangesRequest = new RequestType<{ textDocument: TextDocumentIdentifier }, LanguageRange[], void, void>('documentLanguageRanges');
+const documentLanguageRangesRequest = new RequestType<{ textDocument: TextDocumentIdentifier }, {version:number, ranges: LanguageRange[]}, void, void>('documentLanguageRanges');
 const knownDocumentsRequest = new RequestType<void, {timestamp:number, documents:string[]}, void, void>('knownDocuments');
 
 interface VscodeConfig extends IntelephenseConfig {

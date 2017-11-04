@@ -17,6 +17,7 @@ import {
 	DocumentRangeFormattingRequest
 } from 'vscode-languageclient';
 import { WorkspaceDiscovery } from './workspaceDiscovery';
+import {initializeEmbeddedContentDocuments} from './embeddedContentDocuments';
 
 const phpLanguageId = 'php';
 const version = 'v0.8.0';
@@ -51,6 +52,10 @@ export function activate(context: ExtensionContext) {
 		debug: { module: serverModule, transport: TransportKind.ipc, options: debugOptions }
 	}
 
+	let middleware = initializeEmbeddedContentDocuments(() => {
+		return languageClient;
+	});
+
 	// Options to control the language client
 	let clientOptions: LanguageClientOptions = {
 		documentSelector: [
@@ -65,7 +70,8 @@ export function activate(context: ExtensionContext) {
 		initializationOptions: {
 			storagePath:context.storagePath,
 			clearCache:clearCache
-		}
+		},
+		middleware:middleware.middleware
 	}
 
 	let fsWatcher = workspace.createFileSystemWatcher('**/*.php');
@@ -112,7 +118,8 @@ export function activate(context: ExtensionContext) {
 	let cancelIndexingDisposable = commands.registerCommand('intelephense.cancel.indexing', cancelWorkspaceDiscoveryHandler);
 
 	//push disposables
-	context.subscriptions.push(langClientDisposable, fsWatcher, importCommandDisposable, clearCacheDisposable, onDidChangeWorkspaceFoldersDisposable, cancelIndexingDisposable);
+	context.subscriptions.push(langClientDisposable, fsWatcher, importCommandDisposable, clearCacheDisposable, 
+		onDidChangeWorkspaceFoldersDisposable, cancelIndexingDisposable, middleware);
 
 	let wordPatternParts = [
 		/([$a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff\\]*)/.source,

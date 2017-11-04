@@ -45,7 +45,7 @@ export interface EmbeddedDocuments extends Disposable {
     middleware: Middleware;
 }
 
-export function initializeEmbeddedContentDocuments(client: LanguageClient): EmbeddedDocuments {
+export function initializeEmbeddedContentDocuments(getClient:() => LanguageClient): EmbeddedDocuments {
     let toDispose: Disposable[] = [];
 
     let embeddedContentChanged = new EventEmitter<Uri>();
@@ -65,23 +65,24 @@ export function initializeEmbeddedContentDocuments(client: LanguageClient): Embe
 
     let languageRange2Code = (v: LanguageRange) => {
         return <VLanguageRange>{
-            range: client.protocol2CodeConverter.asRange(v.range),
+            range: getClient().protocol2CodeConverter.asRange(v.range),
             languageId: v.languageId
         }
     }
 
     let fetchRanges = (virtualUri: Uri) => {
         let hostUri = getHostDocumentUri(virtualUri);
-        return documentLanguageRangesRequest(hostUri, client).then((ranges) => {
-            documentLanguageRanges[virtualUri.toString()] = ranges.map(languageRange2Code);
+        return documentLanguageRangesRequest(hostUri, getClient()).then((list) => {
+            openVirtualDocuments[virtualUri.toString()] = list.version;
+            documentLanguageRanges[virtualUri.toString()] = list.ranges.map(languageRange2Code);
             return documentLanguageRanges[virtualUri.toString()];
         });
     }
 
     const replacePattern = /\S/g;
-    function phpEscapedContent(ranges: VLanguageRange[], uri) {
+    function phpEscapedContent(ranges: VLanguageRange[], uri:string) {
         let finderFn = (x: TextDocument) => {
-            return x.uri === uri;
+            return x.uri.toString() === uri;
         }
         let doc = workspace.textDocuments.find(finderFn);
         if (!doc || !ranges || ranges.length < 1) {
@@ -99,7 +100,7 @@ export function initializeEmbeddedContentDocuments(client: LanguageClient): Embe
             }
             text += part;
         }
-
+        
         return text;
     }
 
@@ -113,7 +114,7 @@ export function initializeEmbeddedContentDocuments(client: LanguageClient): Embe
                         return phpEscapedContent(ranges, getHostDocumentUri(uri));
                     });
                 } else {
-                    return phpEscapedContent(docRanges, uri);
+                    return phpEscapedContent(docRanges, getHostDocumentUri(uri));
                 }
             }
             return '';
@@ -135,6 +136,7 @@ export function initializeEmbeddedContentDocuments(client: LanguageClient): Embe
     */
 
     function ensureContentUpdated(virtualURI: Uri, expectedVersion: number) {
+        
         let virtualURIString = virtualURI.toString();
         let virtualDocVersion = openVirtualDocuments[virtualURIString];
         if (isDefined(virtualDocVersion) && virtualDocVersion !== expectedVersion) {
@@ -153,6 +155,7 @@ export function initializeEmbeddedContentDocuments(client: LanguageClient): Embe
     };
 
     function openEmbeddedContentDocument(virtualURI: Uri, expectedVersion: number): Thenable<TextDocument> {
+        
         return ensureContentUpdated(virtualURI, expectedVersion).then(_ => {
             return workspace.openTextDocument(virtualURI).then(document => {
                 if (expectedVersion === openVirtualDocuments[virtualURI.toString()]) {
@@ -221,13 +224,15 @@ export function initializeEmbeddedContentDocuments(client: LanguageClient): Embe
         defaultResult: ProviderResult<R>,
         token: CancellationToken
     ): ProviderResult<R> {
-
+        
         let result = first();
-        if (!this.isThenable(result)) {
+        
+        if (!isThenable(result)) {
             result = Promise.resolve(result);
         }
 
         return (<Thenable<R>>result).then((value): ProviderResult<R> => {
+            
             if (!isFalseyResult(value) || token.isCancellationRequested) {
                 return value;
             }
@@ -249,7 +254,6 @@ export function initializeEmbeddedContentDocuments(client: LanguageClient): Embe
     let middleware = <Middleware>{
 
         provideCompletionItem: (document: TextDocument, position: Position, token: CancellationToken, next: ProvideCompletionItemsSignature) => {
-
             return middleWarePositionalRequest<CompletionList | CompletionItem[]>(document, position, () => {
                 return next(document, position, token);
             }, isFalseyCompletionResult, (vdoc) => {
@@ -270,7 +274,20 @@ export function initializeEmbeddedContentDocuments(client: LanguageClient): Embe
             return middleWarePositionalRequest<Definition>(document, position, () => {
                 return next(document, position, token);
             }, (r) => { return !r || (Array.isArray(r) && r.length < 1); }, (vdoc) => {
-                return commands.executeCommand<Definition>('vscode.executeDefinitionProvider', vdoc.uri, position);
+                return commands.executeCommand<Definition>('vscode.executeDefinitionProvider', vdoc.uri, position).then((def)=>{
+                    let hostUri = getClient().protocol2CodeConverter.asUri(getHostDocumentUri(vdoc.uri));
+                    if(!def) {
+                        return def;
+                    } else if(Array.isArray(def)) {
+                        return def.map((v) => {
+                            v.uri = hostUri;
+                            return v;
+                        });
+                    } else {
+                        def.uri = hostUri;
+                        return def;
+                    }
+                });
             }, [], token);
         },
 
@@ -392,7 +409,7 @@ function isDefined(o: any) {
 }
 
 function documentLanguageRangesRequest(uri: string, client: LanguageClient) {
-    return client.sendRequest<LanguageRange[]>(
+    return client.sendRequest<{version:number, ranges: LanguageRange[]}>(
         documentLanguageRangesRequestName,
         { textDocument: <TextDocumentIdentifier>{ uri: uri } }
     );
@@ -403,5 +420,5 @@ function isThenable(obj: any) {
 }
 
 function isFalseyCompletionResult(result: CompletionItem[] | CompletionList) {
-    return !result || (Array.isArray(result) && result.length < 1) || ((<CompletionList>result).items && (<CompletionList>result).items.length < 1);
+    return !result || (Array.isArray(result) && result.length < 1) || !(<CompletionList>result).items || (<CompletionList>result).items.length < 1;
 }
