@@ -130,6 +130,7 @@ export function initializeEmbeddedContentDocuments(client: LanguageClient): Embe
                         resolve();
                     }
                 });
+                delete documentLanguageRanges[virtualURIString];
                 embeddedContentChanged.fire(virtualURI);
             });
         }
@@ -149,26 +150,26 @@ export function initializeEmbeddedContentDocuments(client: LanguageClient): Embe
 
     function isPositionOutsidePhpLanguageRange(uri: Uri, position: Position) {
 
-        return fetchRanges(getEmbeddedContentUri(uri.toString(), phpLanguageId)).then((ranges) => {
+        let ranges = documentLanguageRanges[getEmbeddedContentUri(uri.toString(), phpLanguageId).toString()];
 
-            if (!ranges || ranges.length < 1) {
-                return false;
-            }
-
-            let r: RangeDto;
-            for (let n = 0, l = ranges.length; n < l; ++n) {
-                r = ranges[n].range;
-                if (
-                    (position.line > r.start.line || (position.line === r.start.line && position.character >= r.start.character)) &&
-                    (position.line < r.end.line || (position.line === r.end.line && position.character <= r.end.character))
-                ) {
-                    return ranges[n].languageId !== phpLanguageId;
-                }
-            }
+        if (!ranges || ranges.length < 1) {
             return false;
+        }
+
+        let r: RangeDto;
+        for (let n = 0, l = ranges.length; n < l; ++n) {
+            r = ranges[n].range;
+            if (
+                (position.line > r.start.line || (position.line === r.start.line && position.character >= r.start.character)) &&
+                (position.line < r.end.line || (position.line === r.end.line && position.character <= r.end.character))
+            ) {
+                return ranges[n].languageId !== phpLanguageId;
+            }
+        }
+        return false;
 
 
-        });
+
     }
 
 
@@ -191,15 +192,13 @@ export function initializeEmbeddedContentDocuments(client: LanguageClient): Embe
                 return value;
             }
 
-            return isPositionOutsidePhpLanguageRange(doc.uri, position).then((isOutside) => {
-
-                if (!isOutside) {
+            let embeddedContentUri = getEmbeddedContentUri(doc.uri.toString(), phpLanguageId);
+            return openEmbeddedContentDocument(embeddedContentUri, doc.version).then((vdoc) => {
+                if (isPositionOutsidePhpLanguageRange(doc.uri, position)) {
+                    return next(vdoc);
+                } else {
                     return defaultResult;
                 }
-
-                let embeddedContentUri = getEmbeddedContentUri(doc.uri.toString(), phpLanguageId);
-                return openEmbeddedContentDocument(embeddedContentUri, doc.version).then(next);
-
             });
 
         });
