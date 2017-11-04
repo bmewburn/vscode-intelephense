@@ -13,13 +13,14 @@ import {
     Middleware, ProvideCompletionItemsSignature, LanguageClient, TextDocumentIdentifier,
     Range as RangeDto, ProvideSignatureHelpSignature, ProvideDefinitionSignature,
     ProvideReferencesSignature, ProvideDocumentSymbolsSignature, ProvideDocumentLinksSignature,
-    ProvideDocumentHighlightsSignature, ProvideHoverSignature
+    ProvideDocumentHighlightsSignature, ProvideHoverSignature, ProvideDocumentRangeFormattingEditsSignature,
+    Code2ProtocolConverter
 } from 'vscode-languageclient';
 import {
     TextDocument, Position, CancellationToken, Range, workspace,
     EventEmitter, Disposable, Uri, commands, ProviderResult, CompletionItem, CompletionList,
     SignatureHelp, Definition, Location, SymbolInformation, DocumentLink, DocumentHighlight,
-    Hover
+    Hover, FormattingOptions, TextEdit, WorkspaceEdit
 } from 'vscode';
 import {
     getEmbeddedContentUri, getEmbeddedLanguageId, getHostDocumentUri,
@@ -32,6 +33,11 @@ const htmlLanguageId = 'html';
 
 interface LanguageRange {
     range: RangeDto;
+    languageId?: string;
+}
+
+interface VLanguageRange {
+    range: Range;
     languageId?: string;
 }
 
@@ -48,7 +54,7 @@ export function initializeEmbeddedContentDocuments(client: LanguageClient): Embe
     let openVirtualDocuments: { [virtualUri: string]: number } = {};
 
     //doc lang ranges
-    let documentLanguageRanges: { [virtualUri: string]: LanguageRange[] } = {};
+    let documentLanguageRanges: { [virtualUri: string]: VLanguageRange[] } = {};
 
     // documents are closed after a time out or when collected.
     toDispose.push(workspace.onDidCloseTextDocument(d => {
@@ -57,16 +63,23 @@ export function initializeEmbeddedContentDocuments(client: LanguageClient): Embe
         }
     }));
 
+    let languageRange2Code = (v: LanguageRange) => {
+        return <VLanguageRange>{
+            range: client.protocol2CodeConverter.asRange(v.range),
+            languageId: v.languageId
+        }
+    }
+
     let fetchRanges = (virtualUri: Uri) => {
         let hostUri = getHostDocumentUri(virtualUri);
         return documentLanguageRangesRequest(hostUri, client).then((ranges) => {
-            documentLanguageRanges[hostUri] = ranges;
-            return ranges;
+            documentLanguageRanges[virtualUri.toString()] = ranges.map(languageRange2Code);
+            return documentLanguageRanges[virtualUri.toString()];
         });
     }
 
     const replacePattern = /\S/g;
-    function phpEscapedContent(ranges: LanguageRange[], uri) {
+    function phpEscapedContent(ranges: VLanguageRange[], uri) {
         let finderFn = (x: TextDocument) => {
             return x.uri === uri;
         }
@@ -75,12 +88,12 @@ export function initializeEmbeddedContentDocuments(client: LanguageClient): Embe
             return '';
         }
 
-        let r: LanguageRange;
+        let r: VLanguageRange;
         let text = '';
         let part: string;
         for (let n = 0, l = ranges.length; n < l; ++n) {
             r = ranges[n];
-            part = doc.getText(new Range(r.range.start.line, r.range.start.character, r.range.end.line, r.range.end.character));
+            part = doc.getText(r.range);
             if (part && r.languageId === phpLanguageId) {
                 part = '<' + part.slice(1, -1).replace(replacePattern, ' ') + '>';
             }
@@ -150,28 +163,54 @@ export function initializeEmbeddedContentDocuments(client: LanguageClient): Embe
         });
     };
 
-    function isPositionOutsidePhpLanguageRange(uri: Uri, position: Position) {
+    function isPositionPhp(vdocUri: Uri, position: Position) {
 
-        let ranges = documentLanguageRanges[getEmbeddedContentUri(uri.toString(), htmlLanguageId).toString()];
+        let ranges = documentLanguageRanges[vdocUri.toString()];
+
+        if (!ranges || ranges.length < 1) {
+            return true;
+        }
+
+        let r: Range;
+        for (let n = 0, l = ranges.length; n < l; ++n) {
+            r = ranges[n].range;
+            if (r.contains(position)) {
+                return ranges[n].languageId === phpLanguageId;
+            }
+        }
+        return true;
+
+    }
+
+    function isRangePhpOnly(vdocUri: Uri, range: Range) {
+        let ranges = documentLanguageRanges[vdocUri.toString()];
 
         if (!ranges || ranges.length < 1) {
             return false;
         }
 
-        let r: RangeDto;
+        let r: Range;
+        let started = false;
         for (let n = 0, l = ranges.length; n < l; ++n) {
             r = ranges[n].range;
-            if (
-                (position.line > r.start.line || (position.line === r.start.line && position.character >= r.start.character)) &&
-                (position.line < r.end.line || (position.line === r.end.line && position.character <= r.end.character))
-            ) {
-                return ranges[n].languageId !== phpLanguageId;
+            if (!started && r.contains(range.start)) {
+                if(ranges[n].languageId !== phpLanguageId) {
+                    return false;
+                } else {
+                    started = true;
+                }
+            } else if(started) {
+                if(ranges[n].languageId !== phpLanguageId) {
+                    return false;
+                }
+                if(r.contains(range.end)) {
+                    return ranges[n].languageId !== phpLanguageId;
+                }
             }
         }
         return false;
 
     }
-
 
     function middleWarePositionalRequest<R>(
         doc: TextDocument,
@@ -180,7 +219,7 @@ export function initializeEmbeddedContentDocuments(client: LanguageClient): Embe
         isFalseyResult: (v: any) => boolean,
         next: (virtualDoc: TextDocument) => ProviderResult<R>,
         defaultResult: ProviderResult<R>,
-        token:CancellationToken
+        token: CancellationToken
     ): ProviderResult<R> {
 
         let result = first();
@@ -195,7 +234,7 @@ export function initializeEmbeddedContentDocuments(client: LanguageClient): Embe
 
             let embeddedContentUri = getEmbeddedContentUri(doc.uri.toString(), htmlLanguageId);
             return openEmbeddedContentDocument(embeddedContentUri, doc.version).then((vdoc) => {
-                if (isPositionOutsidePhpLanguageRange(doc.uri, position) && !token.isCancellationRequested) {
+                if (!isPositionPhp(embeddedContentUri, position) && !token.isCancellationRequested) {
                     return next(vdoc);
                 } else {
                     return defaultResult;
@@ -286,7 +325,7 @@ export function initializeEmbeddedContentDocuments(client: LanguageClient): Embe
         provideDocumentLinks: (document: TextDocument, token: CancellationToken, next: ProvideDocumentLinksSignature) => {
             let vdocUri = getEmbeddedContentUri(document.uri.toString(), htmlLanguageId);
             return openEmbeddedContentDocument(vdocUri, document.version).then((vdoc) => {
-                if(token.isCancellationRequested) {
+                if (token.isCancellationRequested) {
                     return [];
                 }
                 return commands.executeCommand<DocumentLink[]>('vscode.executeLinkProvider', vdoc.uri);
@@ -310,8 +349,34 @@ export function initializeEmbeddedContentDocuments(client: LanguageClient): Embe
             }, undefined, token);
         },
 
-        
+        provideDocumentRangeFormattingEdits: (document: TextDocument, range: Range, options: FormattingOptions, token: CancellationToken, next: ProvideDocumentRangeFormattingEditsSignature) => {
 
+            let vdocUri = getEmbeddedContentUri(document.uri.toString(), htmlLanguageId);
+            return openEmbeddedContentDocument(vdocUri, document.version).then((vdoc) => {
+                if (isRangePhpOnly(vdocUri, range)) {
+                    return next(document, range, options, token);
+                }
+
+                //does applying a workspaceedit cancel a format request?
+                //assuming it does so using another execute command to get php formats
+
+                commands.executeCommand<TextEdit[]>('vscode.executeFormatRangeProvider', vdoc.uri, range, options).then((edits) => {
+                    let workspaceEdit = new WorkspaceEdit();
+                    workspaceEdit.set(document.uri, edits);
+                    return workspace.applyEdit(workspaceEdit);
+                }).then((v)=>{
+                    return commands.executeCommand<TextEdit[]>('vscode.executeFormatRangeProvider', document.uri, range, options);
+                }).then((edits) => {
+                    let workspaceEdit = new WorkspaceEdit();
+                    workspaceEdit.set(document.uri, edits);
+                    return workspace.applyEdit(workspaceEdit);
+                }).then((v) => {
+                    return [];
+                });
+
+            });
+
+        }
 
     }
 
