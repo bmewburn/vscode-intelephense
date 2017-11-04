@@ -45,7 +45,7 @@ export interface EmbeddedDocuments extends Disposable {
     middleware: Middleware;
 }
 
-export function initializeEmbeddedContentDocuments(getClient:() => LanguageClient): EmbeddedDocuments {
+export function initializeEmbeddedContentDocuments(getClient: () => LanguageClient): EmbeddedDocuments {
     let toDispose: Disposable[] = [];
 
     let embeddedContentChanged = new EventEmitter<Uri>();
@@ -80,7 +80,7 @@ export function initializeEmbeddedContentDocuments(getClient:() => LanguageClien
     }
 
     const replacePattern = /\S/g;
-    function phpEscapedContent(ranges: VLanguageRange[], uri:string) {
+    function phpEscapedContent(ranges: VLanguageRange[], uri: string) {
         let finderFn = (x: TextDocument) => {
             return x.uri.toString() === uri;
         }
@@ -100,7 +100,7 @@ export function initializeEmbeddedContentDocuments(getClient:() => LanguageClien
             }
             text += part;
         }
-        
+
         return text;
     }
 
@@ -136,7 +136,7 @@ export function initializeEmbeddedContentDocuments(getClient:() => LanguageClien
     */
 
     function ensureContentUpdated(virtualURI: Uri, expectedVersion: number) {
-        
+
         let virtualURIString = virtualURI.toString();
         let virtualDocVersion = openVirtualDocuments[virtualURIString];
         if (isDefined(virtualDocVersion) && virtualDocVersion !== expectedVersion) {
@@ -155,7 +155,7 @@ export function initializeEmbeddedContentDocuments(getClient:() => LanguageClien
     };
 
     function openEmbeddedContentDocument(virtualURI: Uri, expectedVersion: number): Thenable<TextDocument> {
-        
+
         return ensureContentUpdated(virtualURI, expectedVersion).then(_ => {
             return workspace.openTextDocument(virtualURI).then(document => {
                 if (expectedVersion === openVirtualDocuments[virtualURI.toString()]) {
@@ -185,8 +185,7 @@ export function initializeEmbeddedContentDocuments(getClient:() => LanguageClien
 
     }
 
-    function isRangePhpOnly(vdocUri: Uri, range: Range) {
-        let ranges = documentLanguageRanges[vdocUri.toString()];
+    function isRangePhpOnly(ranges:VLanguageRange[], range: Range) {
 
         if (!ranges || ranges.length < 1) {
             return false;
@@ -197,16 +196,16 @@ export function initializeEmbeddedContentDocuments(getClient:() => LanguageClien
         for (let n = 0, l = ranges.length; n < l; ++n) {
             r = ranges[n].range;
             if (!started && r.contains(range.start)) {
-                if(ranges[n].languageId !== phpLanguageId) {
+                if (ranges[n].languageId !== phpLanguageId) {
                     return false;
                 } else {
                     started = true;
                 }
-            } else if(started) {
-                if(ranges[n].languageId !== phpLanguageId) {
+            } else if (started) {
+                if (ranges[n].languageId !== phpLanguageId) {
                     return false;
                 }
-                if(r.contains(range.end)) {
+                if (r.contains(range.end)) {
                     return ranges[n].languageId !== phpLanguageId;
                 }
             }
@@ -224,15 +223,15 @@ export function initializeEmbeddedContentDocuments(getClient:() => LanguageClien
         defaultResult: ProviderResult<R>,
         token: CancellationToken
     ): ProviderResult<R> {
-        
+
         let result = first();
-        
+
         if (!isThenable(result)) {
             result = Promise.resolve(result);
         }
 
         return (<Thenable<R>>result).then((value): ProviderResult<R> => {
-            
+
             if (!isFalseyResult(value) || token.isCancellationRequested) {
                 return value;
             }
@@ -274,11 +273,11 @@ export function initializeEmbeddedContentDocuments(getClient:() => LanguageClien
             return middleWarePositionalRequest<Definition>(document, position, () => {
                 return next(document, position, token);
             }, (r) => { return !r || (Array.isArray(r) && r.length < 1); }, (vdoc) => {
-                return commands.executeCommand<Definition>('vscode.executeDefinitionProvider', vdoc.uri, position).then((def)=>{
+                return commands.executeCommand<Definition>('vscode.executeDefinitionProvider', vdoc.uri, position).then((def) => {
                     let hostUri = getClient().protocol2CodeConverter.asUri(getHostDocumentUri(vdoc.uri));
-                    if(!def) {
+                    if (!def) {
                         return def;
-                    } else if(Array.isArray(def)) {
+                    } else if (Array.isArray(def)) {
                         return def.map((v) => {
                             v.uri = hostUri;
                             return v;
@@ -302,43 +301,44 @@ export function initializeEmbeddedContentDocuments(getClient:() => LanguageClien
             }, [], token);
 
         },
-/*
-        provideDocumentSymbols: (document: TextDocument, token: CancellationToken, next: ProvideDocumentSymbolsSignature) => {
+        /*
+                provideDocumentSymbols: (document: TextDocument, token: CancellationToken, next: ProvideDocumentSymbolsSignature) => {
+        
+                    return new Promise((resolve, reject) => {
+        
+                        let vdocUri = getEmbeddedContentUri(document.uri.toString(), htmlLanguageId);
+                        let symbolInformationArray = [];
+                        let responseCounter = 2;
+        
+        
+                        let onResolved = (value: SymbolInformation[]) => {
+                            if (value) {
+                                Array.prototype.push.apply(symbolInformationArray, value);
+                            }
+                            if (--responseCounter < 1) {
+                                resolve(symbolInformationArray);
+                            }
+                        }
+        
+                        let htmlResult = openEmbeddedContentDocument(vdocUri, document.version).then((vdoc) => {
+                            return commands.executeCommand<SymbolInformation[]>('vscode.executeDocumentSymbolProvider', vdoc.uri);
+                        });
+                        if (!isThenable(htmlResult)) {
+                            htmlResult = Promise.resolve(htmlResult);
+                        }
+                        htmlResult.then(onResolved);
+        
+                        let phpResult = next(document, token);
+                        if (!isThenable(phpResult)) {
+                            phpResult = Promise.resolve(phpResult);
+                        }
+                        (<Thenable<SymbolInformation[]>>phpResult).then(onResolved);
+        
+                    });
+        
+                },
+        */
 
-            return new Promise((resolve, reject) => {
-
-                let vdocUri = getEmbeddedContentUri(document.uri.toString(), htmlLanguageId);
-                let symbolInformationArray = [];
-                let responseCounter = 2;
-
-
-                let onResolved = (value: SymbolInformation[]) => {
-                    if (value) {
-                        Array.prototype.push.apply(symbolInformationArray, value);
-                    }
-                    if (--responseCounter < 1) {
-                        resolve(symbolInformationArray);
-                    }
-                }
-
-                let htmlResult = openEmbeddedContentDocument(vdocUri, document.version).then((vdoc) => {
-                    return commands.executeCommand<SymbolInformation[]>('vscode.executeDocumentSymbolProvider', vdoc.uri);
-                });
-                if (!isThenable(htmlResult)) {
-                    htmlResult = Promise.resolve(htmlResult);
-                }
-                htmlResult.then(onResolved);
-
-                let phpResult = next(document, token);
-                if (!isThenable(phpResult)) {
-                    phpResult = Promise.resolve(phpResult);
-                }
-                (<Thenable<SymbolInformation[]>>phpResult).then(onResolved);
-
-            });
-
-        },
-*/
         provideDocumentLinks: (document: TextDocument, token: CancellationToken, next: ProvideDocumentLinksSignature) => {
             let vdocUri = getEmbeddedContentUri(document.uri.toString(), htmlLanguageId);
             return openEmbeddedContentDocument(vdocUri, document.version).then((vdoc) => {
@@ -362,7 +362,7 @@ export function initializeEmbeddedContentDocuments(getClient:() => LanguageClien
             return middleWarePositionalRequest<Hover>(document, position, () => {
                 return next(document, position, token);
             }, (r) => { return !r || !r.contents || (Array.isArray(r.contents) && r.contents.length < 1); }, (vdoc) => {
-                return commands.executeCommand<Hover[]>('vscode.executeHoverProvider', vdoc.uri, position).then((h)=>{
+                return commands.executeCommand<Hover[]>('vscode.executeHoverProvider', vdoc.uri, position).then((h) => {
                     return h.shift();
                 });
             }, undefined, token);
@@ -382,7 +382,7 @@ function isDefined(o: any) {
 }
 
 function documentLanguageRangesRequest(uri: string, client: LanguageClient) {
-    return client.sendRequest<{version:number, ranges: LanguageRange[]}>(
+    return client.sendRequest<{ version: number, ranges: LanguageRange[] }>(
         documentLanguageRangesRequestName,
         { textDocument: <TextDocumentIdentifier>{ uri: uri } }
     );
