@@ -302,7 +302,7 @@ export function initializeEmbeddedContentDocuments(getClient:() => LanguageClien
             }, [], token);
 
         },
-
+/*
         provideDocumentSymbols: (document: TextDocument, token: CancellationToken, next: ProvideDocumentSymbolsSignature) => {
 
             return new Promise((resolve, reject) => {
@@ -338,7 +338,7 @@ export function initializeEmbeddedContentDocuments(getClient:() => LanguageClien
             });
 
         },
-
+*/
         provideDocumentLinks: (document: TextDocument, token: CancellationToken, next: ProvideDocumentLinksSignature) => {
             let vdocUri = getEmbeddedContentUri(document.uri.toString(), htmlLanguageId);
             return openEmbeddedContentDocument(vdocUri, document.version).then((vdoc) => {
