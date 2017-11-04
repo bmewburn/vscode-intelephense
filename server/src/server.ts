@@ -87,7 +87,10 @@ connection.onInitialize((params) => {
 				definitionProvider: true,
 				//documentFormattingProvider: true,
 				documentRangeFormattingProvider: true,
-				referencesProvider: true
+				referencesProvider: true,
+				documentLinkProvider: { resolveProvider:false },
+				hoverProvider:true,
+				documentHighlightProvider:true
 			}
 		}
 	});
@@ -127,6 +130,19 @@ connection.onDidChangeConfiguration((params) => {
 	}
 
 });
+
+//atm for html compatibility
+connection.onDocumentLinks((params) => {
+	return [];
+});
+
+connection.onHover((params) => {
+	return undefined;
+});
+
+connection.onDocumentHighlight((params) => {
+	return [];
+})
 
 connection.onDidOpenTextDocument((params) => {
 

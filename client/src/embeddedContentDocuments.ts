@@ -361,8 +361,10 @@ export function initializeEmbeddedContentDocuments(getClient:() => LanguageClien
         provideHover: (document: TextDocument, position: Position, token: CancellationToken, next: ProvideHoverSignature) => {
             return middleWarePositionalRequest<Hover>(document, position, () => {
                 return next(document, position, token);
-            }, (r) => { return !r || (Array.isArray(r) && r.length < 1); }, (vdoc) => {
-                return commands.executeCommand<Hover>('vscode.executeHoverProvider', vdoc.uri, position);
+            }, (r) => { return !r || !r.contents || (Array.isArray(r.contents) && r.contents.length < 1); }, (vdoc) => {
+                return commands.executeCommand<Hover[]>('vscode.executeHoverProvider', vdoc.uri, position).then((h)=>{
+                    return h.shift();
+                });
             }, undefined, token);
         },
 
