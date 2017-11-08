@@ -75,42 +75,50 @@
                 "intelephense.debug.enable": {
                     "type": "boolean",
                     "default": false,
-                    "description": "Enable debug logging."
+                    "description": "Enable debug logging.",
+                    "scope": "window"
                 },
                 "intelephense.file.maxSize": {
                     "type": "number",
                     "default": 1000000,
-                    "description": "Maximum file size in bytes."
+                    "description": "Maximum file size in bytes.",
+                    "scope": "window"
                 },
                 "intelephense.diagnosticsProvider.debounce": {
                     "type": "number",
                     "default": 1000,
-                    "description": "Diagnostics publish debounce wait time in ms."
+                    "description": "Diagnostics publish debounce wait time in ms.",
+                    "scope": "window"
                 },
                 "intelephense.diagnosticsProvider.maxItems": {
                     "type": "number",
                     "default": 100,
-                    "description": "Maximum number of diagnostic items."
+                    "description": "Maximum number of diagnostic items.",
+                    "scope": "window"
                 },
                 "intelephense.completionProvider.maxItems": {
                     "type": "number",
                     "default": 100,
-                    "description": "Maximum number of completion items."
+                    "description": "Maximum number of completion items.",
+                    "scope": "window"
                 },
                 "intelephense.completionProvider.addUseDeclaration": {
                     "type": "boolean",
                     "default": true,
-                    "description": "Use declarations will be automatically added on completion for namespaced classes, functions, and constants."
+                    "description": "Use declarations will be automatically added on completion for namespaced classes, functions, and constants.",
+                    "scope": "window"
                 },
                 "intelephense.completionProvider.backslashPrefix": {
                     "type": "boolean",
                     "default": true,
-                    "description": "Built in constants and functions will be prefixed with a backslash"
+                    "description": "Built in constants and functions will be prefixed with a backslash",
+                    "scope": "window"
                 },
                 "intelephense.formatProvider.enable": {
                     "type": "boolean",
                     "default": true,
-                    "description": "Enables formatting"
+                    "description": "Enables formatting",
+                    "scope": "window"
                 },
                 "intelephense.trace.server": {
                     "type": "string",
@@ -120,7 +128,8 @@
                         "verbose"
                     ],
                     "default": "off",
-                    "description": "Traces the communication between VSCode and the intelephense service."
+                    "description": "Traces the communication between VSCode and the intelephense service.",
+                    "scope": "window"
                 }
             }
         }
