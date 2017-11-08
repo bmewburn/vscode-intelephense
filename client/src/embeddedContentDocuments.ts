@@ -276,16 +276,19 @@ export function initializeEmbeddedContentDocuments(getClient: () => LanguageClie
                 return next(document, position, token);
             }, (r) => { return !r || (Array.isArray(r) && r.length < 1); }, (vdoc) => {
                 return commands.executeCommand<Definition>('vscode.executeDefinitionProvider', vdoc.uri, position).then((def) => {
-                    let hostUri = getClient().protocol2CodeConverter.asUri(getHostDocumentUri(vdoc.uri));
                     if (!def) {
                         return def;
                     } else if (Array.isArray(def)) {
-                        return def.map((v) => {
-                            v.uri = hostUri;
-                            return v;
+                        def.forEach((v) => {
+                            if(isEmbeddedContentUri(v.uri)) {
+                                v.uri = getClient().protocol2CodeConverter.asUri(getHostDocumentUri(v.uri));
+                            }
                         });
+                        return def;
                     } else {
-                        def.uri = hostUri;
+                        if(isEmbeddedContentUri(def.uri)) {
+                            def.uri = getClient().protocol2CodeConverter.asUri(getHostDocumentUri(def.uri));
+                        }
                         return def;
                     }
                 });
@@ -299,7 +302,14 @@ export function initializeEmbeddedContentDocuments(getClient: () => LanguageClie
             return middleWarePositionalRequest<Location[]>(document, position, () => {
                 return next(document, position, options, token);
             }, (r) => { return !r || (Array.isArray(r) && r.length < 1); }, (vdoc) => {
-                return commands.executeCommand<Location[]>('vscode.executeReferenceProvider', vdoc.uri, position);
+                return commands.executeCommand<Location[]>('vscode.executeReferenceProvider', vdoc.uri, position).then(locs => {
+                    locs.forEach((v) => {
+                        if(isEmbeddedContentUri(v.uri)) {
+                            v.uri = getClient().protocol2CodeConverter.asUri(getHostDocumentUri(v.uri));
+                        }
+                    });
+                    return locs;
+                })
             }, [], token);
 
         },
