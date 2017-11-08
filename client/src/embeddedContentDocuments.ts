@@ -61,11 +61,6 @@ export function initializeEmbeddedContentDocuments(getClient: () => LanguageClie
         if (isEmbeddedContentUri(d.uri)) {
             delete openVirtualDocuments[d.uri.toString()];
             delete documentLanguageRanges[d.uri.toString()];
-        } else {
-            let vdocUri = getEmbeddedContentUri(d.uri.toString(), htmlLanguageId);
-            if(openVirtualDocuments[vdocUri.toString()]) {
-                ensureContentUpdated(vdocUri, -1);
-            }
         }
     }));
 
