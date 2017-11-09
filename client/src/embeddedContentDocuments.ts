@@ -74,9 +74,16 @@ export function initializeEmbeddedContentDocuments(getClient: () => LanguageClie
     let fetchRanges = (virtualUri: Uri) => {
         let hostUri = getHostDocumentUri(virtualUri);
         return documentLanguageRangesRequest(hostUri, getClient()).then((list) => {
-            openVirtualDocuments[virtualUri.toString()] = list.version;
-            documentLanguageRanges[virtualUri.toString()] = list.ranges.map(languageRange2Code);
-            return documentLanguageRanges[virtualUri.toString()];
+            let virtualURIString = virtualUri.toString();
+            if (!list || !list.version || !list.ranges) {
+                delete documentLanguageRanges[virtualURIString];
+                delete openVirtualDocuments[virtualURIString];
+                return undefined;
+            }
+
+            openVirtualDocuments[virtualURIString] = list.version;
+            documentLanguageRanges[virtualURIString] = list.ranges.map(languageRange2Code);
+            return documentLanguageRanges[virtualURIString];
         });
     }
 
@@ -136,6 +143,50 @@ export function initializeEmbeddedContentDocuments(getClient: () => LanguageClie
     });
     */
 
+    function shouldForwardRequest(virtualURI: Uri, expectedVersion: number, place?: Position | Range) {
+
+        let virtualURIString = virtualURI.toString();
+        let virtualDocVersion = openVirtualDocuments[virtualURIString];
+        let waitForDocChange: Promise<void>;
+
+        if (isDefined(virtualDocVersion) && virtualDocVersion !== expectedVersion) {
+
+            waitForDocChange = new Promise<void>((resolve, reject) => {
+                let subscription = workspace.onDidChangeTextDocument(d => {
+                    if (d.document.uri.toString() === virtualURIString) {
+                        subscription.dispose();
+                        resolve();
+                    }
+                });
+                delete documentLanguageRanges[virtualURIString];
+                delete openVirtualDocuments[virtualURIString];
+                embeddedContentChanged.fire(virtualURI);
+            });
+        }
+
+        if (!waitForDocChange) {
+            waitForDocChange = Promise.resolve();
+        }
+
+        return waitForDocChange.then(() => {
+            return fetchRanges(virtualURI);
+        }).then((ranges) => {
+
+            if (!ranges || ranges.length < 1) {
+                return false;
+            } else if (!place) {
+                return ranges.length > 1;
+            } else if ((<Position>place).line) {
+                return !isPositionPhp(ranges, <Position>place);
+            } else {
+                return !isRangePhpOnly(ranges, <Range>place);
+            }
+
+        });
+
+    }
+
+    /*
     function ensureContentUpdated(virtualURI: Uri, expectedVersion: number) {
 
         let virtualURIString = virtualURI.toString();
@@ -155,22 +206,18 @@ export function initializeEmbeddedContentDocuments(getClient: () => LanguageClie
         }
         return Promise.resolve();
     };
+    */
 
     function openEmbeddedContentDocument(virtualURI: Uri, expectedVersion: number): Thenable<TextDocument> {
-
-        return ensureContentUpdated(virtualURI, expectedVersion).then(_ => {
-            return workspace.openTextDocument(virtualURI).then(document => {
-                if (expectedVersion === openVirtualDocuments[virtualURI.toString()]) {
-                    return document;
-                }
-                return void 0;
-            });
+        return workspace.openTextDocument(virtualURI).then(document => {
+            if (expectedVersion === openVirtualDocuments[virtualURI.toString()]) {
+                return document;
+            }
+            return void 0;
         });
     };
 
-    function isPositionPhp(vdocUri: Uri, position: Position) {
-
-        let ranges = documentLanguageRanges[vdocUri.toString()];
+    function isPositionPhp(ranges: VLanguageRange[], position: Position) {
 
         if (!ranges || ranges.length < 1) {
             return true;
@@ -187,7 +234,7 @@ export function initializeEmbeddedContentDocuments(getClient: () => LanguageClie
 
     }
 
-    function isRangePhpOnly(ranges:VLanguageRange[], range: Range) {
+    function isRangePhpOnly(ranges: VLanguageRange[], range: Range) {
 
         if (!ranges || ranges.length < 1) {
             return false;
@@ -239,11 +286,13 @@ export function initializeEmbeddedContentDocuments(getClient: () => LanguageClie
             }
 
             let embeddedContentUri = getEmbeddedContentUri(doc.uri.toString(), htmlLanguageId);
-            return openEmbeddedContentDocument(embeddedContentUri, doc.version).then((vdoc) => {
-                if (!isPositionPhp(embeddedContentUri, position) && !token.isCancellationRequested) {
-                    return next(vdoc);
-                } else {
+            return shouldForwardRequest(embeddedContentUri, doc.version, position).then(shouldForward => {
+                if (!shouldForward || token.isCancellationRequested) {
                     return defaultResult;
+                } else {
+                    return openEmbeddedContentDocument(embeddedContentUri, doc.version).then(vdoc => {
+                        return vdoc ? next(vdoc) : defaultResult;
+                    });
                 }
             });
 
@@ -280,13 +329,13 @@ export function initializeEmbeddedContentDocuments(getClient: () => LanguageClie
                         return def;
                     } else if (Array.isArray(def)) {
                         def.forEach((v) => {
-                            if(isEmbeddedContentUri(v.uri)) {
+                            if (isEmbeddedContentUri(v.uri)) {
                                 v.uri = getClient().protocol2CodeConverter.asUri(getHostDocumentUri(v.uri));
                             }
                         });
                         return def;
                     } else {
-                        if(isEmbeddedContentUri(def.uri)) {
+                        if (isEmbeddedContentUri(def.uri)) {
                             def.uri = getClient().protocol2CodeConverter.asUri(getHostDocumentUri(def.uri));
                         }
                         return def;
@@ -304,7 +353,7 @@ export function initializeEmbeddedContentDocuments(getClient: () => LanguageClie
             }, (r) => { return !r || (Array.isArray(r) && r.length < 1); }, (vdoc) => {
                 return commands.executeCommand<Location[]>('vscode.executeReferenceProvider', vdoc.uri, position).then(locs => {
                     locs.forEach((v) => {
-                        if(isEmbeddedContentUri(v.uri)) {
+                        if (isEmbeddedContentUri(v.uri)) {
                             v.uri = getClient().protocol2CodeConverter.asUri(getHostDocumentUri(v.uri));
                         }
                     });
@@ -353,12 +402,16 @@ export function initializeEmbeddedContentDocuments(getClient: () => LanguageClie
 
         provideDocumentLinks: (document: TextDocument, token: CancellationToken, next: ProvideDocumentLinksSignature) => {
             let vdocUri = getEmbeddedContentUri(document.uri.toString(), htmlLanguageId);
-            return openEmbeddedContentDocument(vdocUri, document.version).then((vdoc) => {
-                if (token.isCancellationRequested) {
+            return shouldForwardRequest(vdocUri, document.version).then(result => {
+                
+                if(!result || token.isCancellationRequested) {
                     return [];
                 }
-                return commands.executeCommand<DocumentLink[]>('vscode.executeLinkProvider', vdoc.uri);
-            });
+                
+                return openEmbeddedContentDocument(vdocUri, document.version).then((vdoc) => {
+                    return vdoc ? commands.executeCommand<DocumentLink[]>('vscode.executeLinkProvider', vdoc.uri) : [];
+                });
+            }); 
         },
 
         provideDocumentHighlights: (document: TextDocument, position: Position, token: CancellationToken, next: ProvideDocumentHighlightsSignature) => {
