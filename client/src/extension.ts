@@ -74,7 +74,7 @@ export function activate(context: ExtensionContext) {
 		middleware:middleware.middleware
 	}
 
-	let fsWatcher = workspace.createFileSystemWatcher('**/*.php');
+	let fsWatcher = workspace.createFileSystemWatcher(workspaceFilesIncludeGlob());
 	fsWatcher.onDidDelete(onDidDelete);
 	fsWatcher.onDidCreate(onDidCreate);
 	fsWatcher.onDidChange(onDidChange);
