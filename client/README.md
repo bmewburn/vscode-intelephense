@@ -14,7 +14,7 @@ A high performance and feature rich PHP language server implemented in Typescrip
 * Lossless PSR-2 compatible document and range formatting.
 * Convenient command to add use declarations and condense referenced names.
 * HTML request forwarding allowing for a full HTML/Javascript/CSS/PHP development experience.
-* Hover, highlight + [More to come ...](https://github.com/bmewburn/intelephense/issues)
+* Hover, highlight + [more to come ...](https://github.com/bmewburn/intelephense/issues)
 
 Intelephense is under active development. [Contributions](https://github.com/bmewburn/intelephense/blob/master/CONTRIBUTING.md) in the form of bug reports, feature requests and pull requests are most welcome.
 
