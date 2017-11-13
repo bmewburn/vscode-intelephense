@@ -20,7 +20,7 @@ import { WorkspaceDiscovery } from './workspaceDiscovery';
 import {initializeEmbeddedContentDocuments} from './embeddedContentDocuments';
 
 const phpLanguageId = 'php';
-const version = 'v0.8.0';
+const version = '0.8.1';
 
 let maxFileSizeBytes = 10000000;
 let languageClient: LanguageClient;
@@ -35,9 +35,8 @@ export function activate(context: ExtensionContext) {
 	context.workspaceState.update('clearCache', undefined);
 	context.workspaceState.update('version', version);
 	
-	if(!versionMemento) {
-		//cleanup old symbol cache when updating to v0.8.0
-		fs.remove(path.join(context.storagePath, 'symbols')).catch((err)=>{});
+	if(!versionMemento || versionMemento != version) {
+		clearCache = true;
 	}
 
 	// The server is implemented in node

@@ -1,14 +1,14 @@
 {
   "name": "vscode-intelephense-server",
   "description": "PHP Language Server",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "author": "Ben Mewburn <ben@mewburn.id.au>",
   "license": "ISC",
   "engines": {
     "node": "*"
   },
   "dependencies": {
-    "intelephense": "^0.8.0",
+    "intelephense": "^0.8.1",
     "vscode-languageserver": "^3.4.3"
   },
   "devDependencies": {

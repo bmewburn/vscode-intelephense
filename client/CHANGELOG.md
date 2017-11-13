@@ -1,5 +1,14 @@
 # Change Log
 
+## [0.8.1] - 2017-11-13
+#### Fixed
+* Improved error handling when reading and writing to cache
+* use JSONStream for reading/writing large arrays
+* completions for static members with static keyword.
+* default public members
+* global inbuilt variable completions 
+* crash when forwarding to html server
+
 ## [0.8.0] - 2017-11-05
 #### Added
 * Reference provider
