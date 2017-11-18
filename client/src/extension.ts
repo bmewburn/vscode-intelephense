@@ -20,7 +20,7 @@ import { WorkspaceDiscovery } from './workspaceDiscovery';
 import {initializeEmbeddedContentDocuments} from './embeddedContentDocuments';
 
 const phpLanguageId = 'php';
-const version = '0.8.1';
+const version = '0.8.2';
 
 let maxFileSizeBytes = 10000000;
 let languageClient: LanguageClient;
@@ -35,7 +35,7 @@ export function activate(context: ExtensionContext) {
 	context.workspaceState.update('clearCache', undefined);
 	context.workspaceState.update('version', version);
 	
-	if(!versionMemento || versionMemento != version) {
+	if(!versionMemento || (versionMemento != version && versionMemento != '0.8.1')) {
 		clearCache = true;
 	}
 
