@@ -110,8 +110,8 @@
                 },
                 "intelephense.completionProvider.backslashPrefix": {
                     "type": "boolean",
-                    "default": true,
-                    "description": "Built in constants and functions will be prefixed with a backslash",
+                    "default": false,
+                    "description": "Global namespaced constants and functions will be prefixed with a backslash",
                     "scope": "window"
                 },
                 "intelephense.formatProvider.enable": {
