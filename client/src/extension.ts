@@ -174,10 +174,16 @@ function workspaceFilesIncludeGlob() {
 		return settings[x] === phpLanguageId;
 	});
 
-	if (!associations.length) {
-		associations.push('*.php');
-	}
-	return `**/{${associations.join(',')}}`;
+	associations.push('*.php');
+	associations = associations.map((v, i, a) => {
+		if(v.indexOf('/') < 0 && v.indexOf('\\') < 0) {
+			return '**/' + v;
+		} else {
+			return v;
+		}
+	});
+	
+	return '{' + Array.from(new Set<string>(associations)).join(',') + '}';
 }
 
 function onDidDelete(uri: Uri) {
