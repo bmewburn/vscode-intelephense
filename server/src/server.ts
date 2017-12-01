@@ -10,7 +10,7 @@ import {
 	InitializeParams, InitializeResult, TextDocumentPositionParams,
 	CompletionItem, CompletionItemKind, RequestType, TextDocumentItem,
 	PublishDiagnosticsParams, SignatureHelp, DidChangeConfigurationParams,
-	Position, TextEdit, Disposable, DocumentRangeFormattingRequest, 
+	Position, TextEdit, Disposable, DocumentRangeFormattingRequest,
 	DocumentFormattingRequest, DocumentSelector, TextDocumentIdentifier
 } from 'vscode-languageserver';
 
@@ -25,11 +25,11 @@ const discoverSymbolsRequest = new RequestType<{ textDocument: TextDocumentItem 
 const discoverReferencesRequest = new RequestType<{ textDocument: TextDocumentItem }, number, void, void>('discoverReferences');
 const forgetRequest = new RequestType<{ uri: string }, void, void, void>('forget');
 const importSymbolRequest = new RequestType<{ uri: string, position: Position, alias?: string }, TextEdit[], void, void>('importSymbol');
-const documentLanguageRangesRequest = new RequestType<{ textDocument: TextDocumentIdentifier }, {version:number, ranges: LanguageRange[]}, void, void>('documentLanguageRanges');
-const knownDocumentsRequest = new RequestType<void, {timestamp:number, documents:string[]}, void, void>('knownDocuments');
+const documentLanguageRangesRequest = new RequestType<{ textDocument: TextDocumentIdentifier }, { version: number, ranges: LanguageRange[] }, void, void>('documentLanguageRanges');
+const knownDocumentsRequest = new RequestType<void, { timestamp: number, documents: string[] }, void, void>('knownDocuments');
 
 interface VscodeConfig extends IntelephenseConfig {
-	formatProvider: {enable:boolean}
+	formatProvider: { enable: boolean }
 }
 
 let config: VscodeConfig = {
@@ -38,8 +38,8 @@ let config: VscodeConfig = {
 	},
 	completionProvider: {
 		maxItems: 100,
-		addUseDeclaration:true,
-        backslashPrefix:true
+		addUseDeclaration: true,
+		backslashPrefix: true
 	},
 	diagnosticsProvider: {
 		debounce: 1000,
@@ -58,28 +58,31 @@ connection.onInitialize((params) => {
 	initialisedAt = process.hrtime();
 	connection.console.info('Initialising');
 	let initOptions = <InitialisationOptions>{
-		storagePath:params.initializationOptions.storagePath,
-		logWriter:{
+		storagePath: params.initializationOptions.storagePath,
+		logWriter: {
 			info: connection.console.info,
 			warn: connection.console.warn,
-			error:connection.console.error
+			error: connection.console.error
 		},
-		clearCache:params.initializationOptions.clearCache
+		clearCache: params.initializationOptions.clearCache
 	}
 
-	return Intelephense.initialise(initOptions).then(()=>{
+	return Intelephense.initialise(initOptions).then(() => {
 		Intelephense.onPublishDiagnostics((args) => {
 			connection.sendDiagnostics(args);
 		});
 		connection.console.info(`Initialised in ${elapsed(initialisedAt).toFixed()} ms`);
-		
+
 		return <InitializeResult>{
 			capabilities: {
 				textDocumentSync: TextDocumentSyncKind.Incremental,
 				documentSymbolProvider: true,
 				workspaceSymbolProvider: true,
 				completionProvider: {
-					triggerCharacters: ['$', '>', ':']
+					triggerCharacters: [
+						'$', '>', ':', //php
+						'.', '<', '"', '=', '/' //html
+					]
 				},
 				signatureHelpProvider: {
 					triggerCharacters: ['(', ',']
@@ -88,21 +91,21 @@ connection.onInitialize((params) => {
 				//documentFormattingProvider: true,
 				documentRangeFormattingProvider: false,
 				referencesProvider: true,
-				documentLinkProvider: { resolveProvider:false },
-				hoverProvider:true,
-				documentHighlightProvider:true
+				documentLinkProvider: { resolveProvider: false },
+				hoverProvider: true,
+				documentHighlightProvider: true
 			}
 		}
 	});
-	
+
 });
 
-let docFormatRegister:Thenable<Disposable> = null;
+let docFormatRegister: Thenable<Disposable> = null;
 
 connection.onDidChangeConfiguration((params) => {
 
 	let settings = params.settings.intelephense as VscodeConfig;
-	if(!settings) {
+	if (!settings) {
 		return;
 	}
 	config = settings;
@@ -110,12 +113,12 @@ connection.onDidChangeConfiguration((params) => {
 
 	let enableFormatter = config.formatProvider && config.formatProvider.enable;
 	if (enableFormatter) {
-		let documentSelector: DocumentSelector = [{ language: languageId, scheme:'file' }];
+		let documentSelector: DocumentSelector = [{ language: languageId, scheme: 'file' }];
 		if (!docFormatRegister) {
 			docFormatRegister = connection.client.register(DocumentRangeFormattingRequest.type, { documentSelector });
 		}
 	} else {
-		if(docFormatRegister) {
+		if (docFormatRegister) {
 			docFormatRegister.then(r => r.dispose());
 			docFormatRegister = null;
 		}
