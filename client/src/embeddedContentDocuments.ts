@@ -304,9 +304,18 @@ export function initializeEmbeddedContentDocuments(getClient: () => LanguageClie
     let middleware = <Middleware>{
 
         provideCompletionItem: (document: TextDocument, position: Position, token: CancellationToken, next: ProvideCompletionItemsSignature) => {
+            let triggerChar = document.getText(new Range(position.line, position.character - 1, position.line, position.character));
             return middleWarePositionalRequest<CompletionList | CompletionItem[]>(document, position, () => {
+                if(triggerChar === '.' || triggerChar === '<' || triggerChar === '"' || triggerChar === '=' || triggerChar === '/') {
+                    //these are not php trigger chars -- dont send request to php server
+                    return undefined;
+                }
                 return next(document, position, token);
             }, isFalseyCompletionResult, (vdoc) => {
+                if(triggerChar === '$' || triggerChar === '>') {
+                    //these are php trigger chars -- dont forward to html
+                    return new CompletionList([], false);
+                }
                 return commands.executeCommand<CompletionList>('vscode.executeCompletionItemProvider', vdoc.uri, position);
             }, new CompletionList([], false), token);
 
