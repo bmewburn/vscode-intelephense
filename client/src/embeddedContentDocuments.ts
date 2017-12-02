@@ -306,8 +306,8 @@ export function initializeEmbeddedContentDocuments(getClient: () => LanguageClie
         provideCompletionItem: (document: TextDocument, position: Position, token: CancellationToken, next: ProvideCompletionItemsSignature) => {
             let triggerChar = document.getText(new Range(position.line, position.character - 1, position.line, position.character));   
             return middleWarePositionalRequest<CompletionList | CompletionItem[]>(document, position, () => {
-                if(triggerChar !== '$' && triggerChar !== ':' && triggerChar !== '>') {
-                    //not a php trigger char -- dont send request to php server
+                if(triggerChar === '<' || triggerChar === '/' || triggerChar === '.') {
+                    //not php trigger chars -- dont send request to php server
                     return undefined;
                 }
                 return next(document, position, token);
