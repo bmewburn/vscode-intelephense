@@ -81,7 +81,7 @@ connection.onInitialize((params) => {
 				completionProvider: {
 					triggerCharacters: [
 						'$', '>', ':', //php
-						'.', '<', '"', '=', '/' //html
+						'.', '<', '/' //html/js
 					]
 				},
 				signatureHelpProvider: {

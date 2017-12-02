@@ -304,10 +304,10 @@ export function initializeEmbeddedContentDocuments(getClient: () => LanguageClie
     let middleware = <Middleware>{
 
         provideCompletionItem: (document: TextDocument, position: Position, token: CancellationToken, next: ProvideCompletionItemsSignature) => {
-            let triggerChar = document.getText(new Range(position.line, position.character - 1, position.line, position.character));
+            let triggerChar = document.getText(new Range(position.line, position.character - 1, position.line, position.character));   
             return middleWarePositionalRequest<CompletionList | CompletionItem[]>(document, position, () => {
-                if(triggerChar === '.' || triggerChar === '<' || triggerChar === '"' || triggerChar === '=' || triggerChar === '/') {
-                    //these are not php trigger chars -- dont send request to php server
+                if(triggerChar !== '$' && triggerChar !== ':' && triggerChar !== '>') {
+                    //not a php trigger char -- dont send request to php server
                     return undefined;
                 }
                 return next(document, position, token);
@@ -316,7 +316,7 @@ export function initializeEmbeddedContentDocuments(getClient: () => LanguageClie
                     //these are php trigger chars -- dont forward to html
                     return new CompletionList([], false);
                 }
-                return commands.executeCommand<CompletionList>('vscode.executeCompletionItemProvider', vdoc.uri, position);
+                return commands.executeCommand<CompletionList>('vscode.executeCompletionItemProvider', vdoc.uri, position, triggerChar);
             }, new CompletionList([], false), token);
 
         },
@@ -463,7 +463,7 @@ function documentLanguageRangesRequest(uri: string, client: LanguageClient) {
 }
 
 function isThenable(obj: any) {
-    return obj.then !== undefined;
+    return obj && obj.then !== undefined;
 }
 
 function isFalseyCompletionResult(result: CompletionItem[] | CompletionList) {
