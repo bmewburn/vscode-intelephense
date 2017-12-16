@@ -10,7 +10,7 @@
     "version": "0.8.2",
     "publisher": "bmewburn",
     "engines": {
-        "vscode": "^1.16.0"
+        "vscode": "^1.17.0"
     },
     "categories": [
         "Languages",
@@ -149,7 +149,7 @@
     },
     "dependencies": {
         "fs-extra": "^4.0.2",
-        "vscode-languageclient": "^3.5.0"
+        "vscode-languageclient": "^4.0.0-next.3"
     },
     "private": true
 }

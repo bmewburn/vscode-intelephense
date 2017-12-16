@@ -20,7 +20,7 @@ import {
     TextDocument, Position, CancellationToken, Range, workspace,
     EventEmitter, Disposable, Uri, commands, ProviderResult, CompletionItem, CompletionList,
     SignatureHelp, Definition, Location, SymbolInformation, DocumentLink, DocumentHighlight,
-    Hover, FormattingOptions, TextEdit, WorkspaceEdit
+    Hover, FormattingOptions, TextEdit, WorkspaceEdit, CompletionContext
 } from 'vscode';
 import {
     getEmbeddedContentUri, getEmbeddedLanguageId, getHostDocumentUri,
@@ -303,20 +303,19 @@ export function initializeEmbeddedContentDocuments(getClient: () => LanguageClie
 
     let middleware = <Middleware>{
 
-        provideCompletionItem: (document: TextDocument, position: Position, token: CancellationToken, next: ProvideCompletionItemsSignature) => {
-            let triggerChar = document.getText(new Range(position.line, position.character - 1, position.line, position.character));   
+        provideCompletionItem: (document: TextDocument, position: Position, context: CompletionContext, token: CancellationToken, next: ProvideCompletionItemsSignature) => {
             return middleWarePositionalRequest<CompletionList | CompletionItem[]>(document, position, () => {
-                if(triggerChar === '<' || triggerChar === '/' || triggerChar === '.') {
+                if(context.triggerCharacter === '<' || context.triggerCharacter === '/' || context.triggerCharacter === '.') {
                     //not php trigger chars -- dont send request to php server
                     return undefined;
                 }
-                return next(document, position, token);
+                return next(document, position, context, token);
             }, isFalseyCompletionResult, (vdoc) => {
-                if(triggerChar === '$' || triggerChar === '>') {
+                if(context.triggerCharacter === '$' || context.triggerCharacter === '>') {
                     //these are php trigger chars -- dont forward to html
                     return new CompletionList([], false);
                 }
-                return commands.executeCommand<CompletionList>('vscode.executeCompletionItemProvider', vdoc.uri, position, triggerChar);
+                return commands.executeCommand<CompletionList>('vscode.executeCompletionItemProvider', vdoc.uri, position, context.triggerCharacter);
             }, new CompletionList([], false), token);
 
         },

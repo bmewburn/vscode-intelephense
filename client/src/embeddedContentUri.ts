@@ -13,7 +13,8 @@ export function isEmbeddedContentUri(virtualDocumentUri: Uri): boolean {
 }
 
 export function getEmbeddedContentUri(parentDocumentUri: string, embeddedLanguageId: string): Uri {
-	return new Uri().with({ scheme: EMBEDDED_CONTENT_SCHEME, authority: embeddedLanguageId, path: '/' + encodeURIComponent(parentDocumentUri) + '.' + embeddedLanguageId });
+	let uriString = EMBEDDED_CONTENT_SCHEME + '://' + embeddedLanguageId + '/' + encodeURIComponent(parentDocumentUri) + '.' + embeddedLanguageId;
+	return Uri.parse(uriString);
 };
 
 export function getHostDocumentUri(virtualDocumentUri: Uri): string {
