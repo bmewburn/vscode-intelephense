@@ -4,8 +4,8 @@ Welcome to Intelephense!
 
 A high performance and feature rich PHP language server implemented in Typescript. This extension offers:
 
-* Fast camel/underscore case matching code completion (IntelliSense), offering detailed suggestions for document, workspace and built-in symbols and keywords.
-* Detailed signature help for document, workspace and built-in constructors, methods, and functions.
+* Fast camel/underscore case code completion (IntelliSense), offering detailed suggestions for document, workspace and built-in symbols and keywords.
+* Detailed signature (parameter) help for document, workspace and built-in constructors, methods, and functions.
 * Rapid workspace wide go to definition support.
 * Workspace wide find all references.
 * Fast camel/underscore case workspace symbol search.
