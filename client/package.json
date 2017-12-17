@@ -1,13 +1,13 @@
 {
     "name": "vscode-intelephense-client",
     "displayName": "PHP Intelephense",
-    "description": "High performance and feature rich PHP support",
+    "description": "High performance, feature rich PHP intellisense",
     "author": {
         "name": "Ben Mewburn",
         "email": "ben@mewburn.id.au"
     },
     "license": "ISC",
-    "version": "0.8.2",
+    "version": "0.8.3",
     "publisher": "bmewburn",
     "engines": {
         "vscode": "^1.17.0"
@@ -19,7 +19,8 @@
     ],
     "preview": false,
     "activationEvents": [
-        "onLanguage:php"
+        "onLanguage:php",
+
     ],
     "keywords": [
         "php",
@@ -32,7 +33,7 @@
     "bugs": {
         "url": "https://github.com/bmewburn/intelephense/issues"
     },
-    "homepage": "https://github.com/bmewburn/intelephense",
+    "homepage": "http://intelephense.net",
     "repository": {
         "type": "git",
         "url": "https://github.com/bmewburn/vscode-intelephense.git"
