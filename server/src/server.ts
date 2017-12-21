@@ -145,94 +145,44 @@ connection.onDidOpenTextDocument((params) => {
 		connection.console.warn(`${params.textDocument.uri} not opened -- over max file size.`);
 		return;
 	}
-
-	handleRequest(() => {
-		Intelephense.openDocument(params.textDocument);
-	}, ['onDidOpenTextDocument', params.textDocument.uri]);
+		
+	Intelephense.openDocument(params.textDocument);
 });
 
 connection.onDidChangeTextDocument((params) => {
-	handleRequest(() => {
-		Intelephense.editDocument(params.textDocument, params.contentChanges);
-	}, ['onDidChangeTextDocument', params.textDocument.uri]);
+	Intelephense.editDocument(params.textDocument, params.contentChanges);
 });
 
 connection.onDidCloseTextDocument((params) => {
-	handleRequest(() => {
-		Intelephense.closeDocument(params.textDocument);
-	}, ['onDidCloseTextDocument', params.textDocument.uri]);
+	Intelephense.closeDocument(params.textDocument);
 });
 
 connection.onDocumentSymbol((params) => {
-
-	let debugInfo = ['onDocumentSymbol', params.textDocument.uri];
-	return handleRequest(() => {
-		let symbols = Intelephense.documentSymbols(params.textDocument);
-		debugInfo.push(`${symbols.length} symbols`);
-		return symbols;
-	}, debugInfo);
+	return Intelephense.documentSymbols(params.textDocument);
 });
 
 connection.onWorkspaceSymbol((params) => {
-
-	let debugInfo = ['onWorkspaceSymbol', params.query];
-	return handleRequest(() => {
-		let symbols = Intelephense.workspaceSymbols(params.query);
-		debugInfo.push(`${symbols.length} symbols`);
-		return symbols;
-	}, debugInfo);
+	return Intelephense.workspaceSymbols(params.query);
 });
 
 connection.onReferences((params) => {
-	let debugInfo = ['onReferences', params.textDocument.uri, JSON.stringify(params.position)];
-	return handleRequest(() => {
-		return Intelephense.provideReferences(params.textDocument, params.position, params.context);
-	}, debugInfo);
+	return Intelephense.provideReferences(params.textDocument, params.position, params.context);
 });
 
 connection.onCompletion((params) => {
-
-	let debugInfo = ['onCompletion', params.textDocument.uri, JSON.stringify(params.position)];
-	return handleRequest(() => {
-		let completions = Intelephense.provideCompletions(params.textDocument, params.position);
-		debugInfo.push(`${completions.items.length} items`);
-		return completions;
-	}, debugInfo);
+	return Intelephense.provideCompletions(params.textDocument, params.position);
 });
 
 connection.onSignatureHelp((params) => {
-
-	let debugInfo = ['onSignatureHelp', params.textDocument.uri, JSON.stringify(params.position)];
-	return handleRequest(() => {
-		let sigHelp = Intelephense.provideSignatureHelp(params.textDocument, params.position);
-		debugInfo.push(`${sigHelp ? sigHelp.signatures.length : 0} signatures`);
-		return sigHelp;
-	}, debugInfo);
+	return Intelephense.provideSignatureHelp(params.textDocument, params.position);
 });
 
 connection.onDefinition((params) => {
-
-	let debugInfo = ['onDefinition', params.textDocument.uri, JSON.stringify(params.position)];
-	return handleRequest(() => {
-		return Intelephense.provideDefinition(params.textDocument, params.position);
-	}, debugInfo);
+	return Intelephense.provideDefinition(params.textDocument, params.position);
 });
-
-/*
-connection.onDocumentFormatting((params) => {
-	let debugInfo = ['onDocumentFormat', params.textDocument.uri];
-	return handleRequest(() => {
-		return Intelephense.provideDocumentFormattingEdits(params.textDocument, params.options);
-	}, debugInfo);
-});
-*/
 
 connection.onDocumentRangeFormatting((params) => {
-	let debugInfo = ['onDocumentFormat', params.textDocument.uri];
-	return handleRequest(() => {
-		let r = Intelephense.provideDocumentRangeFormattingEdits(params.textDocument, params.range, params.options);
-		return r;
-	}, debugInfo);
+	return Intelephense.provideDocumentRangeFormattingEdits(params.textDocument, params.range, params.options);
 });
 
 connection.onShutdown(Intelephense.shutdown);
@@ -244,11 +194,7 @@ connection.onRequest(discoverSymbolsRequest, (params) => {
 		return 0;
 	}
 
-	let debugInfo = ['onDiscoverSymbols', params.textDocument.uri];
-	return handleRequest(() => {
-		let symbolCount = Intelephense.discoverSymbols(params.textDocument);
-		return symbolCount;
-	}, debugInfo);
+	return Intelephense.discoverSymbols(params.textDocument);
 });
 
 connection.onRequest(discoverReferencesRequest, (params) => {
@@ -257,86 +203,27 @@ connection.onRequest(discoverReferencesRequest, (params) => {
 		connection.console.warn(`${params.textDocument.uri} exceeds max file size.`);
 		return 0;
 	}
-
-	let debugInfo = ['onDiscoverReferences', params.textDocument.uri];
-	return handleRequest(() => {
-		let refCount = Intelephense.discoverReferences(params.textDocument);
-		return refCount;
-	}, debugInfo);
+	return Intelephense.discoverReferences(params.textDocument);
 });
 
 connection.onRequest(forgetRequest, (params) => {
-	let debugInfo = ['onForget', params.uri];
-	return handleRequest(() => {
-		let nForgot = Intelephense.forget(params.uri);
-		debugInfo.push(`${nForgot} symbols`);
-		return nForgot;
-	}, debugInfo);
+	return Intelephense.forget(params.uri);
 });
 
 connection.onRequest(importSymbolRequest, (params) => {
-	let debugInfo = ['onImportSymbol', params.uri];
-	return handleRequest(() => {
-		return Intelephense.provideContractFqnTextEdits(params.uri, params.position, params.alias);
-	}, debugInfo);
+	return Intelephense.provideContractFqnTextEdits(params.uri, params.position, params.alias);
 });
 
 connection.onRequest(knownDocumentsRequest, () => {
-	let debugInfo = ['onCachedDocument'];
-	return handleRequest(() => {
-		return Intelephense.knownDocuments();
-	}, debugInfo);
+	return Intelephense.knownDocuments();
 });
 
 connection.onRequest(documentLanguageRangesRequest, (params) => {
-	let debugInfo = ['onDocumentLanguageRanges'];
-	return handleRequest(() => {
-		return Intelephense.documentLanguageRanges(params.textDocument);
-	}, debugInfo);
+	return Intelephense.documentLanguageRanges(params.textDocument);
 });
-
 
 // Listen on the connection
 connection.listen();
-
-function handleRequest<T>(handler: () => T, debugMsgArray: string[]): T {
-
-	try {
-		let start = process.hrtime();
-		let t = handler();
-		let snap = takeProcessSnapshot(start);
-		debugMsgArray.push(`${snap.elapsed.toFixed(3)} ms`, `${snap.memory.toFixed(1)} MB`);
-		debug(debugMsgArray.join(' | '));
-		return t;
-	} catch (err) {
-		connection.console.error(debugMsgArray.join(' | ') + '\n' + err.stack);
-		return null;
-	}
-
-}
-
-interface ProcessSnapshot {
-	elapsed: number;
-	memory: number;
-}
-
-function debug(msg: string) {
-	if (config.debug.enable) {
-		connection.console.log(`[Debug - ${timeString()}] ${msg}`);
-	}
-}
-
-function timeString() {
-	let time = new Date();
-	return time.toLocaleString(undefined, { hour: 'numeric', minute: 'numeric', second: 'numeric' });
-}
-
-function takeProcessSnapshot(hrtimeStart: [number, number]) {
-	return <ProcessSnapshot>{
-		elapsed: elapsed(hrtimeStart),
-		memory: memory()
-	};
-}
 
 function elapsed(start: [number, number]) {
 	if (!start) {
@@ -344,8 +231,4 @@ function elapsed(start: [number, number]) {
 	}
 	let diff = process.hrtime(start);
 	return diff[0] * 1000 + diff[1] / 1000000;
-}
-
-function memory() {
-	return process.memoryUsage().heapUsed / 1000000;
 }
