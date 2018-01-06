@@ -1,5 +1,14 @@
 # Change Log
 
+## [0.8.5] - 2018-01-06
+#### Changed
+* Removed debug option in favour of trace
+
+#### Fixed
+* !== format bug
+* crash on merge conflict marker
+* workspace activation event
+
 ## [0.8.4] - 2017-12-17
 #### Added
 * @method static support
