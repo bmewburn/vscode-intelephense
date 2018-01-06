@@ -145,11 +145,13 @@
         "@types/fs-extra": "^5.0.0",
         "@types/mocha": "^2.2.46",
         "@types/node": "^8.5.7",
+        "@types/semver": "^5.4.0",
         "typescript": "^2.6.2",
         "vscode": "^1.1.10"
     },
     "dependencies": {
         "fs-extra": "^5.0.0",
+        "semver": "^5.4.1",
         "vscode-languageclient": "^4.0.0-next.5"
     },
     "private": true

@@ -5,6 +5,7 @@
 
 import * as path from 'path';
 import * as fs from 'fs-extra';
+import * as semver from 'semver';
 
 import {
 	workspace, Disposable, ExtensionContext, Uri, TextDocument, languages,
@@ -20,7 +21,7 @@ import { WorkspaceDiscovery } from './workspaceDiscovery';
 import {initializeEmbeddedContentDocuments} from './embeddedContentDocuments';
 
 const phpLanguageId = 'php';
-const version = '0.8.2';
+const version = '0.8.5';
 
 let maxFileSizeBytes = 10000000;
 let languageClient: LanguageClient;
@@ -35,7 +36,7 @@ export function activate(context: ExtensionContext) {
 	context.workspaceState.update('clearCache', undefined);
 	context.workspaceState.update('version', version);
 	
-	if(!versionMemento || (versionMemento != version && versionMemento != '0.8.1')) {
+	if(!versionMemento || (semver.lt(versionMemento, '0.8.2'))) {
 		clearCache = true;
 	}
 
@@ -82,6 +83,10 @@ export function activate(context: ExtensionContext) {
 	languageClient = new LanguageClient('intelephense', 'intelephense', serverOptions, clientOptions);
 	let langClientDisposable = languageClient.start();
 	let ready = languageClient.onReady();
+
+	ready.then(() => {
+		languageClient.info('Intelephense ' + version);
+	});
 
 	WorkspaceDiscovery.client = languageClient;
 	WorkspaceDiscovery.maxFileSizeBytes = workspace.getConfiguration("intelephense.file").get('maxSize') as number;
