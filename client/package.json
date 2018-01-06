@@ -142,15 +142,15 @@
         "postinstall": "node ./node_modules/vscode/bin/install"
     },
     "devDependencies": {
-        "@types/fs-extra": "^4.0.3",
-        "@types/mocha": "^2.2.40",
-        "@types/node": "^6.0.52",
-        "typescript": "^2.5.3",
-        "vscode": "^1.1.6"
+        "@types/fs-extra": "^5.0.0",
+        "@types/mocha": "^2.2.46",
+        "@types/node": "^8.5.7",
+        "typescript": "^2.6.2",
+        "vscode": "^1.1.10"
     },
     "dependencies": {
-        "fs-extra": "^4.0.2",
-        "vscode-languageclient": "^4.0.0-next.3"
+        "fs-extra": "^5.0.0",
+        "vscode-languageclient": "^4.0.0-next.5"
     },
     "private": true
 }
