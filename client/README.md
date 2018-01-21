@@ -1,5 +1,7 @@
 # Intelephense
 
+### [Support on Patreon](https://www.patreon.com/bmewburn)
+
 Welcome to Intelephense!
 
 A high performance and feature rich PHP language server implemented in Typescript. This extension offers:
