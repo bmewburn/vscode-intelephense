@@ -63,7 +63,7 @@
         "menus": {
             "editor/context": [
                 {
-                    "when": "editorTextFocus",
+                    "when": "editorTextFocus && editorLangId == php",
                     "command": "intelephense.import",
                     "group": "1_modification"
                 }
