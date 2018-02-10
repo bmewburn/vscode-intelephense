@@ -10,7 +10,7 @@
     "version": "0.8.6",
     "publisher": "bmewburn",
     "engines": {
-        "vscode": "^1.17.0"
+        "vscode": "^1.18.0"
     },
     "categories": [
         "Languages",
