@@ -125,15 +125,6 @@ export function activate(context: ExtensionContext) {
 	context.subscriptions.push(langClientDisposable, fsWatcher, importCommandDisposable, clearCacheDisposable, 
 		onDidChangeWorkspaceFoldersDisposable, cancelIndexingDisposable, middleware);
 
-	let wordPatternParts = [
-		/([$a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff\\]*)/.source,
-		/([^\$\-\`\~\!\@\#\%\^\&\*\(\)\=\+\[\{\]\}\\\|\;\:\'\"\,\.\<\>\/\?\s]+)/.source
-	];
-
-	languages.setLanguageConfiguration(phpLanguageId, {
-		wordPattern: new RegExp(wordPatternParts.join('|'), 'g'),
-	});
-
 }
 
 interface ImportSymbolTextEdits {
