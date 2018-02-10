@@ -311,7 +311,7 @@ export function initializeEmbeddedContentDocuments(getClient: () => LanguageClie
                 }
                 return next(document, position, context, token);
             }, isFalseyCompletionResult, (vdoc) => {
-                if(context.triggerCharacter === '$' || context.triggerCharacter === '>') {
+                if(context.triggerCharacter === '$' || context.triggerCharacter === '>' || context.triggerCharacter === '\\') {
                     //these are php trigger chars -- dont forward to html
                     return new CompletionList([], false);
                 }

@@ -80,7 +80,7 @@ connection.onInitialize((params) => {
 				workspaceSymbolProvider: true,
 				completionProvider: {
 					triggerCharacters: [
-						'$', '>', ':', //php
+						'$', '>', ':', '\\', //php
 						'.', '<', '/' //html/js
 					]
 				},
