@@ -137,7 +137,7 @@
     },
     "scripts": {
         "vscode:prepublish": "tsc -p ./",
-        "compile": "tsc -watch -p ./",
+        "compile": "tsc -p ./",
         "update-vscode": "node ./node_modules/vscode/bin/install",
         "postinstall": "node ./node_modules/vscode/bin/install"
     },
@@ -151,7 +151,7 @@
     },
     "dependencies": {
         "fs-extra": "^5.0.0",
-        "intelephense-server": "^0.8.5-alpha.2",
+        "intelephense-server": "^0.8.6",
         "semver": "^5.5.0",
         "vscode-languageclient": "^4.0.0-next.7"
     },
