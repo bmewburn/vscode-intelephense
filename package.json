@@ -7,7 +7,7 @@
         "email": "ben@mewburn.id.au"
     },
     "license": "ISC",
-    "version": "0.8.6",
+    "version": "0.8.8",
     "publisher": "bmewburn",
     "engines": {
         "vscode": "^1.18.0"
@@ -151,7 +151,7 @@
     },
     "dependencies": {
         "fs-extra": "^5.0.0",
-        "intelephense-server": "^0.8.6",
+        "intelephense-server": "^0.8.8",
         "semver": "^5.5.0",
         "vscode-languageclient": "^4.0.0-next.7"
     },

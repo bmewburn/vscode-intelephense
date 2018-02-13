@@ -1,5 +1,10 @@
 # Change Log
 
+## [0.8.8] - 2018-02-13
+#### Fixed
+* Signature help showing ouside of ()
+* Dynamic variable formatting
+
 ## [0.8.6] - 2018-02-11
 #### Changed
 * Improvements to completion suggestions when typing FQNs
