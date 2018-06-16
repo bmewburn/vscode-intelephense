@@ -85,6 +85,11 @@
                     "description": "Maximum file size in bytes.",
                     "scope": "window"
                 },
+                "intelephense.file.externalFolders": {
+                    "type": "array",
+                    "default": [],
+                    "description": "include external folders to workspace, such as php library stubs files."
+                },
                 "intelephense.diagnosticsProvider.debounce": {
                     "type": "number",
                     "default": 1000,
@@ -136,13 +141,15 @@
         }
     },
     "scripts": {
-        "vscode:prepublish": "tsc -p ./",
+        "vscode:prepublish": "npm run compile",
         "compile": "tsc -p ./",
-        "update-vscode": "node ./node_modules/vscode/bin/install",
-        "postinstall": "node ./node_modules/vscode/bin/install"
+        "watch": "tsc -watch -p ./",
+        "postinstall": "node ./node_modules/vscode/bin/install",
+        "test": "npm run compile && node ./node_modules/vscode/bin/test"
     },
     "devDependencies": {
         "@types/fs-extra": "^5.0.0",
+        "@types/glob": "^5.0.35",
         "@types/mocha": "^2.2.48",
         "@types/node": "^7.0.54",
         "@types/semver": "^5.5.0",

@@ -1,4 +1,4 @@
-/* Copyright (c) Ben Robert Mewburn 
+/* Copyright (c) Ben Robert Mewburn
  * Licensed under the ISC Licence.
  */
 'use strict';
@@ -12,21 +12,24 @@ import {
 	IndentAction, window, commands, TextEditor, TextEditorEdit, TextEdit,
 	Range, Position, CancellationToken, CancellationTokenSource
 } from 'vscode';
+import * as glob from 'glob';
+
 import {
 	LanguageClient, LanguageClientOptions, SettingMonitor, ServerOptions,
 	TransportKind, TextDocumentItem, DocumentFormattingRequest,
 	DocumentRangeFormattingRequest
 } from 'vscode-languageclient';
 import { WorkspaceDiscovery } from './workspaceDiscovery';
-import {initializeEmbeddedContentDocuments} from './embeddedContentDocuments';
+import { initializeEmbeddedContentDocuments } from './embeddedContentDocuments';
 
 const phpLanguageId = 'php';
 const version = '0.8.6';
 
 let maxFileSizeBytes = 10000000;
 let languageClient: LanguageClient;
-let extensionContext:ExtensionContext;
-let cancelWorkspaceDiscoveryController:CancellationTokenSource;
+let extensionContext: ExtensionContext;
+let cancelWorkspaceDiscoveryController: CancellationTokenSource;
+let externalFolders: string[];
 
 export function activate(context: ExtensionContext) {
 
@@ -35,11 +38,14 @@ export function activate(context: ExtensionContext) {
 	let clearCache = context.workspaceState.get<boolean>('clearCache');
 	context.workspaceState.update('clearCache', undefined);
 	context.workspaceState.update('version', version);
-	
-	if(!versionMemento || (semver.lt(versionMemento, '0.8.6'))) {
+
+	if (!versionMemento || (semver.lt(versionMemento, '0.8.6'))) {
 		clearCache = true;
 	}
 
+	externalFolders = workspace.getConfiguration('intelephense.file').get("externalFolders", []) as string[];
+
+	workspace.createFileSystemWatcher
 	// The server is implemented in node
 	let serverModule = context.asAbsolutePath(path.join('node_modules', 'intelephense-server', 'lib', 'server.js'));
 	// The debug options for the server
@@ -68,10 +74,10 @@ export function activate(context: ExtensionContext) {
 			//fileEvents: workspace.createFileSystemWatcher('**/*.php')
 		},
 		initializationOptions: {
-			storagePath:context.storagePath,
-			clearCache:clearCache
+			storagePath: context.storagePath,
+			clearCache: clearCache
 		},
-		middleware:middleware.middleware
+		middleware: middleware.middleware
 	}
 
 	let fsWatcher = workspace.createFileSystemWatcher(workspaceFilesIncludeGlob());
@@ -92,29 +98,22 @@ export function activate(context: ExtensionContext) {
 	WorkspaceDiscovery.maxFileSizeBytes = workspace.getConfiguration("intelephense.file").get('maxSize') as number;
 
 	if (workspace.workspaceFolders && workspace.workspaceFolders.length > 0) {
-		let token:CancellationToken;
-		ready.then(()=>{
-			if(cancelWorkspaceDiscoveryController) {
-				cancelWorkspaceDiscoveryController.dispose();
-			}
-			cancelWorkspaceDiscoveryController = new CancellationTokenSource();
-			token = cancelWorkspaceDiscoveryController.token;
-			return workspace.findFiles(workspaceFilesIncludeGlob(), undefined, undefined, token);
-		}).then((uriArray) => {
-			indexWorkspace(uriArray, true, token);
+		ready.then(() => {
+			indexWorkspaceAndExternalFolders(true);
 		});
 	}
 
-	let onDidChangeWorkspaceFoldersDisposable = workspace.onDidChangeWorkspaceFolders((e)=>{
+	let onDidChangeWorkspaceFoldersDisposable = workspace.onDidChangeWorkspaceFolders((e) => {
 		//handle folder add/remove
-		if(cancelWorkspaceDiscoveryController) {
-			cancelWorkspaceDiscoveryController.dispose();
+		return indexWorkspaceAndExternalFolders(false);
+	});
+
+	let onDidChangeConfigurationDisposable = workspace.onDidChangeConfiguration(() => {
+		let newExternalFolders = workspace.getConfiguration('intelephense.file').get("externalFolders", []);
+		if (newExternalFolders.toString() != externalFolders.toString()) {
+			externalFolders = newExternalFolders;
+			indexWorkspaceAndExternalFolders(false);
 		}
-		cancelWorkspaceDiscoveryController = new CancellationTokenSource();
-		let token = cancelWorkspaceDiscoveryController.token;
-		return workspace.findFiles(workspaceFilesIncludeGlob()).then((uriArray) => {
-			indexWorkspace(uriArray, false, token);
-		});
 	});
 
 	let importCommandDisposable = commands.registerTextEditorCommand('intelephense.import', importCommandHandler);
@@ -122,8 +121,8 @@ export function activate(context: ExtensionContext) {
 	let cancelIndexingDisposable = commands.registerCommand('intelephense.cancel.indexing', cancelWorkspaceDiscoveryHandler);
 
 	//push disposables
-	context.subscriptions.push(langClientDisposable, fsWatcher, importCommandDisposable, clearCacheDisposable, 
-		onDidChangeWorkspaceFoldersDisposable, cancelIndexingDisposable, middleware);
+	context.subscriptions.push(langClientDisposable, fsWatcher, importCommandDisposable, clearCacheDisposable,
+		onDidChangeWorkspaceFoldersDisposable, onDidChangeConfigurationDisposable, cancelIndexingDisposable, middleware);
 
 }
 
@@ -152,13 +151,13 @@ function importCommandHandler(textEditor: TextEditor, edit: TextEditorEdit) {
 }
 
 function clearCacheCommandHandler() {
-	return extensionContext.workspaceState.update('clearCache', true).then(()=>{
+	return extensionContext.workspaceState.update('clearCache', true).then(() => {
 		commands.executeCommand('workbench.action.reloadWindow');
 	});
 }
 
 function cancelWorkspaceDiscoveryHandler() {
-	if(cancelWorkspaceDiscoveryController) {
+	if (cancelWorkspaceDiscoveryController) {
 		cancelWorkspaceDiscoveryController.dispose();
 		cancelWorkspaceDiscoveryController = undefined;
 	}
@@ -172,13 +171,13 @@ function workspaceFilesIncludeGlob() {
 
 	associations.push('*.php');
 	associations = associations.map((v, i, a) => {
-		if(v.indexOf('/') < 0 && v.indexOf('\\') < 0) {
+		if (v.indexOf('/') < 0 && v.indexOf('\\') < 0) {
 			return '**/' + v;
 		} else {
 			return v;
 		}
 	});
-	
+
 	return '{' + Array.from(new Set<string>(associations)).join(',') + '}';
 }
 
@@ -194,22 +193,44 @@ function onDidCreate(uri: Uri) {
 	onDidChange(uri);
 }
 
-function indexWorkspace(uriArray: Uri[], checkModTime:boolean, token:CancellationToken) {
+function indexWorkspaceAndExternalFolders(checkModTime: boolean) {
+	if (cancelWorkspaceDiscoveryController) {
+		cancelWorkspaceDiscoveryController.dispose();
+	}
+	cancelWorkspaceDiscoveryController = new CancellationTokenSource();
+	let token = cancelWorkspaceDiscoveryController.token;
 
-	if(token.isCancellationRequested) {
+	let pattern = workspaceFilesIncludeGlob();
+	return workspace.findFiles(pattern, undefined, undefined, token).then(uris => {
+		pattern = pattern.indexOf(',') > 0 ? pattern : pattern.replace(/^\{|\}$/g, '');
+		externalFolders.map(folder => {
+			let files = glob.sync(pattern, { cwd: folder, absolute: true });
+			files.map(file => {
+				uris.push(Uri.file(file));
+			});
+		});
+		return uris;
+	}).then((uriArray) => {
+		indexWorkspace(uriArray, checkModTime, token);
+	});
+}
+
+function indexWorkspace(uriArray: Uri[], checkModTime: boolean, token: CancellationToken) {
+
+	if (token.isCancellationRequested) {
 		return;
 	}
 
 	let indexingStartHrtime = process.hrtime();
 	languageClient.info('Indexing started.');
-	let completedPromise = WorkspaceDiscovery.checkCacheThenDiscover(uriArray, checkModTime, token).then((count)=>{
+	let completedPromise = WorkspaceDiscovery.checkCacheThenDiscover(uriArray, checkModTime, token).then((count) => {
 		indexingCompleteFeedback(indexingStartHrtime, count, token);
 	});
 	window.setStatusBarMessage('$(search) intelephense indexing ...', completedPromise);
 
 }
 
-function indexingCompleteFeedback(startHrtime: [number, number], fileCount: number, token:CancellationToken) {
+function indexingCompleteFeedback(startHrtime: [number, number], fileCount: number, token: CancellationToken) {
 	let elapsed = process.hrtime(startHrtime);
 	let info = [
 		`${fileCount} files`,
