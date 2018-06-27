@@ -205,7 +205,7 @@ function indexWorkspace(uriArray: Uri[], checkModTime:boolean, token:Cancellatio
 	let completedPromise = WorkspaceDiscovery.checkCacheThenDiscover(uriArray, checkModTime, token).then((count)=>{
 		indexingCompleteFeedback(indexingStartHrtime, count, token);
 	});
-	window.setStatusBarMessage('$(search) intelephense indexing ...', completedPromise);
+	window.setStatusBarMessage('$(search) Intelephense indexing ...', completedPromise);
 
 }
 
@@ -221,7 +221,7 @@ function indexingCompleteFeedback(startHrtime: [number, number], fileCount: numb
 	);
 
 	window.setStatusBarMessage([
-		'$(search) intelephense indexing ' + (token.isCancellationRequested ? 'cancelled' : 'complete'),
+		'$(search) Intelephense indexing ' + (token.isCancellationRequested ? 'cancelled' : 'complete'),
 		`$(file-code) ${fileCount}`,
 		`$(clock) ${elapsed[0]}.${Math.round(elapsed[1] / 100000000)}`
 	].join('   '), 30000);
