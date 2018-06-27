@@ -10,7 +10,7 @@ import * as semver from 'semver';
 import {
 	workspace, Disposable, ExtensionContext, Uri, TextDocument, languages,
 	IndentAction, window, commands, TextEditor, TextEditorEdit, TextEdit,
-	Range, Position, CancellationToken, CancellationTokenSource
+	Range, Position, CancellationToken, CancellationTokenSource, StatusBarAlignment
 } from 'vscode';
 import {
 	LanguageClient, LanguageClientOptions, SettingMonitor, ServerOptions,
@@ -22,6 +22,10 @@ import {initializeEmbeddedContentDocuments} from './embeddedContentDocuments';
 
 const phpLanguageId = 'php';
 const version = '0.8.6';
+
+const statusBar = window.createStatusBarItem(StatusBarAlignment.Left);
+statusBar.command = 'workbench.action.output.toggleOutput';
+statusBar.tooltip = 'Intelephense is indexing...';
 
 let maxFileSizeBytes = 10000000;
 let languageClient: LanguageClient;
@@ -202,11 +206,14 @@ function indexWorkspace(uriArray: Uri[], checkModTime:boolean, token:Cancellatio
 
 	let indexingStartHrtime = process.hrtime();
 	languageClient.info('Indexing started.');
-	let completedPromise = WorkspaceDiscovery.checkCacheThenDiscover(uriArray, checkModTime, token).then((count)=>{
-		indexingCompleteFeedback(indexingStartHrtime, count, token);
+	statusBar.show();
+	WorkspaceDiscovery.checkCacheThenDiscover(uriArray, checkModTime, token, (count, total, request) => {
+	  const percentage = (100 * count / total).toFixed(1);
+	  statusBar.text = `$(search) Indexing (${percentage}%)`;
+	  languageClient.info(`Indexed ${request} #${count}/${total} (${percentage}%)`);
+	}).then((count) => {
+	  indexingCompleteFeedback(indexingStartHrtime, count, token);
 	});
-	window.setStatusBarMessage('$(search) intelephense indexing ...', completedPromise);
-
 }
 
 function indexingCompleteFeedback(startHrtime: [number, number], fileCount: number, token:CancellationToken) {
@@ -220,9 +227,10 @@ function indexingCompleteFeedback(startHrtime: [number, number], fileCount: numb
 		[token.isCancellationRequested ? 'Indexing cancelled' : 'Indexing ended', ...info].join(' | ')
 	);
 
-	window.setStatusBarMessage([
-		'$(search) intelephense indexing ' + (token.isCancellationRequested ? 'cancelled' : 'complete'),
-		`$(file-code) ${fileCount}`,
-		`$(clock) ${elapsed[0]}.${Math.round(elapsed[1] / 100000000)}`
-	].join('   '), 30000);
+	statusBar.text = [
+	  `$(search) Indexing ${token.isCancellationRequested ? 'cancelled' : 'completed'}`,
+	  `$(file-code) ${fileCount}`,
+	  `$(clock) ${elapsed[0]}.${Math.round(elapsed[1] / 100000000)}`,
+	].join('   ');
+	setTimeout(statusBar.hide.bind(statusBar), 30000);
 }
