@@ -22,7 +22,7 @@ export namespace WorkspaceDiscovery {
     var delayedDiscoverUriArray: Uri[] = [];
     var delayedDiscoverTimer: NodeJS.Timer;
 
-    export function checkCacheThenDiscover(uriArray: Uri[], checkModTime:boolean, token:CancellationToken) {
+    export function checkCacheThenDiscover(uriArray: Uri[], checkModTime:boolean, token:CancellationToken, progressFn: (count: Number, total: Number, request: String) => void) {
         return knownDocumentsRequest(token).then((status) => {
 
             if(token.isCancellationRequested) {
@@ -51,7 +51,14 @@ export namespace WorkspaceDiscovery {
                 return checkModTime && !token.isCancellationRequested ? filterKnownByModtime(known, timestamp) : Promise.resolve([]);
             }).then((filteredUriArray)=>{
                 Array.prototype.push.apply(notKnown, filteredUriArray);
-                return discover(notKnown, token);
+                let notKnownDiscoveredCount = 0;
+                const notKnownLength = 2 * notKnown.length;
+                return discover(notKnown, token, (request) => {
+                    notKnownDiscoveredCount++;
+                    if(progressFn) {
+                        progressFn(notKnownDiscoveredCount, notKnownLength, request);
+                    }
+                });
             });
 
         });
@@ -147,8 +154,8 @@ export namespace WorkspaceDiscovery {
 
     }
 
-    export function discover(uriArray: Uri[], token?:CancellationToken) {
-        return discoverSymbolsMany(uriArray, token).then(() => { return discoverReferencesMany(uriArray, token); });
+    export function discover(uriArray: Uri[], token?:CancellationToken, progressFn: (request?:String) => void) {
+        return discoverSymbolsMany(uriArray, token, progressFn).then(() => { return discoverReferencesMany(uriArray, token, progressFn); });
     }
 
     export function delayedDiscover(uri: Uri) {
@@ -174,20 +181,20 @@ export namespace WorkspaceDiscovery {
         return forgetRequest(uri);
     }
 
-    function discoverSymbols(uri: Uri) {
-        return readTextDocumentItem(uri).then(discoverSymbolsRequest);
+    function discoverSymbols(progressFn: (request?:String) => void, uri: Uri) {
+        return readTextDocumentItem(uri).then(discoverSymbolsRequest).then(progressFn);
     }
 
-    function discoverSymbolsMany(uriArray: Uri[], token?:CancellationToken) {
-        return discoverMany(discoverSymbols, uriArray, token);
+    function discoverSymbolsMany(uriArray: Uri[], token?:CancellationToken, progressFn: (request?:String) => void) {
+        return discoverMany(discoverSymbols.bind(null, progressFn.bind(null, 'symbol')), uriArray, token);
     }
 
-    function discoverReferences(uri: Uri) {
-        return readTextDocumentItem(uri).then(discoverReferencesRequest);
+    function discoverReferences(progressFn: (request?:String) => void, uri: Uri) {
+        return readTextDocumentItem(uri).then(discoverReferencesRequest).then(progressFn);
     }
 
-    function discoverReferencesMany(uriArray: Uri[], token?:CancellationToken) {
-        return discoverMany(discoverReferences, uriArray, token);
+    function discoverReferencesMany(uriArray: Uri[], token?:CancellationToken, progressFn: (request?:String) => void) {
+        return discoverMany(discoverReferences.bind(null, progressFn.bind(null, 'reference')), uriArray, token);
     }
 
     function discoverMany(discoverFn: (uri: Uri, token?:CancellationToken) => Promise<number>, uriArray: Uri[], token?:CancellationToken) {
