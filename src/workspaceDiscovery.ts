@@ -1,4 +1,4 @@
-/* Copyright (c) Ben Robert Mewburn 
+/* Copyright (c) Ben Robert Mewburn
  * Licensed under the ISC Licence.
  */
 'use strict';
@@ -101,7 +101,7 @@ export namespace WorkspaceDiscovery {
                         modTime(uri).then(onResolved);
                     }
                 }
-            }     
+            }
 
             let count = knownUriArray.length;
             knownUriArray = knownUriArray.slice(0);
@@ -154,7 +154,7 @@ export namespace WorkspaceDiscovery {
 
     }
 
-    export function discover(uriArray: Uri[], token?:CancellationToken, progressFn: (request?:String) => void) {
+    export function discover(uriArray: Uri[], token?:CancellationToken, progressFn?:(request?:String) => void) {
         return discoverSymbolsMany(uriArray, token, progressFn).then(() => { return discoverReferencesMany(uriArray, token, progressFn); });
     }
 
@@ -181,19 +181,19 @@ export namespace WorkspaceDiscovery {
         return forgetRequest(uri);
     }
 
-    function discoverSymbols(progressFn: (request?:String) => void, uri: Uri) {
-        return readTextDocumentItem(uri).then(discoverSymbolsRequest).then(progressFn);
+    function discoverSymbols(discoverProgressFn: (request?:String) => void, uri: Uri) {
+        return readTextDocumentItem(uri).then(discoverSymbolsRequest).then(discoverProgressFn);
     }
 
-    function discoverSymbolsMany(uriArray: Uri[], token?:CancellationToken, progressFn: (request?:String) => void) {
+    function discoverSymbolsMany(uriArray: Uri[], token?:CancellationToken, progressFn?:(request?:String) => void) {
         return discoverMany(discoverSymbols.bind(null, progressFn.bind(null, 'symbol')), uriArray, token);
     }
 
-    function discoverReferences(progressFn: (request?:String) => void, uri: Uri) {
-        return readTextDocumentItem(uri).then(discoverReferencesRequest).then(progressFn);
+    function discoverReferences(discoverProgressFn: (request?:String) => void, uri: Uri) {
+        return readTextDocumentItem(uri).then(discoverReferencesRequest).then(discoverProgressFn);
     }
 
-    function discoverReferencesMany(uriArray: Uri[], token?:CancellationToken, progressFn: (request?:String) => void) {
+    function discoverReferencesMany(uriArray: Uri[], token?:CancellationToken, progressFn?:(request?:String) => void) {
         return discoverMany(discoverReferences.bind(null, progressFn.bind(null, 'reference')), uriArray, token);
     }
 
@@ -213,7 +213,7 @@ export namespace WorkspaceDiscovery {
             let onAlways = () => {
                 --remaining;
                 let uri:Uri;
-                
+
                 if(cancelled) {
                     return;
                 } else if (remaining < 1 || (token && token.isCancellationRequested && !cancelled)) {
