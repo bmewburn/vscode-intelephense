@@ -19,6 +19,7 @@ import {
 } from 'vscode-languageclient';
 import { WorkspaceDiscovery } from './workspaceDiscovery';
 import {initializeEmbeddedContentDocuments} from './embeddedContentDocuments';
+import { ReferencesCodeLensProvider } from './referencesCodeLens';
 
 const phpLanguageId = 'php';
 const version = '0.8.6';
@@ -120,10 +121,11 @@ export function activate(context: ExtensionContext) {
 	let importCommandDisposable = commands.registerTextEditorCommand('intelephense.import', importCommandHandler);
 	let clearCacheDisposable = commands.registerCommand('intelephense.clear.cache', clearCacheCommandHandler);
 	let cancelIndexingDisposable = commands.registerCommand('intelephense.cancel.indexing', cancelWorkspaceDiscoveryHandler);
+	let referencesCodeLensDisposable = languages.registerCodeLensProvider(clientOptions.documentSelector, new ReferencesCodeLensProvider());
 
 	//push disposables
 	context.subscriptions.push(langClientDisposable, fsWatcher, importCommandDisposable, clearCacheDisposable, 
-		onDidChangeWorkspaceFoldersDisposable, cancelIndexingDisposable, middleware);
+		onDidChangeWorkspaceFoldersDisposable, cancelIndexingDisposable, middleware, referencesCodeLensDisposable);
 
 }
 
