@@ -8,8 +8,6 @@ import {
     CodeLensProvider, CodeLens, SymbolInformation, SymbolKind, Location
 } from 'vscode';
 
-import { EmbeddedDocuments } from './embeddedContentDocuments';
-
 export class ReferencesCodeLens extends CodeLens {
     constructor(
         public document: TextDocument,
