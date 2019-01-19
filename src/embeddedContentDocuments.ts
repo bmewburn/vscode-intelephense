@@ -14,18 +14,19 @@ import {
     Range as RangeDto, ProvideSignatureHelpSignature, ProvideDefinitionSignature,
     ProvideReferencesSignature, ProvideDocumentSymbolsSignature, ProvideDocumentLinksSignature,
     ProvideDocumentHighlightsSignature, ProvideHoverSignature, ProvideDocumentRangeFormattingEditsSignature,
-    Code2ProtocolConverter
+    Code2ProtocolConverter, Protocol2CodeConverter
 } from 'vscode-languageclient';
 import {
     TextDocument, Position, CancellationToken, Range, workspace,
     EventEmitter, Disposable, Uri, commands, ProviderResult, CompletionItem, CompletionList,
     SignatureHelp, Definition, Location, SymbolInformation, DocumentLink, DocumentHighlight,
-    Hover, FormattingOptions, TextEdit, WorkspaceEdit, CompletionContext
+    Hover, FormattingOptions, TextEdit, WorkspaceEdit, CompletionContext, DefinitionLink
 } from 'vscode';
 import {
     getEmbeddedContentUri, getEmbeddedLanguageId, getHostDocumentUri,
     isEmbeddedContentUri, EMBEDDED_CONTENT_SCHEME
 } from './embeddedContentUri';
+import { createConverter } from 'vscode-languageclient/lib/protocolConverter';
 
 const documentLanguageRangesRequestName = 'documentLanguageRanges';
 const phpLanguageId = 'php';
@@ -41,20 +42,16 @@ interface VLanguageRange {
     languageId?: string;
 }
 
-export interface EmbeddedDocuments extends Disposable {
-    middleware: Middleware;
-}
+export interface IntelephenseMiddleware extends Middleware, Disposable { }
 
-export function initializeEmbeddedContentDocuments(getClient: () => LanguageClient): EmbeddedDocuments {
-    let toDispose: Disposable[] = [];
+export function initializeEmbeddedContentDocuments(getClient: () => LanguageClient): IntelephenseMiddleware {
 
-    let embeddedContentChanged = new EventEmitter<Uri>();
-
+    const toDispose: Disposable[] = [];
+    const embeddedContentChanged = new EventEmitter<Uri>();
     // remember all open virtual documents with the version of the content
-    let openVirtualDocuments: { [virtualUri: string]: number } = {};
-
+    const openVirtualDocuments: { [virtualUri: string]: number } = {};
     //doc lang ranges
-    let documentLanguageRanges: { [virtualUri: string]: VLanguageRange[] } = {};
+    const documentLanguageRanges: { [virtualUri: string]: VLanguageRange[] } = {};
 
     // documents are closed after a time out or when collected.
     toDispose.push(workspace.onDidCloseTextDocument(d => {
@@ -64,35 +61,34 @@ export function initializeEmbeddedContentDocuments(getClient: () => LanguageClie
         }
     }));
 
-    let languageRange2Code = (v: LanguageRange) => {
+    function languageRange2Code(v: LanguageRange) {
         return <VLanguageRange>{
-            range: getClient().protocol2CodeConverter.asRange(v.range),
+            range: new Range(new Position(v.range.start.line, v.range.start.character), new Position(v.range.end.line, v.range.end.character)),
             languageId: v.languageId
         }
     }
 
-    let fetchRanges = (virtualUri: Uri) => {
-        let hostUri = getHostDocumentUri(virtualUri);
-        return documentLanguageRangesRequest(hostUri, getClient()).then((list) => {
-            let virtualURIString = virtualUri.toString();
-            if (!list || !list.version || !list.ranges) {
-                delete documentLanguageRanges[virtualURIString];
-                delete openVirtualDocuments[virtualURIString];
-                return undefined;
-            }
+    async function fetchRanges(virtualUri: Uri) {
+        const hostUri = getHostDocumentUri(virtualUri);
+        const languageRanges = await documentLanguageRangesRequest(hostUri, getClient());
+        const virtualURIString = virtualUri.toString();
+        if (!languageRanges || !languageRanges.version || !languageRanges.ranges) {
+            delete documentLanguageRanges[virtualURIString];
+            delete openVirtualDocuments[virtualURIString];
+            return undefined;
+        }
 
-            openVirtualDocuments[virtualURIString] = list.version;
-            documentLanguageRanges[virtualURIString] = list.ranges.map(languageRange2Code);
-            return documentLanguageRanges[virtualURIString];
-        });
+        openVirtualDocuments[virtualURIString] = languageRanges.version;
+        documentLanguageRanges[virtualURIString] = languageRanges.ranges.map(languageRange2Code);
+        return documentLanguageRanges[virtualURIString];
     }
 
     const replacePattern = /\S/g;
     function phpEscapedContent(ranges: VLanguageRange[], uri: string) {
-        let finderFn = (x: TextDocument) => {
+        const finderFn = (x: TextDocument) => {
             return x.uri.toString() === uri;
         }
-        let doc = workspace.textDocuments.find(finderFn);
+        const doc = workspace.textDocuments.find(finderFn);
         if (!doc || !ranges || ranges.length < 1) {
             return '';
         }
@@ -143,15 +139,14 @@ export function initializeEmbeddedContentDocuments(getClient: () => LanguageClie
     });
     */
 
-    function shouldForwardRequest(virtualURI: Uri, expectedVersion: number, place?: Position | Range) {
+    async function shouldForwardRequest(virtualURI: Uri, expectedVersion: number, place?: Position | Range) {
 
         let virtualURIString = virtualURI.toString();
         let virtualDocVersion = openVirtualDocuments[virtualURIString];
-        let waitForDocChange: Promise<void>;
 
         if (isDefined(virtualDocVersion) && virtualDocVersion !== expectedVersion) {
 
-            waitForDocChange = new Promise<void>((resolve, reject) => {
+            await new Promise<void>((resolve, reject) => {
                 let subscription = workspace.onDidChangeTextDocument(d => {
                     if (d.document.uri.toString() === virtualURIString) {
                         subscription.dispose();
@@ -164,57 +159,25 @@ export function initializeEmbeddedContentDocuments(getClient: () => LanguageClie
             });
         }
 
-        if (!waitForDocChange) {
-            waitForDocChange = Promise.resolve();
+        const ranges = await fetchRanges(virtualURI);
+
+        if (!ranges || ranges.length < 1) {
+            return false;
+        } else if (!place) {
+            return ranges.length > 1;
+        } else if ((<Position>place).line) {
+            return !isPositionPhp(ranges, <Position>place);
+        } else {
+            return !isRangePhpOnly(ranges, <Range>place);
         }
-
-        return waitForDocChange.then(() => {
-            return fetchRanges(virtualURI);
-        }).then((ranges) => {
-
-            if (!ranges || ranges.length < 1) {
-                return false;
-            } else if (!place) {
-                return ranges.length > 1;
-            } else if ((<Position>place).line) {
-                return !isPositionPhp(ranges, <Position>place);
-            } else {
-                return !isRangePhpOnly(ranges, <Range>place);
-            }
-
-        });
-
     }
 
-    /*
-    function ensureContentUpdated(virtualURI: Uri, expectedVersion: number) {
-
-        let virtualURIString = virtualURI.toString();
-        let virtualDocVersion = openVirtualDocuments[virtualURIString];
-        if (isDefined(virtualDocVersion) && virtualDocVersion !== expectedVersion) {
-            return new Promise<void>((resolve, reject) => {
-                let subscription = workspace.onDidChangeTextDocument(d => {
-                    if (d.document.uri.toString() === virtualURIString) {
-                        subscription.dispose();
-                        resolve();
-                    }
-                });
-                delete documentLanguageRanges[virtualURIString];
-                delete openVirtualDocuments[virtualURIString];
-                embeddedContentChanged.fire(virtualURI);
-            });
+    async function openEmbeddedContentDocument(virtualURI: Uri, expectedVersion: number) {
+        const doc = await workspace.openTextDocument(virtualURI)
+        if (expectedVersion === openVirtualDocuments[virtualURI.toString()]) {
+            return doc;
         }
-        return Promise.resolve();
-    };
-    */
-
-    function openEmbeddedContentDocument(virtualURI: Uri, expectedVersion: number): Thenable<TextDocument> {
-        return workspace.openTextDocument(virtualURI).then(document => {
-            if (expectedVersion === openVirtualDocuments[virtualURI.toString()]) {
-                return document;
-            }
-            return void 0;
-        });
+        return void 0;
     };
 
     function isPositionPhp(ranges: VLanguageRange[], position: Position) {
@@ -300,18 +263,17 @@ export function initializeEmbeddedContentDocuments(getClient: () => LanguageClie
 
     }
 
-
-    let middleware = <Middleware>{
+    let middleware = <IntelephenseMiddleware>{
 
         provideCompletionItem: (document: TextDocument, position: Position, context: CompletionContext, token: CancellationToken, next: ProvideCompletionItemsSignature) => {
             return middleWarePositionalRequest<CompletionList | CompletionItem[]>(document, position, () => {
-                if(context.triggerCharacter === '<' || context.triggerCharacter === '/' || context.triggerCharacter === '.') {
+                if (context.triggerCharacter === '<' || context.triggerCharacter === '/' || context.triggerCharacter === '.') {
                     //not php trigger chars -- dont send request to php server
                     return undefined;
                 }
                 return next(document, position, context, token);
             }, isFalseyCompletionResult, (vdoc) => {
-                if(context.triggerCharacter === '$' || context.triggerCharacter === '>' || context.triggerCharacter === '\\') {
+                if (context.triggerCharacter === '$' || context.triggerCharacter === '>' || context.triggerCharacter === '\\') {
                     //these are php trigger chars -- dont forward to html
                     return new CompletionList([], false);
                 }
@@ -329,7 +291,7 @@ export function initializeEmbeddedContentDocuments(getClient: () => LanguageClie
         },
 
         provideDefinition: (document: TextDocument, position: Position, token: CancellationToken, next: ProvideDefinitionSignature) => {
-            return middleWarePositionalRequest<Definition>(document, position, () => {
+            return middleWarePositionalRequest<Definition | DefinitionLink[]>(document, position, () => {
                 return next(document, position, token);
             }, (r) => { return !r || (Array.isArray(r) && r.length < 1); }, (vdoc) => {
                 return commands.executeCommand<Definition>('vscode.executeDefinitionProvider', vdoc.uri, position).then((def) => {
@@ -344,6 +306,7 @@ export function initializeEmbeddedContentDocuments(getClient: () => LanguageClie
                         return def;
                     } else {
                         if (isEmbeddedContentUri(def.uri)) {
+
                             def.uri = getClient().protocol2CodeConverter.asUri(getHostDocumentUri(def.uri));
                         }
                         return def;
@@ -370,56 +333,19 @@ export function initializeEmbeddedContentDocuments(getClient: () => LanguageClie
             }, [], token);
 
         },
-        /*
-                provideDocumentSymbols: (document: TextDocument, token: CancellationToken, next: ProvideDocumentSymbolsSignature) => {
-        
-                    return new Promise((resolve, reject) => {
-        
-                        let vdocUri = getEmbeddedContentUri(document.uri.toString(), htmlLanguageId);
-                        let symbolInformationArray = [];
-                        let responseCounter = 2;
-        
-        
-                        let onResolved = (value: SymbolInformation[]) => {
-                            if (value) {
-                                Array.prototype.push.apply(symbolInformationArray, value);
-                            }
-                            if (--responseCounter < 1) {
-                                resolve(symbolInformationArray);
-                            }
-                        }
-        
-                        let htmlResult = openEmbeddedContentDocument(vdocUri, document.version).then((vdoc) => {
-                            return commands.executeCommand<SymbolInformation[]>('vscode.executeDocumentSymbolProvider', vdoc.uri);
-                        });
-                        if (!isThenable(htmlResult)) {
-                            htmlResult = Promise.resolve(htmlResult);
-                        }
-                        htmlResult.then(onResolved);
-        
-                        let phpResult = next(document, token);
-                        if (!isThenable(phpResult)) {
-                            phpResult = Promise.resolve(phpResult);
-                        }
-                        (<Thenable<SymbolInformation[]>>phpResult).then(onResolved);
-        
-                    });
-        
-                },
-        */
 
         provideDocumentLinks: (document: TextDocument, token: CancellationToken, next: ProvideDocumentLinksSignature) => {
             let vdocUri = getEmbeddedContentUri(document.uri.toString(), htmlLanguageId);
             return shouldForwardRequest(vdocUri, document.version).then(result => {
-                
-                if(!result || token.isCancellationRequested) {
+
+                if (!result || token.isCancellationRequested) {
                     return [];
                 }
-                
+
                 return openEmbeddedContentDocument(vdocUri, document.version).then((vdoc) => {
                     return vdoc ? commands.executeCommand<DocumentLink[]>('vscode.executeLinkProvider', vdoc.uri) : [];
                 });
-            }); 
+            });
         },
 
         provideDocumentHighlights: (document: TextDocument, position: Position, token: CancellationToken, next: ProvideDocumentHighlightsSignature) => {
@@ -439,14 +365,12 @@ export function initializeEmbeddedContentDocuments(getClient: () => LanguageClie
                     return h.shift();
                 });
             }, undefined, token);
-        }
+        },
 
+        dispose: Disposable.from(...toDispose).dispose
     }
 
-    return {
-        middleware: middleware,
-        dispose: Disposable.from(...toDispose).dispose
-    };
+    return middleware;
 
 }
 

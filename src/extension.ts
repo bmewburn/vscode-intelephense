@@ -15,18 +15,21 @@ import {
 import {
 	LanguageClient, LanguageClientOptions, SettingMonitor, ServerOptions,
 	TransportKind, TextDocumentItem, DocumentFormattingRequest,
-	DocumentRangeFormattingRequest
+	DocumentRangeFormattingRequest,
+	NotificationType,
+	RequestType
 } from 'vscode-languageclient';
-import { WorkspaceDiscovery } from './workspaceDiscovery';
 import {initializeEmbeddedContentDocuments} from './embeddedContentDocuments';
 
-const phpLanguageId = 'php';
-const version = '0.8.6';
+const PHP_LANGUAGE_ID = 'php';
+const VERSION = '1.0.0';
+const INDEXING_STARTED_NOTIFICATION = new NotificationType('indexingStarted');
+const INDEXING_ENDED_NOTIFICATION = new NotificationType('indexingEnded');
+const INDEX_WORKSPACE_REQUEST = new RequestType('indexWorkspace');
+const CANCEL_INDEXING_REQUEST = new RequestType('cancelIndexing');
 
-let maxFileSizeBytes = 10000000;
 let languageClient: LanguageClient;
 let extensionContext:ExtensionContext;
-let cancelWorkspaceDiscoveryController:CancellationTokenSource;
 
 export function activate(context: ExtensionContext) {
 
@@ -34,9 +37,9 @@ export function activate(context: ExtensionContext) {
 	let versionMemento = context.workspaceState.get<string>('version');
 	let clearCache = context.workspaceState.get<boolean>('clearCache');
 	context.workspaceState.update('clearCache', undefined);
-	context.workspaceState.update('version', version);
+	context.workspaceState.update('version', VERSION);
 	
-	if(!versionMemento || (semver.lt(versionMemento, '0.8.6'))) {
+	if(!versionMemento || (semver.lt(versionMemento, VERSION))) {
 		clearCache = true;
 	}
 
@@ -59,25 +62,19 @@ export function activate(context: ExtensionContext) {
 	// Options to control the language client
 	let clientOptions: LanguageClientOptions = {
 		documentSelector: [
-			{ language: phpLanguageId, scheme: 'file' },
+			{ language: PHP_LANGUAGE_ID, scheme: 'file' },
+			{ language: PHP_LANGUAGE_ID, scheme: 'untitled' }
 		],
 		synchronize: {
-			// Synchronize the setting section 'intelephense' to the server
-			configurationSection: 'intelephense',
 			// Notify the server about file changes to php in the workspace
-			//fileEvents: workspace.createFileSystemWatcher('**/*.php')
+			fileEvents: workspace.createFileSystemWatcher(workspaceFilesIncludeGlob()),
 		},
 		initializationOptions: {
 			storagePath:context.storagePath,
 			clearCache:clearCache
 		},
-		middleware:middleware.middleware
+		middleware:middleware
 	}
-
-	let fsWatcher = workspace.createFileSystemWatcher(workspaceFilesIncludeGlob());
-	fsWatcher.onDidDelete(onDidDelete);
-	fsWatcher.onDidCreate(onDidCreate);
-	fsWatcher.onDidChange(onDidChange);
 
 	// Create the language client and start the client.
 	languageClient = new LanguageClient('intelephense', 'intelephense', serverOptions, clientOptions);
@@ -85,89 +82,50 @@ export function activate(context: ExtensionContext) {
 	let ready = languageClient.onReady();
 
 	ready.then(() => {
-		languageClient.info('Intelephense ' + version);
+		languageClient.info('Intelephense ' + VERSION);
 	});
 
-	WorkspaceDiscovery.client = languageClient;
-	WorkspaceDiscovery.maxFileSizeBytes = workspace.getConfiguration("intelephense.file").get('maxSize') as number;
+	let indexWorkspaceDisposable = commands.registerCommand('intelephense.index.workspace', indexWorkspace);
+	let cancelIndexingDisposable = commands.registerCommand('intelephense.cancel.indexing', cancelIndexing);
 
-	if (workspace.workspaceFolders && workspace.workspaceFolders.length > 0) {
-		let token:CancellationToken;
-		ready.then(()=>{
-			if(cancelWorkspaceDiscoveryController) {
-				cancelWorkspaceDiscoveryController.dispose();
+	let resolveIndexingPromise:()=>void;
+	languageClient.onNotification(INDEXING_STARTED_NOTIFICATION.method, () => {
+		window.setStatusBarMessage('$(sync~spin) intelephense indexing ...', new Promise((resolve, reject) => {
+			resolveIndexingPromise = () => {
+				resolve();
 			}
-			cancelWorkspaceDiscoveryController = new CancellationTokenSource();
-			token = cancelWorkspaceDiscoveryController.token;
-			return workspace.findFiles(workspaceFilesIncludeGlob(), undefined, undefined, token);
-		}).then((uriArray) => {
-			indexWorkspace(uriArray, true, token);
-		});
-	}
-
-	let onDidChangeWorkspaceFoldersDisposable = workspace.onDidChangeWorkspaceFolders((e)=>{
-		//handle folder add/remove
-		if(cancelWorkspaceDiscoveryController) {
-			cancelWorkspaceDiscoveryController.dispose();
-		}
-		cancelWorkspaceDiscoveryController = new CancellationTokenSource();
-		let token = cancelWorkspaceDiscoveryController.token;
-		return workspace.findFiles(workspaceFilesIncludeGlob()).then((uriArray) => {
-			indexWorkspace(uriArray, false, token);
-		});
+		}));
 	});
 
-	let importCommandDisposable = commands.registerTextEditorCommand('intelephense.import', importCommandHandler);
-	let clearCacheDisposable = commands.registerCommand('intelephense.clear.cache', clearCacheCommandHandler);
-	let cancelIndexingDisposable = commands.registerCommand('intelephense.cancel.indexing', cancelWorkspaceDiscoveryHandler);
+	languageClient.onNotification(INDEXING_ENDED_NOTIFICATION.method, () => {
+		if(resolveIndexingPromise) {
+			resolveIndexingPromise();
+		}
+		resolveIndexingPromise = undefined;
+	});
 
 	//push disposables
-	context.subscriptions.push(langClientDisposable, fsWatcher, importCommandDisposable, clearCacheDisposable, 
-		onDidChangeWorkspaceFoldersDisposable, cancelIndexingDisposable, middleware);
+	context.subscriptions.push(
+		langClientDisposable, 
+		indexWorkspaceDisposable, 
+		cancelIndexingDisposable, 
+		middleware
+	);
 
 }
 
-interface ImportSymbolTextEdits {
-	edits: TextEdit[],
-	aliasRequired: boolean
+function indexWorkspace() {
+	languageClient.sendRequest(INDEX_WORKSPACE_REQUEST.method);
 }
 
-function importCommandHandler(textEditor: TextEditor, edit: TextEditorEdit) {
-	let inputPromise = window.showInputBox({ placeHolder: 'Enter an alias (optional)' });
-	inputPromise.then((text) => {
-		return languageClient.sendRequest<TextEdit[]>(
-			'importSymbol',
-			{ uri: textEditor.document.uri.toString(), position: textEditor.selection.active, alias: text }
-		);
-	}).then((edits) => {
-		textEditor.edit((eb) => {
-			edits.forEach((e) => {
-				eb.replace(
-					new Range(new Position(e.range.start.line, e.range.start.character), new Position(e.range.end.line, e.range.end.character)),
-					e.newText
-				);
-			});
-		});
-	});
-}
-
-function clearCacheCommandHandler() {
-	return extensionContext.workspaceState.update('clearCache', true).then(()=>{
-		commands.executeCommand('workbench.action.reloadWindow');
-	});
-}
-
-function cancelWorkspaceDiscoveryHandler() {
-	if(cancelWorkspaceDiscoveryController) {
-		cancelWorkspaceDiscoveryController.dispose();
-		cancelWorkspaceDiscoveryController = undefined;
-	}
+function cancelIndexing() {
+	languageClient.sendRequest(CANCEL_INDEXING_REQUEST.method);
 }
 
 function workspaceFilesIncludeGlob() {
 	let settings = workspace.getConfiguration('files').get('associations');
 	let associations = Object.keys(settings).filter((x) => {
-		return settings[x] === phpLanguageId;
+		return settings[x] === PHP_LANGUAGE_ID;
 	});
 
 	associations.push('*.php');
@@ -180,49 +138,4 @@ function workspaceFilesIncludeGlob() {
 	});
 	
 	return '{' + Array.from(new Set<string>(associations)).join(',') + '}';
-}
-
-function onDidDelete(uri: Uri) {
-	WorkspaceDiscovery.forget(uri);
-}
-
-function onDidChange(uri: Uri) {
-	WorkspaceDiscovery.delayedDiscover(uri);
-}
-
-function onDidCreate(uri: Uri) {
-	onDidChange(uri);
-}
-
-function indexWorkspace(uriArray: Uri[], checkModTime:boolean, token:CancellationToken) {
-
-	if(token.isCancellationRequested) {
-		return;
-	}
-
-	let indexingStartHrtime = process.hrtime();
-	languageClient.info('Indexing started.');
-	let completedPromise = WorkspaceDiscovery.checkCacheThenDiscover(uriArray, checkModTime, token).then((count)=>{
-		indexingCompleteFeedback(indexingStartHrtime, count, token);
-	});
-	window.setStatusBarMessage('$(search) intelephense indexing ...', completedPromise);
-
-}
-
-function indexingCompleteFeedback(startHrtime: [number, number], fileCount: number, token:CancellationToken) {
-	let elapsed = process.hrtime(startHrtime);
-	let info = [
-		`${fileCount} files`,
-		`${elapsed[0]}.${Math.round(elapsed[1] / 1000000)} s`
-	];
-
-	languageClient.info(
-		[token.isCancellationRequested ? 'Indexing cancelled' : 'Indexing ended', ...info].join(' | ')
-	);
-
-	window.setStatusBarMessage([
-		'$(search) intelephense indexing ' + (token.isCancellationRequested ? 'cancelled' : 'complete'),
-		`$(file-code) ${fileCount}`,
-		`$(clock) ${elapsed[0]}.${Math.round(elapsed[1] / 100000000)}`
-	].join('   '), 30000);
 }
