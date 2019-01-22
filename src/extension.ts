@@ -4,7 +4,6 @@
 'use strict';
 
 import * as path from 'path';
-import * as fs from 'fs-extra';
 import * as semver from 'semver';
 
 import {
@@ -19,7 +18,7 @@ import {
 	NotificationType,
 	RequestType
 } from 'vscode-languageclient';
-import {initializeEmbeddedContentDocuments} from './embeddedContentDocuments';
+import { initializeEmbeddedContentDocuments } from './embeddedContentDocuments';
 
 const PHP_LANGUAGE_ID = 'php';
 const VERSION = '1.0.0';
@@ -29,7 +28,7 @@ const INDEX_WORKSPACE_REQUEST = new RequestType('indexWorkspace');
 const CANCEL_INDEXING_REQUEST = new RequestType('cancelIndexing');
 
 let languageClient: LanguageClient;
-let extensionContext:ExtensionContext;
+let extensionContext: ExtensionContext;
 
 export function activate(context: ExtensionContext) {
 
@@ -38,15 +37,16 @@ export function activate(context: ExtensionContext) {
 	let clearCache = context.workspaceState.get<boolean>('clearCache');
 	context.workspaceState.update('clearCache', undefined);
 	context.workspaceState.update('version', VERSION);
-	
-	if(!versionMemento || (semver.lt(versionMemento, VERSION))) {
+
+	if (!versionMemento || (semver.lt(versionMemento, VERSION))) {
 		clearCache = true;
 	}
+	clearCache = true;
 
 	// The server is implemented in node
 	let serverModule = context.asAbsolutePath(path.join('node_modules', 'intelephense-server', 'lib', 'server.js'));
 	// The debug options for the server
-	let debugOptions = { execArgv: ["--nolazy", "--debug=6039"] };
+	let debugOptions = { execArgv: ["--nolazy", "--inspect=6039", "--trace-warnings", "--preserve-symlinks"] };
 
 	// If the extension is launched in debug mode then the debug server options are used
 	// Otherwise the run options are used
@@ -70,10 +70,10 @@ export function activate(context: ExtensionContext) {
 			fileEvents: workspace.createFileSystemWatcher(workspaceFilesIncludeGlob()),
 		},
 		initializationOptions: {
-			storagePath:context.storagePath,
-			clearCache:clearCache
+			storagePath: context.storagePath,
+			clearCache: clearCache
 		},
-		middleware:middleware
+		middleware: middleware
 	}
 
 	// Create the language client and start the client.
@@ -83,32 +83,32 @@ export function activate(context: ExtensionContext) {
 
 	ready.then(() => {
 		languageClient.info('Intelephense ' + VERSION);
+		
+		let resolveIndexingPromise: () => void;
+		languageClient.onNotification(INDEXING_STARTED_NOTIFICATION.method, () => {
+			window.setStatusBarMessage('$(sync~spin) intelephense indexing ...', new Promise((resolve, reject) => {
+				resolveIndexingPromise = () => {
+					resolve();
+				}
+			}));
+		});
+
+		languageClient.onNotification(INDEXING_ENDED_NOTIFICATION.method, () => {
+			if (resolveIndexingPromise) {
+				resolveIndexingPromise();
+			}
+			resolveIndexingPromise = undefined;
+		});
 	});
 
 	let indexWorkspaceDisposable = commands.registerCommand('intelephense.index.workspace', indexWorkspace);
 	let cancelIndexingDisposable = commands.registerCommand('intelephense.cancel.indexing', cancelIndexing);
 
-	let resolveIndexingPromise:()=>void;
-	languageClient.onNotification(INDEXING_STARTED_NOTIFICATION.method, () => {
-		window.setStatusBarMessage('$(sync~spin) intelephense indexing ...', new Promise((resolve, reject) => {
-			resolveIndexingPromise = () => {
-				resolve();
-			}
-		}));
-	});
-
-	languageClient.onNotification(INDEXING_ENDED_NOTIFICATION.method, () => {
-		if(resolveIndexingPromise) {
-			resolveIndexingPromise();
-		}
-		resolveIndexingPromise = undefined;
-	});
-
 	//push disposables
 	context.subscriptions.push(
-		langClientDisposable, 
-		indexWorkspaceDisposable, 
-		cancelIndexingDisposable, 
+		langClientDisposable,
+		indexWorkspaceDisposable,
+		cancelIndexingDisposable,
 		middleware
 	);
 
@@ -130,12 +130,12 @@ function workspaceFilesIncludeGlob() {
 
 	associations.push('*.php');
 	associations = associations.map((v, i, a) => {
-		if(v.indexOf('/') < 0 && v.indexOf('\\') < 0) {
+		if (v.indexOf('/') < 0 && v.indexOf('\\') < 0) {
 			return '**/' + v;
 		} else {
 			return v;
 		}
 	});
-	
+
 	return '{' + Array.from(new Set<string>(associations)).join(',') + '}';
 }
