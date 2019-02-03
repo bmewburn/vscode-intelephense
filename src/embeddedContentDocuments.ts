@@ -44,7 +44,7 @@ interface VLanguageRange {
 
 export interface IntelephenseMiddleware extends Middleware, Disposable { }
 
-export function initializeEmbeddedContentDocuments(getClient: () => LanguageClient): IntelephenseMiddleware {
+export function createMiddleware(getClient: () => LanguageClient): IntelephenseMiddleware {
 
     const toDispose: Disposable[] = [];
     const embeddedContentChanged = new EventEmitter<Uri>();

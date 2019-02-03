@@ -7,7 +7,7 @@
         "email": "ben@mewburn.id.au"
     },
     "license": "ISC",
-    "version": "0.8.8",
+    "version": "1.0.0",
     "publisher": "bmewburn",
     "engines": {
         "vscode": "^1.30.0"
@@ -204,13 +204,15 @@
         "postinstall": "node ./node_modules/vscode/bin/install"
     },
     "devDependencies": {
+        "@types/fs-extra": "^5.0.4",
         "@types/mocha": "^5.2.5",
         "@types/node": "^8.10.38",
         "@types/semver": "^5.5.0",
         "typescript": "^3.2.4",
-        "vscode": "^1.1.26"
+        "vscode": "^1.1.28"
     },
     "dependencies": {
+        "fs-extra": "^7.0.1",
         "intelephense-server": "file:../intelephense-server",
         "semver": "^5.6.0",
         "vscode-languageclient": "^5.2.1"

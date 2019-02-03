@@ -18,7 +18,8 @@ import {
 	NotificationType,
 	RequestType
 } from 'vscode-languageclient';
-import { initializeEmbeddedContentDocuments } from './embeddedContentDocuments';
+import { createMiddleware } from './embeddedContentDocuments';
+import * as fs from 'fs-extra';
 
 const PHP_LANGUAGE_ID = 'php';
 const VERSION = '1.0.0';
@@ -39,10 +40,15 @@ export function activate(context: ExtensionContext) {
 	context.workspaceState.update('version', VERSION);
 
 	if (!versionMemento || (semver.lt(versionMemento, VERSION))) {
+		try {
+			fs.removeSync(context.storagePath);
+		} catch (e) {
+			//ignore
+		}
+		
 		clearCache = true;
 	}
 	clearCache = true;
-
 	// The server is implemented in node
 	let serverModule = context.asAbsolutePath(path.join('node_modules', 'intelephense-server', 'lib', 'server.js'));
 	// The debug options for the server
@@ -55,7 +61,7 @@ export function activate(context: ExtensionContext) {
 		debug: { module: serverModule, transport: TransportKind.ipc, options: debugOptions }
 	}
 
-	let middleware = initializeEmbeddedContentDocuments(() => {
+	let middleware = createMiddleware(() => {
 		return languageClient;
 	});
 
