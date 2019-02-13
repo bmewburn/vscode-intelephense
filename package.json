@@ -208,14 +208,14 @@
         "@types/mocha": "^5.2.5",
         "@types/node": "^8.10.38",
         "@types/semver": "^5.5.0",
-        "typescript": "^3.2.4",
+        "typescript": "^3.3.3",
         "vscode": "^1.1.28"
     },
     "dependencies": {
         "fs-extra": "^7.0.1",
-        "intelephense-server": "file:../intelephense-server",
+        "intelephense": "file:../intelephense",
         "semver": "^5.6.0",
-        "vscode-languageclient": "^5.2.1"
+        "vscode-languageclient": "^5.3.0-next.1"
     },
     "private": true
 }

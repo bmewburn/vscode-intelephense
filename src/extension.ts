@@ -18,7 +18,7 @@ import {
 	NotificationType,
 	RequestType
 } from 'vscode-languageclient';
-import { createMiddleware } from './embeddedContentDocuments';
+import { createMiddleware } from './middleware';
 import * as fs from 'fs-extra';
 
 const PHP_LANGUAGE_ID = 'php';
@@ -50,7 +50,12 @@ export function activate(context: ExtensionContext) {
 	}
 	clearCache = true;
 	// The server is implemented in node
-	let serverModule = context.asAbsolutePath(path.join('node_modules', 'intelephense-server', 'lib', 'server.js'));
+	let serverModule:string;
+	if(process.env.mode === 'debug') {
+		serverModule = context.asAbsolutePath(path.join('node_modules', 'intelephense', 'out', 'server.js'));
+	} else {
+		serverModule = context.asAbsolutePath(path.join('node_modules', 'intelephense', 'lib', 'intelephense.js'));
+	} 
 	// The debug options for the server
 	let debugOptions = { execArgv: ["--nolazy", "--inspect=6039", "--trace-warnings", "--preserve-symlinks"] };
 

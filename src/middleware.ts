@@ -14,13 +14,13 @@ import {
     Range as RangeDto, ProvideSignatureHelpSignature, ProvideDefinitionSignature,
     ProvideReferencesSignature, ProvideDocumentSymbolsSignature, ProvideDocumentLinksSignature,
     ProvideDocumentHighlightsSignature, ProvideHoverSignature, ProvideDocumentRangeFormattingEditsSignature,
-    Code2ProtocolConverter, Protocol2CodeConverter
+    Code2ProtocolConverter, Protocol2CodeConverter, HandleDiagnosticsSignature
 } from 'vscode-languageclient';
 import {
     TextDocument, Position, CancellationToken, Range, workspace,
     EventEmitter, Disposable, Uri, commands, ProviderResult, CompletionItem, CompletionList,
     SignatureHelp, Definition, Location, SymbolInformation, DocumentLink, DocumentHighlight,
-    Hover, FormattingOptions, TextEdit, WorkspaceEdit, CompletionContext, DefinitionLink
+    Hover, FormattingOptions, TextEdit, WorkspaceEdit, CompletionContext, DefinitionLink, Diagnostic, DiagnosticTag
 } from 'vscode';
 import {
     getEmbeddedContentUri, getEmbeddedLanguageId, getHostDocumentUri,
@@ -43,6 +43,8 @@ interface VLanguageRange {
 }
 
 export interface IntelephenseMiddleware extends Middleware, Disposable { }
+
+const DIAGNOSTIC_CODE_UNUSED = 10010;
 
 export function createMiddleware(getClient: () => LanguageClient): IntelephenseMiddleware {
 
@@ -263,8 +265,21 @@ export function createMiddleware(getClient: () => LanguageClient): IntelephenseM
 
     }
 
-    let middleware = <IntelephenseMiddleware>{
+    function diagnosticsTagAsUnnecessary(diagnostics:Diagnostic[]) {
+        let d:Diagnostic;
+        for(let n = 0, l = diagnostics.length; n < l; ++n) {
+            d = diagnostics[n];
+            if(d.code === DIAGNOSTIC_CODE_UNUSED) {
+                d.tags = [DiagnosticTag.Unnecessary];
+            }
+        }
+        return diagnostics;
+    }
 
+    let middleware = <IntelephenseMiddleware>{
+        handleDiagnostics: (uri: Uri, diagnostics: Diagnostic[], next: HandleDiagnosticsSignature) => {
+            next(uri, diagnosticsTagAsUnnecessary(diagnostics));
+        },
         provideCompletionItem: (document: TextDocument, position: Position, context: CompletionContext, token: CancellationToken, next: ProvideCompletionItemsSignature) => {
             return middleWarePositionalRequest<CompletionList | CompletionItem[]>(document, position, () => {
                 if (context.triggerCharacter === '<' || context.triggerCharacter === '/' || context.triggerCharacter === '.') {
@@ -333,7 +348,7 @@ export function createMiddleware(getClient: () => LanguageClient): IntelephenseM
             }, [], token);
 
         },
-
+/*
         provideDocumentLinks: (document: TextDocument, token: CancellationToken, next: ProvideDocumentLinksSignature) => {
             let vdocUri = getEmbeddedContentUri(document.uri.toString(), htmlLanguageId);
             return shouldForwardRequest(vdocUri, document.version).then(result => {
@@ -347,7 +362,7 @@ export function createMiddleware(getClient: () => LanguageClient): IntelephenseM
                 });
             });
         },
-
+*/
         provideDocumentHighlights: (document: TextDocument, position: Position, token: CancellationToken, next: ProvideDocumentHighlightsSignature) => {
             return middleWarePositionalRequest<DocumentHighlight[]>(document, position, () => {
                 return next(document, position, token);
