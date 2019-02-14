@@ -1,5 +1,49 @@
 # Change Log
 
+## [1.0.0 - TBA]
+#### Added
+* Undefined vars, unused symbols, type checking, arg count, duplicate definitions diagnostics.
+* Go to, completion, highlight, hover, references inside doc blocks.
+* HTML/js/CSS formatting in php template files via js-beautify.
+* Detailed hover documentation.
+* PHP 7.3 support.
+* Trait alias and precedence support.
+* Compile time constant values.
+* `global` and `@global` support.
+* `ArrayAccess` and `Iterator` support.
+* Added associations and exclude files config.
+* Added stub config.
+* Added completion resolve provider
+
+#### Changed
+* Improved/refactored compilation and type inference.
+* Improved/refactored highlight.
+* Improved built-in symbol documentation.
+* Improved/refactored caching of symbols and indexes.
+* Improved/refactored response to file change events.
+* Completions now use `TextEdit` interface.
+* Document symbols now use `DocumentSymbol` interface.
+* Changed licence.
+* Anon functions now have more concise name.
+* Goto on object creation will send location of constructor _and_ class.
+* Format now preserves horizontal whitespace where PSR2 allows.
+* Various format changes to match extended PSR2.
+* Changed names of several config settings.
+* Moved indexing to server.
+
+#### Fixed
+* Nested signature help.
+* Various parser fixes.
+* Variable variables causing outline and symbol search to not work.
+* Buggy completions when name starts with keyword.
+* `__CLASS__` getting lowercased on format.
+* Various PSR2 formatting fixes.
+* Variable completion adding extra `$`.
+
+#### Removed
+* Add use declaration command (can use tigger suggestions keybinding to auto add use decl).
+* Clear cache and reload (cmd is now `Index workspace`).
+
 ## [0.8.8] - 2018-02-13
 #### Fixed
 * Signature help showing ouside of ()
