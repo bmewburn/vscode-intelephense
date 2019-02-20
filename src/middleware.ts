@@ -4,7 +4,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 /* Copyright (c) Ben Robert Mewburn 
- * Licensed under the ISC Licence.
+ * Licensed under the MIT Licence.
  */
 
 'use strict';

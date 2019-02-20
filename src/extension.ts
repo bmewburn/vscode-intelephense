@@ -1,5 +1,5 @@
 /* Copyright (c) Ben Robert Mewburn 
- * Licensed under the ISC Licence.
+ * Licensed under the MIT Licence.
  */
 'use strict';
 
@@ -48,7 +48,7 @@ export function activate(context: ExtensionContext) {
 		
 		clearCache = true;
 	}
-	clearCache = true;
+	//clearCache = true;
 	// The server is implemented in node
 	let serverModule:string;
 	if(process.env.mode === 'debug') {
@@ -57,13 +57,16 @@ export function activate(context: ExtensionContext) {
 		serverModule = context.asAbsolutePath(path.join('node_modules', 'intelephense', 'lib', 'intelephense.js'));
 	} 
 	// The debug options for the server
-	let debugOptions = { execArgv: ["--nolazy", "--inspect=6039", "--trace-warnings", "--preserve-symlinks"] };
+	let debugOptions = { 
+		execArgv: ["--nolazy", "--inspect=6039", "--trace-warnings", "--preserve-symlinks"], 
+		detached: true
+	};
 
 	// If the extension is launched in debug mode then the debug server options are used
 	// Otherwise the run options are used
 	let serverOptions: ServerOptions = {
 		run: { module: serverModule, transport: TransportKind.ipc },
-		debug: { module: serverModule, transport: TransportKind.ipc, options: debugOptions }
+		debug: { module: serverModule, transport: TransportKind.ipc, options: debugOptions  }
 	}
 
 	let middleware = createMiddleware(() => {
@@ -89,7 +92,6 @@ export function activate(context: ExtensionContext) {
 
 	// Create the language client and start the client.
 	languageClient = new LanguageClient('intelephense', 'intelephense', serverOptions, clientOptions);
-	let langClientDisposable = languageClient.start();
 	let ready = languageClient.onReady();
 
 	ready.then(() => {
@@ -117,12 +119,19 @@ export function activate(context: ExtensionContext) {
 
 	//push disposables
 	context.subscriptions.push(
-		langClientDisposable,
 		indexWorkspaceDisposable,
 		cancelIndexingDisposable,
 		middleware
 	);
 
+	languageClient.start();
+}
+
+export function deactivate() {
+	if(!languageClient) {
+		return undefined;
+	}
+	return languageClient.stop();
 }
 
 function indexWorkspace() {

@@ -6,7 +6,7 @@
         "name": "Ben Mewburn",
         "email": "ben@mewburn.id.au"
     },
-    "license": "ISC",
+    "license": "SEE LICENSE IN LICENSE.txt",
     "version": "1.0.0",
     "publisher": "bmewburn",
     "engines": {
@@ -19,8 +19,7 @@
     ],
     "preview": false,
     "activationEvents": [
-        "onLanguage:php",
-        "workspaceContains:**/*.php"
+        "onLanguage:php"
     ],
     "keywords": [
         "php",
@@ -28,7 +27,11 @@
         "references",
         "symbols",
         "format",
-        "multi-root ready"
+        "multi-root ready",
+        "language server",
+        "autocomplete",
+        "language",
+        "support"
     ],
     "bugs": {
         "url": "https://github.com/bmewburn/vscode-intelephense/issues"
@@ -61,13 +64,13 @@
             "type": "object",
             "title": "intelephense",
             "properties": {
-                "intelephense.file.maxSize": {
+                "intelephense.files.maxSize": {
                     "type": "number",
                     "default": 1000000,
                     "description": "Maximum file size in bytes.",
                     "scope": "window"
                 },
-                "intelephense.file.associations": {
+                "intelephense.files.associations": {
                     "type": "array",
                     "default": [
                         "*.php",
@@ -76,13 +79,13 @@
                     "description": "Configure glob patterns to make files available for language server features.",
                     "scope": "window"
                 },
-                "intelephense.file.exclude": {
+                "intelephense.files.exclude": {
                     "type": "array",
                     "default": [],
                     "description": "Configure glob patterns to exclude certain files and folders from all language server features.",
                     "scope": "window"
                 },
-                "intelephense.stub": {
+                "intelephense.stubs": {
                     "type": "array",
                     "default": [
                         "apache",
