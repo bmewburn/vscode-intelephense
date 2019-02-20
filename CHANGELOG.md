@@ -1,6 +1,10 @@
 # Change Log
 
-## [1.0.0 - TBA]
+## [1.0.1 - 2019-02-20]
+#### Fixed
+* uri/path conversion failing on windows
+
+## [1.0.0 - 2019-02-20]
 #### Added
 * Undefined vars, unused symbols, type checking, arg count, duplicate definitions diagnostics.
 * Go to, completion, highlight, hover, references inside doc blocks.
