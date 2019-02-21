@@ -1,5 +1,15 @@
 # Change Log
 
+## [1.0.2 - 2019-02-21]
+#### Added
+* default exlude globs
+
+#### Fixed
+* various read/set property of undefined errors
+* fixed Index workspace cmd causing corrupted open document state
+* fixed cancel indexing cmd causing crash
+* reference transform recursion limit
+
 ## [1.0.1 - 2019-02-20]
 #### Fixed
 * uri/path conversion failing on windows
