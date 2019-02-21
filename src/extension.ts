@@ -31,7 +31,7 @@ const CANCEL_INDEXING_REQUEST = new RequestType('cancelIndexing');
 let languageClient: LanguageClient;
 let extensionContext: ExtensionContext;
 
-export function activate(context: ExtensionContext) {
+export async function activate(context: ExtensionContext) {
 
 	extensionContext = context;
 	let versionMemento = context.workspaceState.get<string>('version');
@@ -41,7 +41,7 @@ export function activate(context: ExtensionContext) {
 
 	if (!versionMemento || (semver.lt(versionMemento, VERSION))) {
 		try {
-			fs.removeSync(context.storagePath);
+			await fs.remove(context.storagePath);
 		} catch (e) {
 			//ignore
 		}
