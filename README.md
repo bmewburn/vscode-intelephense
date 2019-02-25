@@ -32,6 +32,6 @@ Intelephense uses the following open source libraries. Please see the `node_modu
 * [fast-glob](https://github.com/mrmlnc/fast-glob)
 * [lru-cache](https://github.com/isaacs/node-lru-cache)
 * [turndown](https://github.com/domchristie/turndown)
-* [split2](https://github.com/mcollina/split2)
+* [protobufjs](https://github.com/dcodeIO/ProtoBuf.js/)
 * [phpstorm-stubs](https://github.com/JetBrains/phpstorm-stubs)
 * [js-beautify](https://github.com/beautify-web/js-beautify)
