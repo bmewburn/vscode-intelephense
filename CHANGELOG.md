@@ -1,4 +1,15 @@
 # Change Log
+## [1.0.3 - 2019-02-25]
+#### Added
+* use cancellation tokens for long running async functions.
+
+#### Fixed
+* various read/set property of undefined errors.
+* various false diagnostics.
+* infinite recursion on circular refs.
+* parse bug with dollar curly open ${v}.
+* completions with dollar curly open.
+* parse error on use decl with backslash prefix causing incorrect symbol data to be sent. 
 
 ## [1.0.2 - 2019-02-21]
 #### Added
