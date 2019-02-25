@@ -21,7 +21,7 @@ Intelephense is a high performance and feature rich PHP language server offering
 _This extension may conflict with other PHP extensions which provide similar functionality. Should you experience duplicate suggestions, incorrect results and/or poor performance, try disabling other extensions first before reporting an issue. Disabling the built-in VSCode PHP Language Features is recommended. Please check the configuration section for language server options._
 
 ## Licence
-The language server client (vscode-intelephense) is open source and licensed under the MIT licence. The language server (intelephense) is proprietary. Please see [here]() for details.
+The language server client (vscode-intelephense) is open source and licensed under the MIT licence. The language server (intelephense) is proprietary. Please see [here](https://github.com/bmewburn/vscode-intelephense/blob/master/LICENSE.txt#L29) for details.
 
 ## Acknowledgements
 
