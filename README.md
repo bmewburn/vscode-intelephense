@@ -13,7 +13,7 @@ Intelephense is a high performance and feature rich PHP language server offering
 * Fast camel/underscore case **workspace symbol search**.
 * Full **document symbol search** that also powers **breadcrumbs** and **outline** UI.
 * Multiple **diagnostics** for open files via an error tolerant parser and powerful static analysis engine.
-* Lossless PSR-2 compatible document and range **formatting**. Will format combined HTML/PHP/js/CSS files too. 
+* Lossless PSR-2 compatible document and **range formatting**. Will format combined HTML/PHP/js/CSS files too. 
 * HTML request forwarding allowing for a **full HTML/Javascript/CSS/PHP development experience**.
 * Detailed **hover** with links to official PHP documentation.
 * Smart **highlight** of references and keywords.
