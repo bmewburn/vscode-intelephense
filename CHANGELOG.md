@@ -1,4 +1,20 @@
 # Change Log
+
+## [1.0.4 - 2019-02-28]
+#### Changed
+* updated stub files
+
+#### Fixed
+* various false diagnostics
+* various set/read of undefined errors
+* array dereferencing union type arrays.
+* freeze/crash when inferring type of global vars
+* global function/constant refs not found when not fully qualified in namespaced code
+* maximum file size
+* correct spaceship operator return type
+* parse error when phpdoc immediately follows else
+* empty type when iterating over object in foreach
+
 ## [1.0.3 - 2019-02-25]
 #### Added
 * use cancellation tokens for long running async functions.
