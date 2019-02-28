@@ -52,14 +52,27 @@
         "commands": [
             {
                 "command": "intelephense.index.workspace",
-                "title": "Intelephense: Index workspace"
+                "title": "Index workspace",
+                "category": "Intelephense"
             },
             {
                 "command": "intelephense.cancel.indexing",
-                "title": "Intelephense: Cancel indexing"
+                "title": "Cancel indexing",
+                "category": "Intelephense"
             }
         ],
-        "menus": {},
+        "menus": {
+            "commandPalette": [
+                {
+                    "command": "intelephense.index.workspace",
+                    "when": "resourceLangId == php"
+                },
+                {
+                    "command": "intelephense.cancel.indexing",
+                    "when": "resourceLangId == php"
+                }
+            ]
+        },
         "configuration": {
             "type": "object",
             "title": "intelephense",
