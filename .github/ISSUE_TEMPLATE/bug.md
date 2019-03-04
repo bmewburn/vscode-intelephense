@@ -16,7 +16,7 @@ List Reproduce ways step by step:
 2. context menu, goto definition '....'
 3. now you can the error '...'
 
-**Enviroment**
+**Environment**
  - Version: [e.g. 1.0.7]
  - OS: [e.g. MacOS El Captain]
  - VSCode Version: [e.g 1.31.1]
