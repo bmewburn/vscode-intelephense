@@ -14,7 +14,7 @@ Please write the bug detail informations here. And paste original exception info
 List Reproduce ways step by step:
 1. open file '...'
 2. context menu, goto definition '....'
-3. now you can the error '...'
+3. now you can see the error '...'
 
 **Environment**
  - Version: [e.g. 1.0.7]
@@ -25,4 +25,4 @@ List Reproduce ways step by step:
 Upload screenshots if necessary
 
 **Extra information, optional**
-Extra information.
+Extra information if necessary
