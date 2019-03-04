@@ -1,5 +1,9 @@
 # Change Log
 
+## [1.0.6 - 2019-03-04]
+#### Fixed
+* fixed compilation routine skipping object creation arg list.
+
 ## [1.0.5 - 2019-03-04]
 #### Changed
 * js-beautifier 1.9
