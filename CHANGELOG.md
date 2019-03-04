@@ -1,5 +1,20 @@
 # Change Log
 
+## [1.0.5 - 2019-03-04]
+#### Changed
+* js-beautifier 1.9
+
+#### Fixed
+* various false diagnostics.
+* obey tab format options.
+* formatting breaks code when close bracket follows a comment.
+* crash when attempting to save server state to disk.
+* chained function call completion.
+* dont store stub references.
+* late static binding type inference.
+* variable typings lost after assignment in conditional statements.
+* intelephense command pallet commands should only be available when language is php.
+
 ## [1.0.4 - 2019-02-28]
 #### Changed
 * updated stub files

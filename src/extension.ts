@@ -22,7 +22,7 @@ import { createMiddleware } from './middleware';
 import * as fs from 'fs-extra';
 
 const PHP_LANGUAGE_ID = 'php';
-const VERSION = '1.0.4';
+const VERSION = '1.0.5';
 const INDEXING_STARTED_NOTIFICATION = new NotificationType('indexingStarted');
 const INDEXING_ENDED_NOTIFICATION = new NotificationType('indexingEnded');
 const INDEX_WORKSPACE_REQUEST = new RequestType('indexWorkspace');
@@ -35,8 +35,7 @@ export async function activate(context: ExtensionContext) {
 
 	extensionContext = context;
 	let versionMemento = context.workspaceState.get<string>('version');
-	let clearCache = context.workspaceState.get<boolean>('clearCache');
-	context.workspaceState.update('clearCache', undefined);
+	let clearCache = false;
 	context.workspaceState.update('version', VERSION);
 
 	if (!versionMemento || (semver.lt(versionMemento, VERSION))) {
