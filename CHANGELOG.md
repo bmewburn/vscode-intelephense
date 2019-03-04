@@ -1,5 +1,10 @@
 # Change Log
 
+## [1.0.7 - 2019-03-04]
+#### Fixed
+* fixed $this type resolution when type checking.
+* get property of undefined error on closure array dereference call.
+
 ## [1.0.6 - 2019-03-04]
 #### Fixed
 * fixed compilation routine skipping object creation arg list.
