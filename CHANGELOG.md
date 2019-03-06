@@ -1,5 +1,13 @@
 # Change Log
 
+## [1.0.8 - 2019-03-06]
+#### Fixed
+* defined constants not indexed if define is fully qualified.
+* dont grey out method body when identifying unused methods.
+* infinite loop when searching for references.
+* regression where property types were not inferred from constructor assignment.
+* $this type hint being ignored when inferring types.
+
 ## [1.0.7 - 2019-03-04]
 #### Fixed
 * fixed $this type resolution when type checking.
