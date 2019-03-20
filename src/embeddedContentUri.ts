@@ -20,7 +20,7 @@ export function getEmbeddedContentUri(parentDocumentUri: string, embeddedLanguag
 export function getHostDocumentUri(virtualDocumentUri: Uri): string {
 	let languageId = virtualDocumentUri.authority;
 	let path = virtualDocumentUri.path.substring(1, virtualDocumentUri.path.length - languageId.length - 1); // remove leading '/' and new file extension
-	return decodeURIComponent(path);
+	return path;
 };
 
 export function getEmbeddedLanguageId(virtualDocumentUri: Uri): string {
