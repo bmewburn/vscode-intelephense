@@ -1,6 +1,6 @@
 # Intelephense
 
-### [Support on Patreon](https://www.patreon.com/bmewburn)
+### Support via [Patreon](https://www.patreon.com/bmewburn) | [PayPal](https://www.paypal.me/bmewburn)
 
 Welcome to Intelephense!
 
