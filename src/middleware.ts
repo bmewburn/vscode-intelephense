@@ -12,21 +12,19 @@
 import {
     Middleware, ProvideCompletionItemsSignature, LanguageClient, TextDocumentIdentifier,
     Range as RangeDto, ProvideSignatureHelpSignature, ProvideDefinitionSignature,
-    ProvideReferencesSignature, ProvideDocumentSymbolsSignature, ProvideDocumentLinksSignature,
-    ProvideDocumentHighlightsSignature, ProvideHoverSignature, ProvideDocumentRangeFormattingEditsSignature,
-    Code2ProtocolConverter, Protocol2CodeConverter, HandleDiagnosticsSignature
+    ProvideReferencesSignature, ProvideDocumentHighlightsSignature, ProvideHoverSignature,
+    HandleDiagnosticsSignature, ResolveCompletionItemSignature
 } from 'vscode-languageclient';
 import {
     TextDocument, Position, CancellationToken, Range, workspace,
     EventEmitter, Disposable, Uri, commands, ProviderResult, CompletionItem, CompletionList,
-    SignatureHelp, Definition, Location, SymbolInformation, DocumentLink, DocumentHighlight,
-    Hover, FormattingOptions, TextEdit, WorkspaceEdit, CompletionContext, DefinitionLink, Diagnostic, DiagnosticTag
+    SignatureHelp, Definition, Location, DocumentHighlight,
+    Hover, CompletionContext, DefinitionLink, Diagnostic, DiagnosticTag
 } from 'vscode';
 import {
-    getEmbeddedContentUri, getEmbeddedLanguageId, getHostDocumentUri,
+    getEmbeddedContentUri, getHostDocumentUri,
     isEmbeddedContentUri, EMBEDDED_CONTENT_SCHEME
 } from './embeddedContentUri';
-import { createConverter } from 'vscode-languageclient/lib/protocolConverter';
 
 const documentLanguageRangesRequestName = 'documentLanguageRanges';
 const phpLanguageId = 'php';
@@ -276,12 +274,14 @@ export function createMiddleware(getClient: () => LanguageClient): IntelephenseM
         return diagnostics;
     }
 
+    let lastCompletionWasPhp = true;
     let middleware = <IntelephenseMiddleware>{
         handleDiagnostics: (uri: Uri, diagnostics: Diagnostic[], next: HandleDiagnosticsSignature) => {
             next(uri, diagnosticsTagAsUnnecessary(diagnostics));
         },
         provideCompletionItem: (document: TextDocument, position: Position, context: CompletionContext, token: CancellationToken, next: ProvideCompletionItemsSignature) => {
             return middleWarePositionalRequest<CompletionList | CompletionItem[]>(document, position, () => {
+                lastCompletionWasPhp = true;
                 if (context.triggerCharacter === '<' || context.triggerCharacter === '/' || context.triggerCharacter === '.') {
                     //not php trigger chars -- dont send request to php server
                     return undefined;
@@ -292,6 +292,7 @@ export function createMiddleware(getClient: () => LanguageClient): IntelephenseM
                     //these are php trigger chars -- dont forward to html
                     return new CompletionList([], false);
                 }
+                lastCompletionWasPhp = false;
                 return commands.executeCommand<CompletionList>('vscode.executeCompletionItemProvider', vdoc.uri, position, context.triggerCharacter);
             }, new CompletionList([], false), token);
 
@@ -380,6 +381,10 @@ export function createMiddleware(getClient: () => LanguageClient): IntelephenseM
                     return h.shift();
                 });
             }, undefined, token);
+        },
+
+        resolveCompletionItem: (item:CompletionItem, token: CancellationToken, next: ResolveCompletionItemSignature) => {
+            return lastCompletionWasPhp ? next(item, token) : item;
         },
 
         dispose: Disposable.from(...toDispose).dispose
