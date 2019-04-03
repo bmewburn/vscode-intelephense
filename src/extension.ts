@@ -7,14 +7,11 @@ import * as path from 'path';
 import * as semver from 'semver';
 
 import {
-	workspace, Disposable, ExtensionContext, Uri, TextDocument, languages,
-	IndentAction, window, commands, TextEditor, TextEditorEdit, TextEdit,
-	Range, Position, CancellationToken, CancellationTokenSource
+	workspace, ExtensionContext, window, commands
 } from 'vscode';
 import {
-	LanguageClient, LanguageClientOptions, SettingMonitor, ServerOptions,
-	TransportKind, TextDocumentItem, DocumentFormattingRequest,
-	DocumentRangeFormattingRequest,
+	LanguageClient, LanguageClientOptions, ServerOptions,
+	TransportKind,
 	NotificationType,
 	RequestType
 } from 'vscode-languageclient';
@@ -22,7 +19,7 @@ import { createMiddleware } from './middleware';
 import * as fs from 'fs-extra';
 
 const PHP_LANGUAGE_ID = 'php';
-const VERSION = '1.0.8';
+const VERSION = '1.0.10';
 const INDEXING_STARTED_NOTIFICATION = new NotificationType('indexingStarted');
 const INDEXING_ENDED_NOTIFICATION = new NotificationType('indexingEnded');
 const INDEX_WORKSPACE_REQUEST = new RequestType('indexWorkspace');

@@ -1,5 +1,38 @@
 # Change Log
 
+## [1.0.10 - 2019-04-03]
+#### Fixed
+* Removed console.log
+
+## [1.0.9 - 2019-04-03]
+#### Changed
+* updated stubs
+* improved extension activation time and size by using turndown with minidom instead of jsdom
+* jsbeautify 1.9.1
+* vscode-languageserver 5.2.1
+
+#### Fixed
+* various false diagnostics.
+* various get/set of undefined errors.
+* not indexing hidden directories.
+* bad method declaration completion when nullable types are used.
+* extra / inserted on html end tag completion.
+* bad type inferrence on array addition
+* should not lowercase keywords that are used as class const and methods
+* type changes to properties not being tracked.
+* classes with __invoke are valid callable args
+* overlapping format ranges
+* soft reserved names being treated as reserved.
+* preserve comment position when inserting use declaration
+* handle nullable types in phpdoc
+* dont treat downcasting as type error
+* allow $this to be typehinted again
+* failed to apply changes errors from open doc being prematurely closed
+* member modifiers sometimes not showing as completion suggestions
+* range formatting adding random spaces in code
+* html request forwarding failing for urls with encoded characters
+* mixed html/php indentation.
+
 ## [1.0.8 - 2019-03-06]
 #### Fixed
 * defined constants not indexed if define is fully qualified.
