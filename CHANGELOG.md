@@ -1,5 +1,11 @@
 # Change Log
 
+## [1.0.12 - 2019-04-04]
+#### Fixed
+* cant read property type of undefined with variable variable function calls
+* ternary expr formatting
+* no completion for magic members
+
 ## [1.0.11 - 2019-04-03]
 #### Fixed
 * cant read property values of undefined with built in variables
