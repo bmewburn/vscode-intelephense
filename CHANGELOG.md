@@ -1,5 +1,10 @@
 # Change Log
 
+## [1.0.13 - 2019-04-05]
+#### Fixed
+* Various formatting fixes
+* Various false diagnostic fixes.
+
 ## [1.0.12 - 2019-04-04]
 #### Fixed
 * cant read property type of undefined with variable variable function calls
