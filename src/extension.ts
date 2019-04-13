@@ -75,10 +75,6 @@ export async function activate(context: ExtensionContext) {
 			{ language: PHP_LANGUAGE_ID, scheme: 'file' },
 			{ language: PHP_LANGUAGE_ID, scheme: 'untitled' }
 		],
-		synchronize: {
-			// Notify the server about file changes to php in the workspace
-			fileEvents: workspace.createFileSystemWatcher(workspaceFilesIncludeGlob()),
-		},
 		initializationOptions: {
 			storagePath: context.storagePath,
 			clearCache: clearCache
@@ -136,22 +132,4 @@ function indexWorkspace() {
 
 function cancelIndexing() {
 	languageClient.sendRequest(CANCEL_INDEXING_REQUEST.method);
-}
-
-function workspaceFilesIncludeGlob() {
-	let settings = workspace.getConfiguration('files').get('associations');
-	let associations = Object.keys(settings).filter((x) => {
-		return settings[x] === PHP_LANGUAGE_ID;
-	});
-
-	associations.push('*.php');
-	associations = associations.map((v, i, a) => {
-		if (v.indexOf('/') < 0 && v.indexOf('\\') < 0) {
-			return '**/' + v;
-		} else {
-			return v;
-		}
-	});
-
-	return '{' + Array.from(new Set<string>(associations)).join(',') + '}';
 }
