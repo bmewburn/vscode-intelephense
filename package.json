@@ -140,7 +140,6 @@
                         "mbstring",
                         "mcrypt",
                         "mssql",
-                        "mysql",
                         "mysqli",
                         "oci8",
                         "odcb",
