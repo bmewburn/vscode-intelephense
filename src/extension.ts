@@ -85,7 +85,6 @@ export async function activate(context: ExtensionContext) {
 	let ready = languageClient.onReady();
 
 	ready.then(() => {
-		languageClient.info('Intelephense ' + VERSION);
 		
 		let resolveIndexingPromise: () => void;
 		languageClient.onNotification(INDEXING_STARTED_NOTIFICATION.method, () => {
