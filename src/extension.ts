@@ -6,9 +6,7 @@
 import * as path from 'path';
 import * as semver from 'semver';
 
-import {
-	workspace, ExtensionContext, window, commands
-} from 'vscode';
+import { ExtensionContext, window, commands } from 'vscode';
 import {
 	LanguageClient, LanguageClientOptions, ServerOptions,
 	TransportKind,
@@ -19,7 +17,7 @@ import { createMiddleware } from './middleware';
 import * as fs from 'fs-extra';
 
 const PHP_LANGUAGE_ID = 'php';
-const VERSION = '1.0.13';
+const VERSION = '1.0.14';
 const INDEXING_STARTED_NOTIFICATION = new NotificationType('indexingStarted');
 const INDEXING_ENDED_NOTIFICATION = new NotificationType('indexingEnded');
 const INDEX_WORKSPACE_REQUEST = new RequestType('indexWorkspace');
