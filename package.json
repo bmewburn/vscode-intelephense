@@ -10,7 +10,7 @@
     "version": "1.0.14",
     "publisher": "bmewburn",
     "engines": {
-        "vscode": "^1.30.0"
+        "vscode": "^1.33.0"
     },
     "categories": [
         "Programming Languages",
