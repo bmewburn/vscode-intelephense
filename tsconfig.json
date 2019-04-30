@@ -7,10 +7,7 @@
 		"lib": [ "es2016" ],
 		"sourceMap": true
 	},
-	"exclude": [
-		"node_modules",
-		"out",
-		".vscode",
-		"images"
+	"include": [
+		"src"
 	]
 }

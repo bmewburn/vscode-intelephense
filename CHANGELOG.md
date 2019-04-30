@@ -1,15 +1,17 @@
 # Change Log
 
-## [1.0.14 - 2019-04-26]
+## [1.0.14 - 2019-04-30]
 
 #### Changed
 * Removed mysql from default stubs (can be reenabled by adding `mysql` to `intelephense.stubs` setting).
 * Updated stubs.
 * didChangeWatchedFiles and didChangeConfiguration now dynamically registered if client has support.
 * bundle extension with webpack.
+* micromatch 4
 
 #### Fixed
 * if statement formatting.
+* multi line method header formatting.
 * Variable variable false positive diagnostic.
 * Diagnose undefined self referencing variables.
 * False positive duplicate identifier diagnostics when symbol conditionally declared.
