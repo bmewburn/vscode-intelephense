@@ -202,6 +202,12 @@
                     "description": "Global namespace constants and functions will be fully qualified (prefixed with a backslash).",
                     "scope": "window"
                 },
+                "intelephense.completion.triggerParameterHints": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Method and function completions will include parentheses and trigger parameter hints.",
+                    "scope": "window"
+                },
                 "intelephense.format.enable": {
                     "type": "boolean",
                     "default": true,
