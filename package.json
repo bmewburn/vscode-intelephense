@@ -139,6 +139,7 @@
                         "libxml",
                         "mbstring",
                         "mcrypt",
+                        "meta",
                         "mssql",
                         "mysqli",
                         "oci8",
