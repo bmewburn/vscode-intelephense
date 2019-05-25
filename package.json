@@ -109,6 +109,9 @@
                 },
                 "intelephense.stubs": {
                     "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
                     "default": [
                         "apache",
                         "bcmath",
@@ -212,6 +215,19 @@
                     "type": "boolean",
                     "default": true,
                     "description": "Enables formatting",
+                    "scope": "window"
+                },
+                "intelephense.environment.documentRoot": {
+                    "type": "string",
+                    "description": "The directory of the entry point to the application (index.php). Defaults to the first workspace folder. Used for resolving script inclusion.",
+                    "scope": "window"
+                },
+                "intelephense.environment.includePaths": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "The include paths (as individual path items) as defined in the include_path ini setting. Used for resolving script inclusion.",
                     "scope": "window"
                 },
                 "intelephense.trace.server": {
