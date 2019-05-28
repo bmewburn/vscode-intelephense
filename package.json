@@ -211,6 +211,12 @@
                     "description": "Method and function completions will include parentheses and trigger parameter hints.",
                     "scope": "window"
                 },
+                "intelephense.completion.maxItems": {
+                    "type": "number",
+                    "default": 100,
+                    "description": "The maximum number of completion items returned per request.",
+                    "scope": "window"
+                },
                 "intelephense.format.enable": {
                     "type": "boolean",
                     "default": true,
