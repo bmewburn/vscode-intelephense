@@ -282,7 +282,7 @@ export function createMiddleware(getClient: () => LanguageClient): IntelephenseM
         provideCompletionItem: (document: TextDocument, position: Position, context: CompletionContext, token: CancellationToken, next: ProvideCompletionItemsSignature) => {
             return middleWarePositionalRequest<CompletionList | CompletionItem[]>(document, position, () => {
                 lastCompletionWasPhp = true;
-                if (context.triggerCharacter === '<' || context.triggerCharacter === '/' || context.triggerCharacter === '.') {
+                if (context.triggerCharacter === '<' || context.triggerCharacter === '.') {
                     //not php trigger chars -- dont send request to php server
                     return undefined;
                 }
