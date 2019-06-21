@@ -236,6 +236,16 @@
                     "description": "The include paths (as individual path items) as defined in the include_path ini setting. Used for resolving script inclusion.",
                     "scope": "window"
                 },
+                "intelephense.runtime": {
+                    "type": "string",
+                    "description": "Path to a Node.js executable. Defaults to Node.js shipped with VSCode.",
+                    "scope": "window"
+                },
+                "intelephense.maxMemory": {
+                    "type": "number",
+                    "description": "Maximum memory that the server should use. Only applicable if runtime has been set.",
+                    "scope": "window"
+                },
                 "intelephense.trace.server": {
                     "type": "string",
                     "enum": [

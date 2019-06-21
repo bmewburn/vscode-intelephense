@@ -6,7 +6,7 @@
 import * as path from 'path';
 import * as semver from 'semver';
 
-import { ExtensionContext, window, commands } from 'vscode';
+import { ExtensionContext, window, commands, workspace } from 'vscode';
 import {
 	LanguageClient, LanguageClientOptions, ServerOptions,
 	TransportKind,
@@ -39,20 +39,20 @@ export async function activate(context: ExtensionContext) {
 		} catch (e) {
 			//ignore
 		}
-		
+
 		clearCache = true;
 	}
 	//clearCache = true;
 	// The server is implemented in node
-	let serverModule:string;
-	if(process.env.mode === 'debug') {
+	let serverModule: string;
+	if (process.env.mode === 'debug') {
 		serverModule = context.asAbsolutePath(path.join('node_modules', 'intelephense', 'out', 'server.js'));
 	} else {
 		serverModule = context.asAbsolutePath(path.join('node_modules', 'intelephense', 'lib', 'intelephense.js'));
-	} 
+	}
 	// The debug options for the server
-	let debugOptions = { 
-		execArgv: ["--nolazy", "--inspect=6039", "--trace-warnings", "--preserve-symlinks"], 
+	let debugOptions = {
+		execArgv: ["--nolazy", "--inspect=6039", "--trace-warnings", "--preserve-symlinks"],
 		detached: true
 	};
 
@@ -60,7 +60,21 @@ export async function activate(context: ExtensionContext) {
 	// Otherwise the run options are used
 	let serverOptions: ServerOptions = {
 		run: { module: serverModule, transport: TransportKind.ipc },
-		debug: { module: serverModule, transport: TransportKind.ipc, options: debugOptions  }
+		debug: { module: serverModule, transport: TransportKind.ipc, options: debugOptions }
+	}
+
+	let intelephenseConfig = workspace.getConfiguration('intelephense');
+	let runtime = intelephenseConfig.get('runtime') as string | undefined;
+	let memory = Math.floor(Number(intelephenseConfig.get('maxMemory')));
+
+	if (runtime) {
+		serverOptions.run.runtime = runtime;
+		serverOptions.debug.runtime = runtime;
+		if (memory && memory > 512) {
+			let maxOldSpaceSize = '--max-old-space-size=' + memory.toString();
+			serverOptions.run.options = { execArgv: [maxOldSpaceSize] };
+			serverOptions.debug.options.execArgv.push(maxOldSpaceSize);
+		}
 	}
 
 	let middleware = createMiddleware(() => {
@@ -85,7 +99,7 @@ export async function activate(context: ExtensionContext) {
 	let ready = languageClient.onReady();
 
 	ready.then(() => {
-		
+
 		let resolveIndexingPromise: () => void;
 		languageClient.onNotification(INDEXING_STARTED_NOTIFICATION.method, () => {
 			window.setStatusBarMessage('$(sync~spin) intelephense indexing ...', new Promise((resolve, reject) => {
@@ -117,7 +131,7 @@ export async function activate(context: ExtensionContext) {
 }
 
 export function deactivate() {
-	if(!languageClient) {
+	if (!languageClient) {
 		return undefined;
 	}
 	return languageClient.stop();
