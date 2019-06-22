@@ -20,11 +20,11 @@ const PHP_LANGUAGE_ID = 'php';
 const VERSION = '1.0.14';
 const INDEXING_STARTED_NOTIFICATION = new NotificationType('indexingStarted');
 const INDEXING_ENDED_NOTIFICATION = new NotificationType('indexingEnded');
-const INDEX_WORKSPACE_REQUEST = new RequestType('indexWorkspace');
 const CANCEL_INDEXING_REQUEST = new RequestType('cancelIndexing');
 
 let languageClient: LanguageClient;
 let extensionContext: ExtensionContext;
+let initializationOptions: { storagePath?: string, clearCache?: boolean };
 
 export async function activate(context: ExtensionContext) {
 
@@ -70,16 +70,22 @@ export async function activate(context: ExtensionContext) {
 	if (runtime) {
 		serverOptions.run.runtime = runtime;
 		serverOptions.debug.runtime = runtime;
-		if (memory && memory > 512) {
-			let maxOldSpaceSize = '--max-old-space-size=' + memory.toString();
-			serverOptions.run.options = { execArgv: [maxOldSpaceSize] };
-			serverOptions.debug.options.execArgv.push(maxOldSpaceSize);
-		}
+	}
+
+	if (memory && memory > 512) {
+		let maxOldSpaceSize = '--max-old-space-size=' + memory.toString();
+		serverOptions.run.options = { execArgv: [maxOldSpaceSize] };
+		serverOptions.debug.options.execArgv.push(maxOldSpaceSize);
 	}
 
 	let middleware = createMiddleware(() => {
 		return languageClient;
 	});
+
+	initializationOptions = {
+		storagePath: context.storagePath,
+		clearCache: clearCache
+	};
 
 	// Options to control the language client
 	let clientOptions: LanguageClientOptions = {
@@ -87,10 +93,7 @@ export async function activate(context: ExtensionContext) {
 			{ language: PHP_LANGUAGE_ID, scheme: 'file' },
 			{ language: PHP_LANGUAGE_ID, scheme: 'untitled' }
 		],
-		initializationOptions: {
-			storagePath: context.storagePath,
-			clearCache: clearCache
-		},
+		initializationOptions: initializationOptions,
 		middleware: middleware
 	}
 
@@ -138,7 +141,10 @@ export function deactivate() {
 }
 
 function indexWorkspace() {
-	languageClient.sendRequest(INDEX_WORKSPACE_REQUEST.method);
+	initializationOptions.clearCache = true;
+	languageClient.stop().then(_ => {
+		languageClient.start();
+	});
 }
 
 function cancelIndexing() {
