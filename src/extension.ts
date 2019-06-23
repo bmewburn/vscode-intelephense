@@ -72,7 +72,7 @@ export async function activate(context: ExtensionContext) {
 		serverOptions.debug.runtime = runtime;
 	}
 
-	if (memory && memory > 512) {
+	if (memory && memory > 256) {
 		let maxOldSpaceSize = '--max-old-space-size=' + memory.toString();
 		serverOptions.run.options = { execArgv: [maxOldSpaceSize] };
 		serverOptions.debug.options.execArgv.push(maxOldSpaceSize);
