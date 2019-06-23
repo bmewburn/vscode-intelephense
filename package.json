@@ -146,7 +146,7 @@
                         "mssql",
                         "mysqli",
                         "oci8",
-                        "odcb",
+                        "odbc",
                         "openssl",
                         "password",
                         "pcntl",
@@ -243,7 +243,7 @@
                 },
                 "intelephense.maxMemory": {
                     "type": "number",
-                    "description": "Maximum memory that the server should use. Only applicable if runtime has been set.",
+                    "description": "Maximum memory (in MB) that the server should use. Only applicable if runtime has been set. Minimum 256.",
                     "scope": "window"
                 },
                 "intelephense.trace.server": {
