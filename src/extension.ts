@@ -6,14 +6,14 @@
 import * as path from 'path';
 import * as semver from 'semver';
 
-import { ExtensionContext, window, commands, workspace } from 'vscode';
+import { ExtensionContext, window, commands, workspace, Disposable } from 'vscode';
 import {
 	LanguageClient, LanguageClientOptions, ServerOptions,
 	TransportKind,
 	NotificationType,
 	RequestType
 } from 'vscode-languageclient';
-import { createMiddleware } from './middleware';
+import { createMiddleware, IntelephenseMiddleware } from './middleware';
 import * as fs from 'fs-extra';
 
 const PHP_LANGUAGE_ID = 'php';
@@ -24,7 +24,8 @@ const CANCEL_INDEXING_REQUEST = new RequestType('cancelIndexing');
 
 let languageClient: LanguageClient;
 let extensionContext: ExtensionContext;
-let initializationOptions: { storagePath?: string, clearCache?: boolean };
+let middleware:IntelephenseMiddleware;
+let clientDisposable:Disposable;
 
 export async function activate(context: ExtensionContext) {
 
@@ -42,8 +43,27 @@ export async function activate(context: ExtensionContext) {
 
 		clearCache = true;
 	}
-	//clearCache = true;
-	// The server is implemented in node
+
+	middleware = createMiddleware(() => {
+		return languageClient;
+	});
+
+	languageClient = createClient(context, middleware, clearCache);
+	
+	let indexWorkspaceDisposable = commands.registerCommand('intelephense.index.workspace', indexWorkspace);
+	let cancelIndexingDisposable = commands.registerCommand('intelephense.cancel.indexing', cancelIndexing);
+
+	//push disposables
+	context.subscriptions.push(
+		indexWorkspaceDisposable,
+		cancelIndexingDisposable,
+		middleware
+	);
+
+	clientDisposable = languageClient.start();
+}
+
+function createClient(context:ExtensionContext, middleware:IntelephenseMiddleware, clearCache:boolean) {
 	let serverModule: string;
 	if (process.env.mode === 'debug') {
 		serverModule = context.asAbsolutePath(path.join('node_modules', 'intelephense', 'out', 'server.js'));
@@ -78,11 +98,7 @@ export async function activate(context: ExtensionContext) {
 		serverOptions.debug.options.execArgv.push(maxOldSpaceSize);
 	}
 
-	let middleware = createMiddleware(() => {
-		return languageClient;
-	});
-
-	initializationOptions = {
+	let initializationOptions = {
 		storagePath: context.storagePath,
 		clearCache: clearCache
 	};
@@ -99,38 +115,10 @@ export async function activate(context: ExtensionContext) {
 
 	// Create the language client and start the client.
 	languageClient = new LanguageClient('intelephense', 'intelephense', serverOptions, clientOptions);
-	let ready = languageClient.onReady();
-
-	ready.then(() => {
-
-		let resolveIndexingPromise: () => void;
-		languageClient.onNotification(INDEXING_STARTED_NOTIFICATION.method, () => {
-			window.setStatusBarMessage('$(sync~spin) intelephense indexing ...', new Promise((resolve, reject) => {
-				resolveIndexingPromise = () => {
-					resolve();
-				}
-			}));
-		});
-
-		languageClient.onNotification(INDEXING_ENDED_NOTIFICATION.method, () => {
-			if (resolveIndexingPromise) {
-				resolveIndexingPromise();
-			}
-			resolveIndexingPromise = undefined;
-		});
+	languageClient.onReady().then(() => {
+		registerNotificationListeners();
 	});
-
-	let indexWorkspaceDisposable = commands.registerCommand('intelephense.index.workspace', indexWorkspace);
-	let cancelIndexingDisposable = commands.registerCommand('intelephense.cancel.indexing', cancelIndexing);
-
-	//push disposables
-	context.subscriptions.push(
-		indexWorkspaceDisposable,
-		cancelIndexingDisposable,
-		middleware
-	);
-
-	languageClient.start();
+	return languageClient;
 }
 
 export function deactivate() {
@@ -141,12 +129,34 @@ export function deactivate() {
 }
 
 function indexWorkspace() {
-	initializationOptions.clearCache = true;
+	if(!languageClient) {
+		return;
+	}
 	languageClient.stop().then(_ => {
-		languageClient.start();
+		clientDisposable.dispose();
+		languageClient = createClient(extensionContext, middleware, true);
+		clientDisposable = languageClient.start();
 	});
 }
 
 function cancelIndexing() {
 	languageClient.sendRequest(CANCEL_INDEXING_REQUEST.method);
+}
+
+function registerNotificationListeners() {
+	let resolveIndexingPromise: () => void;
+	languageClient.onNotification(INDEXING_STARTED_NOTIFICATION.method, () => {
+		window.setStatusBarMessage('$(sync~spin) intelephense indexing ...', new Promise((resolve, reject) => {
+			resolveIndexingPromise = () => {
+				resolve();
+			}
+		}));
+	});
+
+	languageClient.onNotification(INDEXING_ENDED_NOTIFICATION.method, () => {
+		if (resolveIndexingPromise) {
+			resolveIndexingPromise();
+		}
+		resolveIndexingPromise = undefined;
+	});
 }
