@@ -89,8 +89,8 @@
                         "*.php",
                         "*.phtml"
                     ],
-                    "description": "Configure glob patterns to make files available for language server features.",
-                    "scope": "window"
+                    "description": "Configure glob patterns to make files available for language server features. Values set in files.associations are merged.",
+                    "scope": "resource"
                 },
                 "intelephense.files.exclude": {
                     "type": "array",
@@ -104,8 +104,8 @@
                         "**/bower_components/**",
                         "**/vendor/**/{Test,test,Tests,tests}/**"
                     ],
-                    "description": "Configure glob patterns to exclude certain files and folders from all language server features.",
-                    "scope": "window"
+                    "description": "Configure glob patterns to exclude certain files and folders from all language server features. Values set in files.exclude are merged.",
+                    "scope": "resource"
                 },
                 "intelephense.stubs": {
                     "type": "array",

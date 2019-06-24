@@ -13,7 +13,7 @@ import {
     Middleware, ProvideCompletionItemsSignature, LanguageClient, TextDocumentIdentifier,
     Range as RangeDto, ProvideSignatureHelpSignature, ProvideDefinitionSignature,
     ProvideReferencesSignature, ProvideDocumentHighlightsSignature, ProvideHoverSignature,
-    HandleDiagnosticsSignature, ResolveCompletionItemSignature
+    HandleDiagnosticsSignature, ResolveCompletionItemSignature, ConfigurationParams, RequestHandler, DidChangeConfigurationSignature
 } from 'vscode-languageclient';
 import {
     TextDocument, Position, CancellationToken, Range, workspace,
@@ -25,6 +25,7 @@ import {
     getEmbeddedContentUri, getHostDocumentUri,
     isEmbeddedContentUri, EMBEDDED_CONTENT_SCHEME
 } from './embeddedContentUri';
+import { HandlerResult } from 'vscode-jsonrpc';
 
 const documentLanguageRangesRequestName = 'documentLanguageRanges';
 const phpLanguageId = 'php';
@@ -274,8 +275,66 @@ export function createMiddleware(getClient: () => LanguageClient): IntelephenseM
         return diagnostics;
     }
 
+    function mergeAssociations(intelephenseAssociations:string[], resource?:string) {
+        let resourceUri:Uri;
+        if(resource) {
+            resourceUri = Uri.parse(resource);
+        }
+        let vscodeAssociations = workspace.getConfiguration('files', resourceUri).get('associations') || { };
+        let associationsSet = new Set<string>(intelephenseAssociations);
+        for(let [key, val] of Object.entries(vscodeAssociations)) {
+            if(val === 'php') {
+                associationsSet.add(key);
+            }
+        }
+        return Array.from(associationsSet);
+    }
+
+    function mergeExclude(intelephenseExclude:string[], resource?:string) {
+        let resourceUri:Uri;
+        if(resource) {
+            resourceUri = Uri.parse(resource);
+        }
+        let vscodeExclude = workspace.getConfiguration('files', resourceUri).get('exclude') || { };
+        let excludeSet = new Set<string>(intelephenseExclude);
+        for(let [key, val] of Object.entries(vscodeExclude)) {
+            if(val) {
+                excludeSet.add(key);
+            }
+        }
+        return Array.from(excludeSet);
+    }
+
     let lastCompletionWasPhp = true;
     let middleware = <IntelephenseMiddleware>{
+        workspace: {
+            configuration: (
+                params: ConfigurationParams, 
+                token: CancellationToken, 
+                next: RequestHandler<ConfigurationParams, any[], void>
+            ): HandlerResult<any[], void> => {
+                
+                let result = next(params, token);
+                if(!isThenable(result)) {
+                    result = Promise.resolve(result);
+                }
+
+                return (<Thenable<any>>result).then(r => {
+                    if(Array.isArray(r)) {
+                        r.forEach((v, i) => {
+                            if(v && v.files && v.files.associations) {
+                                v.files.associations = mergeAssociations(v.files.associations, params.items[i].scopeUri);
+                            }
+                            if(v && v.files && v.files.exclude) {
+                                v.files.exclude = mergeExclude(v.files.exclude, params.items[i].scopeUri);
+                            }
+                        });
+                    }
+                    return r;
+                });
+            }
+        },
+
         handleDiagnostics: (uri: Uri, diagnostics: Diagnostic[], next: HandleDiagnosticsSignature) => {
             next(uri, diagnosticsTagAsUnnecessary(diagnostics));
         },
