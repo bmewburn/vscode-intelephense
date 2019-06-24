@@ -42,7 +42,7 @@
         "url": "https://github.com/bmewburn/vscode-intelephense.git"
     },
     "icon": "images/elephpant.png",
-    "main": "./out/extension",
+    "main": "./lib/extension",
     "contributes": {
         "languages": [
             {
@@ -264,15 +264,19 @@
         "vscode:prepublish": "rm -rf out/* && tsc -p ./",
         "compile": "rm -rf out/* && tsc -p ./",
         "update-vscode": "node ./node_modules/vscode/bin/install",
-        "postinstall": "node ./node_modules/vscode/bin/install"
+        "postinstall": "node ./node_modules/vscode/bin/install",
+        "production": "rm -rf ./lib && ./node_modules/.bin/webpack --config webpack.config.js"
     },
     "devDependencies": {
         "@types/fs-extra": "^7.0.0",
         "@types/mocha": "^5.2.7",
         "@types/node": "^10.14.9",
         "@types/semver": "^6.0.1",
+        "ts-loader": "^6.0.4",
         "typescript": "^3.5.2",
-        "vscode": "^1.1.34"
+        "vscode": "^1.1.34",
+        "webpack": "^4.35.0",
+        "webpack-cli": "^3.3.5"
     },
     "dependencies": {
         "fs-extra": "^8.0.1",
