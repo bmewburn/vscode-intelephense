@@ -90,7 +90,7 @@
                         "*.phtml"
                     ],
                     "description": "Configure glob patterns to make files available for language server features. Values set in files.associations are merged.",
-                    "scope": "resource"
+                    "scope": "window"
                 },
                 "intelephense.files.exclude": {
                     "type": "array",
