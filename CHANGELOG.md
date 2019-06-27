@@ -1,5 +1,10 @@
 # Change Log
 
+## [1.1.1 - 2019-06-27]
+
+#### Changed
+* Updated stubs.
+
 ## [1.1.0 - 2019-06-27]
 #### Added
 * Support for PhpDoc intersection types, generic collections, variadic notation, default param args
