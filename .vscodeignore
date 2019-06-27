@@ -10,3 +10,4 @@ out/**
 webpack.config.js
 **/*.ts
 .git/**
+node_modules/!(intelephense)/**

@@ -26,7 +26,7 @@ The language server client (vscode-intelephense) is open source and licensed und
 
 ## Acknowledgements
 
-Intelephense uses the following open source libraries. Please see the `node_modules` directory of install for licences.
+Intelephense uses the following open source libraries. Please see the following links for source code and licences.
 * [vscode-languageserver-node](https://github.com/Microsoft/vscode-languageserver-node)
 * [micromatch](https://github.com/micromatch/micromatch)
 * [fs-extra](https://github.com/jprichardson/node-fs-extra)
