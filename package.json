@@ -269,7 +269,7 @@
         }
     },
     "scripts": {
-        "vscode:prepublish": "rm -rf out/* && tsc -p ./",
+        "vscode:prepublish": "npm run production",
         "compile": "rm -rf out/* && tsc -p ./",
         "update-vscode": "node ./node_modules/vscode/bin/install",
         "postinstall": "node ./node_modules/vscode/bin/install",
