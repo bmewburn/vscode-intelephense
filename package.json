@@ -270,16 +270,17 @@
     },
     "scripts": {
         "vscode:prepublish": "npm run production",
-        "compile": "rm -rf out/* && tsc -p ./",
+        "compile": "rimraf out/* && tsc -p ./",
         "update-vscode": "node ./node_modules/vscode/bin/install",
         "postinstall": "node ./node_modules/vscode/bin/install",
-        "production": "rm -rf ./lib && ./node_modules/.bin/webpack --config webpack.config.js"
+        "production": "rimraf ./lib && ./node_modules/.bin/webpack --config webpack.config.js"
     },
     "devDependencies": {
         "@types/fs-extra": "^8.0.0",
         "@types/mocha": "^5.2.7",
         "@types/node": "^10.14.10",
         "@types/semver": "^6.0.1",
+        "rimraf": "^2.6.3",
         "ts-loader": "^6.0.4",
         "typescript": "^3.5.2",
         "vscode": "^1.1.35",
