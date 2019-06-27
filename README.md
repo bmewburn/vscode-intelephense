@@ -17,6 +17,7 @@ Intelephense is a high performance and feature rich PHP language server offering
 * HTML request forwarding allowing for a **full HTML/Javascript/CSS/PHP development experience**.
 * Detailed **hover** with links to official PHP documentation.
 * Smart **highlight** of references and keywords.
+* Reads PHPStorm metadata.
 
 _This extension may conflict with other PHP extensions which provide similar functionality. Should you experience duplicate suggestions, incorrect results and/or poor performance, try disabling other extensions first before reporting an issue. Disabling the built-in VSCode PHP Language Features is recommended. Please check the configuration section for language server options._
 
