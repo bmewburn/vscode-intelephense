@@ -275,12 +275,8 @@ export function createMiddleware(getClient: () => LanguageClient): IntelephenseM
         return diagnostics;
     }
 
-    function mergeAssociations(intelephenseAssociations:string[], resource?:string) {
-        let resourceUri:Uri;
-        if(resource) {
-            resourceUri = Uri.parse(resource);
-        }
-        let vscodeAssociations = workspace.getConfiguration('files', resourceUri).get('associations') || { };
+    function mergeAssociations(intelephenseAssociations:string[]) {
+        let vscodeAssociations = workspace.getConfiguration('files').get('associations') || { };
         let associationsSet = new Set<string>(intelephenseAssociations);
         for(let [key, val] of Object.entries(vscodeAssociations)) {
             if(val === 'php') {
@@ -295,7 +291,7 @@ export function createMiddleware(getClient: () => LanguageClient): IntelephenseM
         if(resource) {
             resourceUri = Uri.parse(resource);
         }
-        let vscodeExclude = workspace.getConfiguration('files', resourceUri).get('exclude') || { };
+        let vscodeExclude = workspace.getConfiguration('files', resourceUri || null).get('exclude') || { };
         let excludeSet = new Set<string>(intelephenseExclude);
         for(let [key, val] of Object.entries(vscodeExclude)) {
             if(val) {
@@ -323,7 +319,7 @@ export function createMiddleware(getClient: () => LanguageClient): IntelephenseM
                     if(Array.isArray(r)) {
                         r.forEach((v, i) => {
                             if(v && v.files && v.files.associations) {
-                                v.files.associations = mergeAssociations(v.files.associations, params.items[i].scopeUri);
+                                v.files.associations = mergeAssociations(v.files.associations);
                             }
                             if(v && v.files && v.files.exclude) {
                                 v.files.exclude = mergeExclude(v.files.exclude, params.items[i].scopeUri);
