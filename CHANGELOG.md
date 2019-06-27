@@ -1,5 +1,42 @@
 # Change Log
 
+## [1.1.0 - 2019-06-27]
+#### Added
+* Support for PhpDoc intersection types, generic collections, variadic notation, default param args
+* File path completion
+* Support PHPStorm metadata
+* Support .jsbeautifyrc file in project root
+* Setting to enable/disable triggering param hints on completion `intelephense.completion.triggerParameterHints`
+* Setting to run server with alternate node runtime `intelephense.runtime`
+* Setting to control server memory usage `intelephense.maxMemory`
+* Setting to declare document root `intelephense.environment.documentRoot`
+* Setting to declare include paths `intelephense.environment.includePaths`
+* Global scoped variable completion/hover/definition
+* Client now webpacked.
+* Plain text documentation support.
+
+#### Changed
+* updated stubs
+* fast-glob 3
+* Improved type inferrence when using asserts, instanceof (negation too), and built in function type guards
+* improved keyword completion
+* x2+ increase in indexing speed
+
+#### Fixed
+* Group use declaration formatting
+* Range formatting with mixed php/html files
+* Formatting removing comments
+* False undefined var diagnostics in closures
+* Completion not working in anon class argument lists
+* Wrong closure signature when inspecting closures that return closures.
+* Error when indexing workspace with NTFS junctions
+* Auto add group use declaration adding name with backslash
+* Unused method diagnostics not considering traits
+* Obey LSP client capabilities
+* Index workspace now guaranteed to clear cache.
+* Various read prop of undefined errors.
+* Diagnostics/signature help using overidden base constructor signature.
+
 ## [1.0.14 - 2019-04-30]
 
 #### Changed
