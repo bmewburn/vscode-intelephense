@@ -273,7 +273,7 @@
         "compile": "rimraf out/* && tsc -p ./",
         "update-vscode": "node ./node_modules/vscode/bin/install",
         "postinstall": "node ./node_modules/vscode/bin/install",
-        "production": "rimraf ./lib && ./node_modules/.bin/webpack --config webpack.config.js"
+        "production": "rimraf lib && webpack --config webpack.config.js"
     },
     "devDependencies": {
         "@types/fs-extra": "^8.0.0",
