@@ -7,7 +7,7 @@
         "email": "ben@mewburn.id.au"
     },
     "license": "SEE LICENSE IN LICENSE.txt",
-    "version": "1.1.1",
+    "version": "1.1.2",
     "publisher": "bmewburn",
     "engines": {
         "vscode": "^1.33.0"
@@ -278,19 +278,19 @@
     "devDependencies": {
         "@types/fs-extra": "^8.0.0",
         "@types/mocha": "^5.2.7",
-        "@types/node": "^10.14.10",
+        "@types/node": "^10.14.12",
         "@types/semver": "^6.0.1",
         "rimraf": "^2.6.3",
         "ts-loader": "^6.0.4",
-        "typescript": "^3.5.2",
+        "typescript": "^3.5.3",
         "vscode": "^1.1.35",
-        "webpack": "^4.35.0",
+        "webpack": "^4.35.3",
         "webpack-cli": "^3.3.5"
     },
     "dependencies": {
-        "fs-extra": "^8.0.1",
+        "fs-extra": "^8.1.0",
         "intelephense": "^1.1.1",
-        "semver": "^6.1.2",
+        "semver": "^6.2.0",
         "vscode-languageclient": "^5.3.0-next.6"
     },
     "private": true

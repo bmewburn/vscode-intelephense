@@ -1,5 +1,18 @@
 # Change Log
 
+## [1.1.2 - 2019-07-09]
+
+#### Changed
+* Updated stubs.
+
+#### fixed
+* Bad formatting in mixed JS/PHP script block.
+* Copy and paste argument inserts a space in front of it.
+* False undefined variable for anon. use variables when anon function is in script scope.
+* Path intellisense for windows paths.
+* Cannot read property codePointAt of undefined.
+* False unused variable diagnostics when assigning to array.
+
 ## [1.1.1 - 2019-06-27]
 
 #### Changed
