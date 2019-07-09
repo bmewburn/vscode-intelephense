@@ -25,7 +25,6 @@ import {
     getEmbeddedContentUri, getHostDocumentUri,
     isEmbeddedContentUri, EMBEDDED_CONTENT_SCHEME
 } from './embeddedContentUri';
-import { HandlerResult } from 'vscode-jsonrpc';
 
 const documentLanguageRangesRequestName = 'documentLanguageRanges';
 const phpLanguageId = 'php';
@@ -308,7 +307,7 @@ export function createMiddleware(getClient: () => LanguageClient): IntelephenseM
                 params: ConfigurationParams, 
                 token: CancellationToken, 
                 next: RequestHandler<ConfigurationParams, any[], void>
-            ): HandlerResult<any[], void> => {
+            ) => {
                 
                 let result = next(params, token);
                 if(!isThenable(result)) {
