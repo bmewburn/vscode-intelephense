@@ -97,7 +97,7 @@
                         "*.php",
                         "*.phtml"
                     ],
-                    "description": "Configure glob patterns to make files available for language server features. Values set in files.associations are merged.",
+                    "description": "Configure glob patterns to make files available for language server features. Inherits from files.associations.",
                     "scope": "window"
                 },
                 "intelephense.files.exclude": {
@@ -112,7 +112,7 @@
                         "**/bower_components/**",
                         "**/vendor/**/{Test,test,Tests,tests}/**"
                     ],
-                    "description": "Configure glob patterns to exclude certain files and folders from all language server features. Values set in files.exclude are merged.",
+                    "description": "Configure glob patterns to exclude certain files and folders from all language server features. Inherits from files.exclude.",
                     "scope": "resource"
                 },
                 "intelephense.stubs": {
@@ -226,7 +226,7 @@
                 "intelephense.format.enable": {
                     "type": "boolean",
                     "default": true,
-                    "description": "Enables formatting",
+                    "description": "Enables formatting.",
                     "scope": "window"
                 },
                 "intelephense.environment.documentRoot": {
@@ -244,12 +244,12 @@
                 },
                 "intelephense.runtime": {
                     "type": "string",
-                    "description": "Path to a Node.js executable. Defaults to Node.js shipped with VSCode.",
+                    "description": "Path to a Node.js executable. Use this if you wish to control memory usage or use a newer version of Node.js. Defaults to Node.js shipped with VSCode.",
                     "scope": "machine"
                 },
                 "intelephense.maxMemory": {
                     "type": "number",
-                    "description": "Maximum memory (in MB) that the server should use. Only applicable if runtime has been set. Minimum 256.",
+                    "description": "Maximum memory (in MB) that the server should use. Only applicable if runtime has been set. Minimum 256. Defaults to ~1500 when using default runtime.",
                     "scope": "window"
                 },
                 "intelephense.trace.server": {
