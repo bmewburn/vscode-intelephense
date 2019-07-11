@@ -1,5 +1,20 @@
 # Change Log
 
+## [1.1.4 - 2019-07-11]
+
+#### Added
+* On enter rules for doc blocks.
+
+#### Changed
+* Updated stubs.
+* vscode-uri 2.0.3
+
+#### Fixed
+* Bad formatting in mixed JS/PHP script block -- again.
+* Use declaration clause completion not working when typing fully qualified names.
+* Single level namespaces not indexing.
+* Global var hover sometimes shows multiple identical tag annotations.
+
 ## [1.1.3 - 2019-07-09]
 
 #### Changed
