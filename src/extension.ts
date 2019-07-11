@@ -6,7 +6,7 @@
 import * as path from 'path';
 import * as semver from 'semver';
 
-import { ExtensionContext, window, commands, workspace, Disposable } from 'vscode';
+import { ExtensionContext, window, commands, workspace, Disposable, languages, IndentAction } from 'vscode';
 import {
 	LanguageClient, LanguageClientOptions, ServerOptions,
 	TransportKind,
@@ -28,6 +28,38 @@ let middleware:IntelephenseMiddleware;
 let clientDisposable:Disposable;
 
 export async function activate(context: ExtensionContext) {
+
+	languages.setLanguageConfiguration('php', {
+		wordPattern: /(-?\d*\.\d\w*)|([^\-\`\~\!\@\#\%\^\&\*\(\)\=\+\[\{\]\}\\\|\;\:\'\"\,\.\<\>\/\?\s]+)/g,
+		onEnterRules: [
+			{
+				// e.g. /** | */
+				beforeText: /^\s*\/\*\*(?!\/)([^\*]|\*(?!\/))*$/,
+				afterText: /^\s*\*\/$/,
+				action: { indentAction: IndentAction.IndentOutdent, appendText: ' * ' }
+			},
+			{
+				// e.g. /** ...|
+				beforeText: /^\s*\/\*\*(?!\/)([^\*]|\*(?!\/))*$/,
+				action: { indentAction: IndentAction.None, appendText: ' * ' }
+			},
+			{
+				// e.g.  * ...|
+				beforeText: /^(\t|(\ \ ))*\ \*(\ ([^\*]|\*(?!\/))*)?$/,
+				action: { indentAction: IndentAction.None, appendText: '* ' }
+			},
+			{
+				// e.g.  */|
+				beforeText: /^(\t|(\ \ ))*\ \*\/\s*$/,
+				action: { indentAction: IndentAction.None, removeText: 1 }
+			},
+			{
+				// e.g.  *-----*/|
+				beforeText: /^(\t|(\ \ ))*\ \*[^/]*\*\/\s*$/,
+				action: { indentAction: IndentAction.None, removeText: 1 }
+			}
+		]
+	});
 
 	extensionContext = context;
 	let versionMemento = context.workspaceState.get<string>('version');
