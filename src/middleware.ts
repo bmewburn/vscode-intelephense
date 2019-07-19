@@ -323,6 +323,9 @@ export function createMiddleware(getClient: () => LanguageClient): IntelephenseM
                             if(v && v.files && v.files.exclude) {
                                 v.files.exclude = mergeExclude(v.files.exclude, params.items[i].scopeUri);
                             }
+                            if(v && v.telemetry === null) {
+                                v.telemetry.enabled = workspace.getConfiguration('telemetry').get('enableTelemetry');
+                            }
                         });
                     }
                     return r;
