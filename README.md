@@ -17,9 +17,14 @@ Intelephense is a high performance and feature rich PHP language server offering
 * HTML request forwarding allowing for a **full HTML/Javascript/CSS/PHP development experience**.
 * Detailed **hover** with links to official PHP documentation.
 * Smart **highlight** of references and keywords.
-* Reads PHPStorm metadata.
+* Reads **PHPStorm metadata**.
 
-_This extension may conflict with other PHP extensions which provide similar functionality. Should you experience duplicate suggestions, incorrect results and/or poor performance, try disabling other extensions first before reporting an issue. Disabling the built-in VSCode PHP Language Features is recommended. Please check the configuration section for language server options._
+## Quick Start
+
+1. Disable the built-in VSCode PHP Language Features. Extensions -> Search `@builtin php` -> PHP Language Features -> Disable.
+Note that other PHP extensions which provide similar functionality should also be disabled for best results.
+2. Add glob patterns for non standard php file extensions to the `files.associations` setting. For example, `*.module`. Settings -> Search `files`.
+3. View settings for further configuration options. Settings -> Search `intelephense`. 
 
 ## Licence
 The language server client (vscode-intelephense) is open source and licensed under the MIT licence. The language server (intelephense) is proprietary. Please see [here](https://github.com/bmewburn/vscode-intelephense/blob/master/LICENSE.txt#L29) for details.
@@ -36,3 +41,4 @@ Intelephense uses the following open source libraries. Please see the following 
 * [protobufjs](https://github.com/dcodeIO/ProtoBuf.js/)
 * [phpstorm-stubs](https://github.com/JetBrains/phpstorm-stubs)
 * [js-beautify](https://github.com/beautify-web/js-beautify)
+* [uuid](https://github.com/kelektiv/node-uuid)
