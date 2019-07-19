@@ -1,5 +1,30 @@
 # Change Log
 
+## [1.1.5 - 2019-07-20]
+
+#### Added
+* Telemetry to report anonymous usage and crash data. Use `intelephense.telemetry.enabled` to configure. Inherits from `telemetry.enableTelemetry`.
+
+#### Changed
+* jsbeautify 1.10.1
+* Diagnostics now refresh after indexing completed and when referenced files are edited.
+* Format now aborts if a parse error is encountered.
+* compiled with strictNullChecks.
+* updated stubs.
+
+#### Fixed
+* Trait property member completion.
+* Type inferrence when a conditional block with type guard has return statement.
+* Type inferrence for properties when used in type guards.
+* Bad formatting when HTML embedded in methods.
+* Formatter repeatedly indents commented html.
+* Preserve indentation on phpdoc markdown code blocks.
+* $this shouldnt be suggested when in static context.
+* Various read prop of undefined errors.
+* Formatter adding spaces before variables in double quoted string.
+* Formatter inserting spaces in else keyword if no if statement provided.
+* `return` not showing in completion suggestions.
+
 ## [1.1.4 - 2019-07-11]
 
 #### Added
