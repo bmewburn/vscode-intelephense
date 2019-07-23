@@ -110,7 +110,7 @@
                         "**/.DS_Store/**",
                         "**/node_modules/**",
                         "**/bower_components/**",
-                        "**/vendor/**/{Test,test,Tests,tests}/**"
+                        "**/vendor/**/{Test,test,Tests,tests}/**/*Test.php"
                     ],
                     "description": "Configure glob patterns to exclude certain files and folders from all language server features. Inherits from files.exclude.",
                     "scope": "resource"
