@@ -344,7 +344,7 @@ export function createMiddleware(getClient: () => LanguageClient): IntelephenseM
                     return undefined;
                 }
                 return next(document, position, context, token);
-            }, isFalseyCompletionResult, (vdoc) => {
+            }, r => r === null, (vdoc) => {
                 if (context.triggerCharacter === '$' || context.triggerCharacter === '>' || context.triggerCharacter === '\\') {
                     //these are php trigger chars -- dont forward to html
                     return new CompletionList([], false);
@@ -358,7 +358,7 @@ export function createMiddleware(getClient: () => LanguageClient): IntelephenseM
         provideSignatureHelp: (document: TextDocument, position: Position, token: CancellationToken, next: ProvideSignatureHelpSignature) => {
             return middleWarePositionalRequest<SignatureHelp>(document, position, () => {
                 return next(document, position, token);
-            }, (r) => { return !r; }, (vdoc) => {
+            }, r => r === null, (vdoc) => {
                 return commands.executeCommand<SignatureHelp>('vscode.executeSignatureHelpProvider', vdoc.uri, position);
             }, undefined, token);
         },
@@ -366,7 +366,7 @@ export function createMiddleware(getClient: () => LanguageClient): IntelephenseM
         provideDefinition: (document: TextDocument, position: Position, token: CancellationToken, next: ProvideDefinitionSignature) => {
             return middleWarePositionalRequest<Definition | DefinitionLink[]>(document, position, () => {
                 return next(document, position, token);
-            }, (r) => { return !r || (Array.isArray(r) && r.length < 1); }, (vdoc) => {
+            }, r => r === null, (vdoc) => {
                 return commands.executeCommand<Definition>('vscode.executeDefinitionProvider', vdoc.uri, position).then((def) => {
                     if (!def) {
                         return def;
@@ -394,7 +394,7 @@ export function createMiddleware(getClient: () => LanguageClient): IntelephenseM
 
             return middleWarePositionalRequest<Location[]>(document, position, () => {
                 return next(document, position, options, token);
-            }, (r) => { return !r || (Array.isArray(r) && r.length < 1); }, (vdoc) => {
+            }, r => r === null, (vdoc) => {
                 return commands.executeCommand<Location[]>('vscode.executeReferenceProvider', vdoc.uri, position).then(locs => {
                     locs.forEach((v) => {
                         if (isEmbeddedContentUri(v.uri)) {
@@ -424,7 +424,7 @@ export function createMiddleware(getClient: () => LanguageClient): IntelephenseM
         provideDocumentHighlights: (document: TextDocument, position: Position, token: CancellationToken, next: ProvideDocumentHighlightsSignature) => {
             return middleWarePositionalRequest<DocumentHighlight[]>(document, position, () => {
                 return next(document, position, token);
-            }, (r) => { return !r || (Array.isArray(r) && r.length < 1); }, (vdoc) => {
+            }, r => r === null, (vdoc) => {
                 return commands.executeCommand<DocumentHighlight[]>('vscode.executeDocumentHighlights', vdoc.uri, position);
             }, [], token);
 
@@ -433,7 +433,7 @@ export function createMiddleware(getClient: () => LanguageClient): IntelephenseM
         provideHover: (document: TextDocument, position: Position, token: CancellationToken, next: ProvideHoverSignature) => {
             return middleWarePositionalRequest<Hover>(document, position, () => {
                 return next(document, position, token);
-            }, (r) => { return !r || !r.contents || (Array.isArray(r.contents) && r.contents.length < 1); }, (vdoc) => {
+            }, r => r === null, (vdoc) => {
                 return commands.executeCommand<Hover[]>('vscode.executeHoverProvider', vdoc.uri, position).then((h) => {
                     return h.shift();
                 });
@@ -464,8 +464,4 @@ function documentLanguageRangesRequest(uri: string, client: LanguageClient) {
 
 function isThenable(obj: any) {
     return obj && obj.then !== undefined;
-}
-
-function isFalseyCompletionResult(result: CompletionItem[] | CompletionList) {
-    return !result || (Array.isArray(result) && result.length < 1) || !(<CompletionList>result).items || (<CompletionList>result).items.length < 1;
 }
