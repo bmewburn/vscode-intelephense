@@ -1,5 +1,30 @@
 # Change Log
 
+## [1.1.6 - 2019-08-12]
+
+#### Added
+* declare directive completion
+
+#### Changed
+* completion suggestion order of symbols with same name changed to local > project > builtin/stub > vendor
+* use declarations now added in alphabetical order and after any top level comment, script level doc block, or declare directive.
+* signature help no longer shows if inside a deep multiline argument. eg inside a closure that is a function argument.
+
+#### Fixed
+* various cannot read prop of undefined errors
+* formatter repeatedly adding spaces to some sections of html/js
+* auto complete prefixing array type declaration with \
+* documentation sometimes shows raw html instead of markdown table
+* features stop working for files/folders containing a `.`
+* group use declaration list trailing comma
+* false unused var/param when used in a member name expression.
+* some control structure keywords not being suggested - eg endif, endforeach.
+* format enable setting beng ignored.
+* false unused use declarations when use declaration is a namespace only.
+* auto use decl not creating alias when there is a name clash with a declared class.
+* doc block type completion when using union/intersection types
+* completion suggestion documentation not showing full documentation of symbol if it is imported.
+
 ## [1.1.5 - 2019-07-20]
 
 #### Added
