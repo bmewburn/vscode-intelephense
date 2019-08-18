@@ -132,7 +132,8 @@ function createClient(context:ExtensionContext, middleware:IntelephenseMiddlewar
 
 	let initializationOptions = {
 		storagePath: context.storagePath,
-		clearCache: clearCache
+		clearCache: clearCache,
+		globalStoragePath: context.globalStoragePath
 	};
 
 	// Options to control the language client
