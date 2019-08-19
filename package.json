@@ -102,6 +102,9 @@
                 },
                 "intelephense.files.exclude": {
                     "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
                     "default": [
                         "**/.git/**",
                         "**/.svn/**",
@@ -257,6 +260,17 @@
                     "description": "Anonymous usage and crash data will be sent to Azure Application Insights. Inherits from telemetry.enableTelemetry.",
                     "scope": "window",
                     "default": null
+                },
+                "intelephense.rename.exclude": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "default": [
+                        "**/vendor/**"
+                    ],
+                    "description": "Glob patterns to exclude files and folders from having symbols renamed. Rename operation will fail if references and/or definitions are found in excluded files/folders.",
+                    "scope": "resource"
                 },
                 "intelephense.trace.server": {
                     "type": "string",
