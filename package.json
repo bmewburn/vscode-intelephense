@@ -255,6 +255,11 @@
                     "description": "Maximum memory (in MB) that the server should use. Only applicable if runtime has been set. Minimum 256. Defaults to ~1500 when using default runtime.",
                     "scope": "window"
                 },
+                "intelephense.licenceKey": {
+                    "type": "string",
+                    "description": "Enter your intelephense licence key here to access premium features.",
+                    "scope": "application"
+                },
                 "intelephense.telemetry.enabled": {
                     "type": "boolean",
                     "description": "Anonymous usage and crash data will be sent to Azure Application Insights. Inherits from telemetry.enableTelemetry.",
