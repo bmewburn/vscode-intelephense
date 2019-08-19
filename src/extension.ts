@@ -6,7 +6,7 @@
 import * as path from 'path';
 import * as semver from 'semver';
 
-import { ExtensionContext, window, commands, workspace, Disposable, languages, IndentAction } from 'vscode';
+import { ExtensionContext, window, commands, workspace, Disposable, languages, IndentAction, env, Uri, ConfigurationTarget } from 'vscode';
 import {
 	LanguageClient, LanguageClientOptions, ServerOptions,
 	TransportKind,
@@ -133,7 +133,8 @@ function createClient(context:ExtensionContext, middleware:IntelephenseMiddlewar
 	let initializationOptions = {
 		storagePath: context.storagePath,
 		clearCache: clearCache,
-		globalStoragePath: context.globalStoragePath
+		globalStoragePath: context.globalStoragePath,
+		isVscode: true
 	};
 
 	// Options to control the language client
@@ -150,8 +151,33 @@ function createClient(context:ExtensionContext, middleware:IntelephenseMiddlewar
 	languageClient = new LanguageClient('intelephense', 'intelephense', serverOptions, clientOptions);
 	languageClient.onReady().then(() => {
 		registerNotificationListeners();
+		showStartMessage();
 	});
 	return languageClient;
+}
+
+function showStartMessage() {
+	const key = workspace.getConfiguration('intelephense').get('licenceKey');
+	const getKey = 'Get Key';
+	const enterKey = 'Enter Key';
+	if(key) {
+		return;
+	}
+	window.showInformationMessage(
+		'Thank you for using Intelephense.\nUpgrade now to access premium features.',
+		getKey, 
+		enterKey
+	).then(value => {
+		if(value === getKey) {
+			env.openExternal(Uri.parse('https://intelephense.com'));
+		} else if(value === enterKey) {
+			window.showInputBox({prompt: 'Enter Intelephense Licence Key', ignoreFocusOut: true}).then(key => {
+				if(key) {
+					workspace.getConfiguration('intelephense').update('licenceKey', key, ConfigurationTarget.Global);
+				}
+			});
+		}
+	});
 }
 
 export function deactivate() {
