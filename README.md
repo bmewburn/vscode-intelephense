@@ -45,6 +45,10 @@ The language server (intelephense) is proprietary. Please see [here](https://git
 
 Further configuration options are available in the `intelephense` section of settings.
 
+## Support
+
+Found a bug? Got a feature request? [Create an issue](https://github.com/bmewburn/vscode-intelephense/issues).
+
 ## Acknowledgements
 
 Intelephense uses the following open source libraries. Please see the following links for source code and licences.
