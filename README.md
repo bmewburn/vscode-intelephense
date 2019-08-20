@@ -61,3 +61,4 @@ Intelephense uses the following open source libraries. Please see the following 
 * [protobufjs](https://github.com/dcodeIO/ProtoBuf.js/)
 * [phpstorm-stubs](https://github.com/JetBrains/phpstorm-stubs)
 * [js-beautify](https://github.com/beautify-web/js-beautify)
+* [vscode-uri](https://github.com/microsoft/vscode-uri)
