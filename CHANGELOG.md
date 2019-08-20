@@ -1,5 +1,20 @@
 # Change Log
 
+# Change Log
+
+## [1.2.0 - 2019-08-20]
+
+#### Added
+* Rename. [PREMIUM](https://intelephense.com)
+* Find implementations. [PREMIUM](https://intelephense.com)
+* Folding. [PREMIUM](https://intelephense.com)
+* Go to declaration. [PREMIUM](https://intelephense.com)
+* Go to type definition. [PREMIUM](https://intelephense.com)
+
+#### Fixed
+* Various cannot read prop of undefined errors
+* Mixed PHP/HTML if else blocks not indenting correctly on format
+
 ## [1.1.6 - 2019-08-12]
 
 #### Added
