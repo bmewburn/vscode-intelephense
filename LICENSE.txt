@@ -28,38 +28,58 @@ intelephense (server application)
 
 Intelephense Licence
 
-Copyright (c) 2019 - present Ben Robert Mewburn <ben@mewburn.id.au>
+Copyright (c) 2019 - present Intelephense <ben@intelephense.com>
 
 By installing this software you agree to be bound by the provisions 
 of this agreement.
 
-Ben Robert Mewburn (hereafter referred to as the Licensor) grants you 
-a personal, non-transferable, non-exclusive licence to use the Intelephense 
-software (hereafter referred to as the Software) on your devices in accordance 
-with the terms of this agreement.
+1. DEFINITIONS
+  a)  "Licensor" is Intelephense, Australia, ABN 93900829846.
+  b)  "Software" is the software known as Intelephense.
+  c)  "Licence Key" is the software key purchasable from the Licensor which 
+      enables access to Premium Features.
+  d)  "Premium Features" are those features only accessible and permitted for 
+      use by holders of a Licence Key.
+      That is: rename; code folding; find all implementations; 
+      go to type definition; go to declaration.
 
+2. GRANT OF LICENCE
+The Licensor grants you a personal, non-transferable, non-exclusive licence 
+to use the Software on your devices in accordance with the terms of this 
+agreement.
+
+3. LICENCE KEYS
+  a)  Purchase of a Licence Key grants a single user access and use of 
+      Premium Features for a period of 12 months from the date of purchase. 
+      After which time the Licence Key must be renewed to continue to access 
+      and use Premium Features.
+  b)  A Licence Key may be revoked if it is suspected that a user has breached 
+      restrictions detailed in item 4.
+
+4. RESTRICTIONS
+You are NOT permitted to:
+  a)  Edit, alter, modify, adapt, translate or otherwise change the whole or any 
+      part of the Software. 
+  b)  Decompile, disassemble or reverse engineer the Software or attempt to do 
+      any such things.
+  c)  Reproduce, copy, distribute, resell or otherwise use the whole or any part 
+      of the Software for any commercial purpose.
+  d)  Disable, modify or hide notifications sent by the Software.
+  e)  Distribute, resell, or share Licence Keys.
+  f)  Access or use Premium Features without a valid Licence Key.
+
+5. OWNERSHIP
 The Software, copyright, and other intellectual property rights of whatever 
 nature in the Software, including any modifications made thereto are and shall 
 remain the property of the Licensor.
 
-You may use the Software as a standalone PHP language server with any 
-Language Server Protocol capable IDE or text editor.
-
-You are NOT permitted to:
-
-* Edit, alter, modify, adapt, translate or otherwise change the whole or any 
-  part of the Software. 
-* Decompile, disassemble or reverse engineer the Software or attempt to do 
-  any such things.
-* Reproduce, copy, distribute, resell or otherwise use the whole or any part 
-  of the Software for any commercial purpose.
-* Disable, modify or hide notifications sent by the Software.
-
+6. WARRANTY DISCLAIMER
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-LICENSOR, AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR 
-OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS 
-IN THE SOFTWARE.
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
 
+7. LIMITATION OF LIABILITY
+IN NO EVENT SHALL THE LICENSOR BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS 
+IN THE SOFTWARE.
