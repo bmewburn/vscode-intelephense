@@ -1,13 +1,13 @@
 {
     "name": "vscode-intelephense-client",
-    "displayName": "PHP Intelephense",
-    "description": "High performance, feature rich PHP intellisense",
+    "displayName": "Intelephense",
+    "description": "PHP code intelligence for Visual Studio Code",
     "author": {
         "name": "Ben Mewburn",
         "email": "ben@mewburn.id.au"
     },
     "license": "SEE LICENSE IN LICENSE.txt",
-    "version": "1.1.6",
+    "version": "1.2.0",
     "publisher": "bmewburn",
     "engines": {
         "vscode": "^1.33.0"
@@ -36,7 +36,7 @@
     "bugs": {
         "url": "https://github.com/bmewburn/vscode-intelephense/issues"
     },
-    "homepage": "http://intelephense.net",
+    "homepage": "https://intelephense.com",
     "repository": {
         "type": "git",
         "url": "https://github.com/bmewburn/vscode-intelephense.git"
