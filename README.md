@@ -1,10 +1,8 @@
 # Intelephense
 
-### Support via [Patreon](https://www.patreon.com/bmewburn) | [PayPal](https://www.paypal.me/bmewburn)
+PHP code intelligence for Visual Studio Code.
 
-Welcome to Intelephense!
-
-Intelephense is a high performance and feature rich PHP language server offering:
+Intelephense is a high performance PHP language server packed full of essential features for productive PHP development. 
 
 * Fast camel/underscore case **code completion (IntelliSense)**. Offering detailed suggestions for document, workspace and built-in symbols and keywords. Automatic addition of use declarations.
 * Detailed **signature (parameter) help** for document, workspace and built-in constructors, methods, and functions.
@@ -13,21 +11,39 @@ Intelephense is a high performance and feature rich PHP language server offering
 * Fast camel/underscore case **workspace symbol search**.
 * Full **document symbol search** that also powers **breadcrumbs** and **outline** UI.
 * Multiple **diagnostics** for open files via an error tolerant parser and powerful static analysis engine.
-* Lossless [PSR-12](https://github.com/php-fig/fig-standards/blob/master/proposed/extended-coding-style-guide.md) compatible document and **range formatting**. Will format combined HTML/PHP/JS/CSS files too. 
-* HTML request forwarding allowing for a **full HTML/Javascript/CSS/PHP development experience**.
+* Lossless PSR-12 compatible **document/range formatting**. Formats combined HTML/PHP/JS/CSS files too. 
+* HTML request forwarding to HTML language servers for complete **HTML/JS/CSS/PHP code intelligence**.
 * Detailed **hover** with links to official PHP documentation.
 * Smart **highlight** of references and keywords.
-* Reads **PHPStorm metadata**.
+* Reads **PHPStorm metadata** for improved type analysis and suggestions.
+* Easy **rename** of symbols. When appropriate, files/folders are automatically renamed too. [PREMIUM](https://intelephense.com)
+* Accurate **code folding** of definitions, blocks, use declarations, heredoc, comments, and custom regions. [PREMIUM](https://intelephense.com)
+* Quickly **find all implementations** of interfaces and abstract classes and associated methods. [PREMIUM](https://intelephense.com)
+* Fast **go to type definition** of typed variables and parameters. [PREMIUM](https://intelephense.com)
+* Fast **go to declaration** for methods implementing an interface or abstract method declaration. [PREMIUM](https://intelephense.com)
+
+## Licence
+Purchase a licence at https://intelephense.com to access premium features. Licence keys grant a single user access to premium features for a period of 12 months and must be activated via https before use.
+
+The language server client (vscode-intelephense) is open source and licensed under the MIT licence. 
+
+The language server (intelephense) is proprietary. Please see [here](https://github.com/bmewburn/vscode-intelephense/blob/master/LICENSE.txt#L29) for details.
 
 ## Quick Start
 
-1. Disable the built-in VSCode PHP Language Features. Extensions -> Search `@builtin php` -> PHP Language Features -> Disable.
-Note that other PHP extensions which provide similar functionality should also be disabled for best results.
-2. Add glob patterns for non standard php file extensions to the `files.associations` setting. For example, `*.module`. Settings -> Search `files`.
-3. View settings for further configuration options. Settings -> Search `intelephense`. 
+1. Disable the built-in VSCode PHP Language Features. 
+    
+    * Go to `Extensions`.
+    * Search for `@builtin php`
+    * Disable `PHP Language Features`.
 
-## Licence
-The language server client (vscode-intelephense) is open source and licensed under the MIT licence. The language server (intelephense) is proprietary. Please see [here](https://github.com/bmewburn/vscode-intelephense/blob/master/LICENSE.txt#L29) for details.
+    Note that other PHP extensions which provide similar functionality should also be disabled for best results.
+2. Add glob patterns for non standard php file extensions to the `files.associations` setting.
+
+    For example: `files.associations: { "*.module": "php" }`.
+3. Enter your [licence key](https://intelephense.com) in the `intelephense.licenceKey` setting.
+
+Further configuration options are available in the `intelephense` section of settings.
 
 ## Acknowledgements
 
@@ -41,4 +57,3 @@ Intelephense uses the following open source libraries. Please see the following 
 * [protobufjs](https://github.com/dcodeIO/ProtoBuf.js/)
 * [phpstorm-stubs](https://github.com/JetBrains/phpstorm-stubs)
 * [js-beautify](https://github.com/beautify-web/js-beautify)
-* [uuid](https://github.com/kelektiv/node-uuid)
