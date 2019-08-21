@@ -151,24 +151,29 @@ function createClient(context:ExtensionContext, middleware:IntelephenseMiddlewar
 	languageClient = new LanguageClient('intelephense', 'intelephense', serverOptions, clientOptions);
 	languageClient.onReady().then(() => {
 		registerNotificationListeners();
-		showStartMessage();
+		showStartMessage(context);
 	});
 	return languageClient;
 }
 
-function showStartMessage() {
+function showStartMessage(context: ExtensionContext) {
+	const startMsgTimestampKey = 'intelephenseStartMessageTimestamp';
+	const now = Date.now();
 	const key = workspace.getConfiguration('intelephense').get('licenceKey');
-	const getKey = 'Get Key';
+	const lastStartMsgTimestamp = context.globalState.get<number>(startMsgTimestampKey) || 0;
+	const upgrade = 'Upgrade';
 	const enterKey = 'Enter Key';
-	if(key) {
+	const dismiss = 'Dismiss';
+	if(key || (lastStartMsgTimestamp + 24 * 60 * 60 * 1000) > now) {
 		return;
 	}
 	window.showInformationMessage(
 		'Thank you for using Intelephense.\nUpgrade now to access premium features.',
-		getKey, 
-		enterKey
+		upgrade, 
+		enterKey,
+		dismiss
 	).then(value => {
-		if(value === getKey) {
+		if(value === upgrade) {
 			env.openExternal(Uri.parse('https://intelephense.com'));
 		} else if(value === enterKey) {
 			window.showInputBox({prompt: 'Enter Intelephense Licence Key', ignoreFocusOut: true}).then(key => {
@@ -176,6 +181,8 @@ function showStartMessage() {
 					workspace.getConfiguration('intelephense').update('licenceKey', key, ConfigurationTarget.Global);
 				}
 			});
+		} else {
+			context.globalState.update(startMsgTimestampKey, now);
 		}
 	});
 }
