@@ -1,6 +1,15 @@
 # Change Log
 
-# Change Log
+## [1.2.1 - 2019-08-22]
+
+#### Added
+- additional command palette command to enter licence key.
+
+#### Changed
+- Server start notification will show at most once every 24 hours.
+
+#### Fixed
+- Rename not detecting anonymous function use variables.
 
 ## [1.2.0 - 2019-08-20]
 
