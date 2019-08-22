@@ -218,9 +218,10 @@ function enterLicenceKey() {
 		ignoreFocusOut: true,
 		validateInput: v => {
 			v = v.trim();
-			if(!/^[0-9a-zA-Z]{15}$/.test(v)) {
+			if(v && !/^[0-9a-zA-Z]{15}$/.test(v)) {
 				return 'A licence key must be a 15 character alphanumeric string.'
 			}
+			return '';
 		}
 	}
 
