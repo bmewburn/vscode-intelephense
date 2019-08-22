@@ -67,6 +67,11 @@
                 "command": "intelephense.cancel.indexing",
                 "title": "Cancel indexing",
                 "category": "Intelephense"
+            },
+            {
+                "command": "intelephense.enter.key",
+                "title": "Enter licence key",
+                "category": "Intelephense"
             }
         ],
         "menus": {
@@ -77,6 +82,10 @@
                 },
                 {
                     "command": "intelephense.cancel.indexing",
+                    "when": "resourceLangId == php"
+                },
+                {
+                    "command": "intelephense.enter.key",
                     "when": "resourceLangId == php"
                 }
             ]

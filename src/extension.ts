@@ -6,7 +6,7 @@
 import * as path from 'path';
 import * as semver from 'semver';
 
-import { ExtensionContext, window, commands, workspace, Disposable, languages, IndentAction, env, Uri, ConfigurationTarget } from 'vscode';
+import { ExtensionContext, window, commands, workspace, Disposable, languages, IndentAction, env, Uri, ConfigurationTarget, InputBoxOptions } from 'vscode';
 import {
 	LanguageClient, LanguageClientOptions, ServerOptions,
 	TransportKind,
@@ -21,6 +21,9 @@ const VERSION = '1.2.0';
 const INDEXING_STARTED_NOTIFICATION = new NotificationType('indexingStarted');
 const INDEXING_ENDED_NOTIFICATION = new NotificationType('indexingEnded');
 const CANCEL_INDEXING_REQUEST = new RequestType('cancelIndexing');
+const INDEX_WORKSPACE_CMD_NAME = 'intelephense.index.workspace';
+const CANCEL_INDEXING_CMD_NAME = 'intelephense.cancel.indexing';
+const ENTER_KEY_CMD_NAME = 'intelephense.enter.key';
 
 let languageClient: LanguageClient;
 let extensionContext: ExtensionContext;
@@ -82,13 +85,15 @@ export async function activate(context: ExtensionContext) {
 
 	languageClient = createClient(context, middleware, clearCache);
 	
-	let indexWorkspaceDisposable = commands.registerCommand('intelephense.index.workspace', indexWorkspace);
-	let cancelIndexingDisposable = commands.registerCommand('intelephense.cancel.indexing', cancelIndexing);
+	let indexWorkspaceCmdDisposable = commands.registerCommand(INDEX_WORKSPACE_CMD_NAME, indexWorkspace);
+	let cancelIndexingCmdDisposable = commands.registerCommand(CANCEL_INDEXING_CMD_NAME, cancelIndexing);
+	let enterKeyCmdDisposable = commands.registerCommand(ENTER_KEY_CMD_NAME, enterLicenceKey)
 
 	//push disposables
 	context.subscriptions.push(
-		indexWorkspaceDisposable,
-		cancelIndexingDisposable,
+		indexWorkspaceCmdDisposable,
+		cancelIndexingCmdDisposable,
+		enterKeyCmdDisposable,
 		middleware
 	);
 
@@ -174,15 +179,11 @@ function showStartMessage(context: ExtensionContext) {
 		dismiss
 	).then(value => {
 		if(value === upgrade) {
-			env.openExternal(Uri.parse('https://intelephense.com'));
+			return env.openExternal(Uri.parse('https://intelephense.com'));
 		} else if(value === enterKey) {
-			window.showInputBox({prompt: 'Enter Intelephense Licence Key', ignoreFocusOut: true}).then(key => {
-				if(key) {
-					workspace.getConfiguration('intelephense').update('licenceKey', key, ConfigurationTarget.Global);
-				}
-			});
+			return commands.executeCommand(ENTER_KEY_CMD_NAME);
 		} else {
-			context.globalState.update(startMsgTimestampKey, now);
+			return context.globalState.update(startMsgTimestampKey, now);
 		}
 	});
 }
@@ -207,6 +208,31 @@ function indexWorkspace() {
 
 function cancelIndexing() {
 	languageClient.sendRequest(CANCEL_INDEXING_REQUEST.method);
+}
+
+function enterLicenceKey() {
+	
+	let currentValue = workspace.getConfiguration('intelephense').get<string>('licenceKey', '');
+	let options:InputBoxOptions = {
+		prompt: 'Intelephense Licence Key',
+		ignoreFocusOut: true,
+		validateInput: v => {
+			v = v.trim();
+			if(!/^[0-9a-zA-Z]{15}$/.test(v)) {
+				return 'A licence key must be a 15 character alphanumeric string.'
+			}
+		}
+	}
+
+	if(currentValue) {
+		options.value = currentValue;
+	}
+
+	window.showInputBox(options).then(key => {
+		if(key !== undefined) {
+			workspace.getConfiguration('intelephense').update('licenceKey', key, ConfigurationTarget.Global);
+		}
+	});
 }
 
 function registerNotificationListeners() {
