@@ -23,7 +23,7 @@ Intelephense is a high performance PHP language server packed full of essential 
 * Fast **go to declaration** for methods implementing an interface or abstract method declaration. [PREMIUM](https://intelephense.com)
 
 ## Licence
-Purchase a licence at https://intelephense.com to access premium features. Licence keys grant a single user access to premium features on multiple devices for a period of 12 months and must be activated via https before use.
+Purchase a licence at https://intelephense.com to access PREMIUM features. Licence keys grant a single user access to all current and future premium features on multiple devices forever. Licence keys must be activated (automatically) via https before use.
 
 The language server client (vscode-intelephense) is open source and licensed under the MIT licence. 
 
@@ -42,7 +42,6 @@ The language server (intelephense) is proprietary. Please see [here](https://git
 
     For example: `files.associations: { "*.module": "php" }`.
 3. Optionally purchase and enter your [licence key](https://intelephense.com) by either: 
-    * Clicking the `Enter Key` action of the start notification. OR
     * Opening the command pallete -- `ctrl + shift + p` -- and searching for `Enter licence key`. OR 
     * Opening your **user** settings and entering it into `intelephense.licenceKey`.
 
