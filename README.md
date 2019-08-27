@@ -23,7 +23,7 @@ Intelephense is a high performance PHP language server packed full of essential 
 * Fast **go to declaration** for methods implementing an interface or abstract method declaration. [PREMIUM](https://intelephense.com)
 
 ## Licence
-Purchase a licence at https://intelephense.com to access PREMIUM features. Licence keys grant a single user access to all current and future premium features on multiple devices forever. Licence keys must be activated (automatically) via https before use.
+Purchase a licence at https://intelephense.com to access PREMIUM features. Licence keys grant a single user access to all current and future premium features on multiple devices _forever_. Licence keys must be activated (automatically) via https before use. Features not marked as PREMIUM are free and always will be free.
 
 The language server client (vscode-intelephense) is open source and licensed under the MIT licence. 
 
