@@ -49,10 +49,8 @@ to use the Software on your devices in accordance with the terms of this
 agreement.
 
 3. LICENCE KEYS
-  a)  Purchase of a Licence Key grants a single user access and use of 
-      Premium Features for a period of 12 months from the date of purchase. 
-      After which time the Licence Key must be renewed to continue to access 
-      and use Premium Features.
+  a)  Purchase of a Licence Key grants a single end user access and use of all
+      current and future Premium Features in perpetuity.
   b)  A Licence Key may be revoked if it is suspected that a user has breached 
       restrictions detailed in item 4.
 
