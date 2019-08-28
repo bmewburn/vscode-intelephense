@@ -162,28 +162,27 @@ function createClient(context:ExtensionContext, middleware:IntelephenseMiddlewar
 }
 
 function showStartMessage(context: ExtensionContext) {
-	const startMsgTimestampKey = 'intelephenseStartMessageTimestamp';
-	const now = Date.now();
-	const key = workspace.getConfiguration('intelephense').get('licenceKey');
-	const lastStartMsgTimestamp = context.globalState.get<number>(startMsgTimestampKey) || 0;
-	const upgrade = 'Upgrade';
-	const enterKey = 'Enter Key';
+	const globalVersionMementoKey = 'intelephenseVersion';
+	let key:string|undefined;
+	let intelephenseConfig = workspace.getConfiguration('intelephense');
+	if(intelephenseConfig) {
+		key = intelephenseConfig.get('licenceKey');
+	}
+	const lastVersion = context.globalState.get<string>(globalVersionMementoKey);
+	const open = 'Open';
 	const dismiss = 'Dismiss';
-	if(key || (lastStartMsgTimestamp + 24 * 60 * 60 * 1000) > now) {
+	if (key || (lastVersion && !semver.lt(lastVersion, VERSION))) {
 		return;
 	}
 	window.showInformationMessage(
-		'Thank you for using Intelephense.\nUpgrade now to access premium features.',
-		upgrade, 
-		enterKey,
+		`Intelephense updated to ${VERSION}.\nClick 'Open' to read about the latest features.`,
+		open, 
 		dismiss
 	).then(value => {
-		if(value === upgrade) {
-			return env.openExternal(Uri.parse('https://intelephense.com'));
-		} else if(value === enterKey) {
-			return commands.executeCommand(ENTER_KEY_CMD_NAME);
+		if(value === open) {
+			env.openExternal(Uri.parse('https://intelephense.com'));
 		} else {
-			return context.globalState.update(startMsgTimestampKey, now);
+			context.globalState.update(globalVersionMementoKey, VERSION);
 		}
 	});
 }
