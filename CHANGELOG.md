@@ -1,5 +1,22 @@
 # Change Log
 
+## [1.2.2 - 2019-08-28]
+
+#### Changed
+- Removed upgrade notification that showed every day. 
+Replaced with a notification that appears once per update that reads 
+"Intelephense updated to X.X.X. Click 'Open' to read about the latest features and fixes."
+- added upper case __HALT_COMPILER completion as required by phar.
+- __HALT_COMPILER is no longer lowercased on format as required by phar.
+
+#### Fixed
+- trait adaptation list format indent
+- maxSize not respected
+- overriden method params with default args losing typing of base method
+- mixed html/php format indentation
+- __halt_compiler has space inserted between keyword and opening parentheses
+- code folding in mixed php/html/js/css not working
+
 ## [1.2.1 - 2019-08-22]
 
 #### Added

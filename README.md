@@ -53,6 +53,8 @@ Found a bug? Got a feature request? [Create an issue](https://github.com/bmewbur
 
 ## Acknowledgements
 
+A big thank you to supporters who have bought a premium licence and have enabled the continued development and maintenance of this extension.
+
 Intelephense uses the following open source libraries. Please see the following links for source code and licences.
 * [vscode-languageserver-node](https://github.com/Microsoft/vscode-languageserver-node)
 * [micromatch](https://github.com/micromatch/micromatch)
