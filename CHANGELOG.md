@@ -1,5 +1,14 @@
 # Change Log
 
+## [1.2.3 - 2019-09-04]
+
+#### Fixed
+- Premium features not accessible on remotes because outbound https cant be made. 
+Activating on a local php project now also activates for remotes.
+- Code folding for arrays,
+- Hover for anonymous use variables.
+- find all references/rename not working for trait/interface methods.
+
 ## [1.2.2 - 2019-08-28]
 
 #### Changed
