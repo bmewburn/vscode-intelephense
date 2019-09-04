@@ -238,7 +238,7 @@ function enterLicenceKey() {
 function registerNotificationListeners() {
 	let resolveIndexingPromise: () => void;
 	languageClient.onNotification(INDEXING_STARTED_NOTIFICATION.method, () => {
-		window.setStatusBarMessage('$(sync~spin) intelephense indexing ...', new Promise((resolve, reject) => {
+		window.setStatusBarMessage('$(sync~spin) intelephense ' + VERSION.toString() + ' indexing ...', new Promise((resolve, reject) => {
 			resolveIndexingPromise = () => {
 				resolve();
 			}
