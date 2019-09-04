@@ -79,10 +79,7 @@ export async function activate(context: ExtensionContext) {
 		clearCache = true;
 	}
 
-	middleware = createMiddleware(() => {
-		return languageClient;
-	});
-
+	middleware = createMiddleware();
 	languageClient = createClient(context, middleware, clearCache);
 	
 	let indexWorkspaceCmdDisposable = commands.registerCommand(INDEX_WORKSPACE_CMD_NAME, indexWorkspace);
