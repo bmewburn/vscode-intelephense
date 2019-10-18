@@ -254,6 +254,59 @@
                     "description": "The include paths (as individual path items) as defined in the include_path ini setting. Used for resolving script inclusion.",
                     "scope": "window"
                 },
+                "intelephense.diagnostics.enable": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enables diagnostics.",
+                    "scope": "window"
+                },
+                "intelephense.diagnostics.run": {
+                    "type":"string",
+                    "default": "onType",
+                    "enum":["onType", "onSave"],
+                    "enumDescriptions": [
+                        "Diagnostics will run as changes are made to the document.",
+                        "Diagnostics will run when the document is saved."
+                    ],
+                    "description": "Controls when diagnostics are run.",
+                    "scope":"window"
+                },
+                "intelephense.diagnostics.undefinedSymbols": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enables undefined type, member, function, constant and variable diagnostics.",
+                    "scope": "window"
+                },
+                "intelephense.diagnostics.unusedSymbols": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enables unused variable, private member, and import diagnostics.",
+                    "scope": "window"
+                },
+                "intelephense.diagnostics.parseErrors": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enables parse error diagnostics.",
+                    "scope": "window"
+                },
+                "intelephense.diagnostics.duplicateSymbols": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enables duplicate symbol diagnostics.",
+                    "scope": "window"
+                },
+                "intelephense.diagnostics.argumentCount": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enables argument count diagnostics.",
+                    "scope": "window"
+                },
+                "intelephense.diagnostics.typeDeclarations": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enables diagnostics on type compatibility of arguments, property assignments, and return statements where types have been declared.",
+                    "scope": "window"
+                },
                 "intelephense.runtime": {
                     "type": "string",
                     "description": "Path to a Node.js executable. Use this if you wish to control memory usage or use a newer version of Node.js. Defaults to Node.js shipped with VSCode.",
