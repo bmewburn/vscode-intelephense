@@ -40,7 +40,7 @@ The language server (intelephense) is proprietary. Please see [here](https://git
     Note that other PHP extensions which provide similar functionality should also be disabled for best results.
 2. Add glob patterns for non standard php file extensions to the `files.associations` setting.
 
-    For example: `files.associations: { "*.module": "php" }`.
+    For example: `"files.associations": { "*.module": "php" }`.
 3. Optionally purchase and enter your [licence key](https://intelephense.com) by either: 
     * Opening the command pallete -- `ctrl + shift + p` -- and searching for `Enter licence key`. OR 
     * Opening your **user** settings and entering it into `intelephense.licenceKey`.
