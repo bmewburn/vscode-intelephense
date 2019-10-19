@@ -25,12 +25,12 @@ const DIAGNOSTIC_CODE_DEPRECATED = 10016;
 export function createMiddleware(): IntelephenseMiddleware {
 
     const toDispose: Disposable[] = [];
-    
-    function addDiagnosticTags(diagnostics:Diagnostic[]) {
-        let d:Diagnostic;
-        for(let n = 0, l = diagnostics.length; n < l; ++n) {
+
+    function addDiagnosticTags(diagnostics: Diagnostic[]) {
+        let d: Diagnostic;
+        for (let n = 0, l = diagnostics.length; n < l; ++n) {
             d = diagnostics[n];
-            if(d.code === DIAGNOSTIC_CODE_UNUSED) {
+            if (d.code === DIAGNOSTIC_CODE_UNUSED) {
                 d.tags = [DiagnosticTag.Unnecessary];
             } else if (d.code === DIAGNOSTIC_CODE_DEPRECATED) {
                 d.tags = [DiagnosticTag.Deprecated];
@@ -39,60 +39,79 @@ export function createMiddleware(): IntelephenseMiddleware {
         return diagnostics;
     }
 
-    function mergeAssociations(intelephenseAssociations:string[]) {
-        let vscodeAssociations = workspace.getConfiguration('files').get('associations') || { };
+    function mergeAssociations(intelephenseAssociations: string[]) {
+        let vscodeConfig = workspace.getConfiguration('files');
+        if(!vscodeConfig) {
+            return intelephenseAssociations;
+        }
+        let vscodeAssociations = vscodeConfig.get('associations') || {};
         let associationsSet = new Set<string>(intelephenseAssociations);
-        for(let [key, val] of Object.entries(vscodeAssociations)) {
-            if(val === 'php') {
+        for (let [key, val] of Object.entries(vscodeAssociations)) {
+            if (val === 'php') {
                 associationsSet.add(key);
             }
         }
         return Array.from(associationsSet);
     }
 
-    function mergeExclude(intelephenseExclude:string[], resource?:string) {
-        let resourceUri:Uri;
-        if(resource) {
+    function mergeExclude(intelephenseExclude: string[], resource?: string) {
+        let resourceUri: Uri;
+        if (resource) {
             resourceUri = Uri.parse(resource);
         }
-        let vscodeExclude = workspace.getConfiguration('files', resourceUri || null).get('exclude') || { };
+        let vscodeConfig = workspace.getConfiguration('files', resourceUri || null);
+        if (!vscodeConfig) {
+            return intelephenseExclude;
+        }
+        let vscodeExclude = vscodeConfig.get('exclude') || {};
         let excludeSet = new Set<string>(intelephenseExclude);
-        for(let [key, val] of Object.entries(vscodeExclude)) {
-            if(val) {
+        for (let [key, val] of Object.entries(vscodeExclude)) {
+            if (val) {
                 excludeSet.add(key);
             }
         }
         return Array.from(excludeSet);
     }
 
+    function mergeSettings(settings: any[], configurationParams: ConfigurationParams): any[] {
+        settings.forEach((v, i) => {
+            if (v && v.files && v.files.associations) {
+                v.files.associations = mergeAssociations(v.files.associations);
+            }
+            if (v && v.files && v.files.exclude) {
+                v.files.exclude = mergeExclude(v.files.exclude, configurationParams.items[i].scopeUri);
+            }
+            if (v && v.telemetry === null) {
+                let vscodeConfig = workspace.getConfiguration('telemetry');
+                if (vscodeConfig) {
+                    v.telemetry.enabled = vscodeConfig.get('enableTelemetry', true);
+                }
+            }
+            if (v && v.diagnostics && v.diagnsotics.run === null) {
+                let vscodeConfig = workspace.getConfiguration('php.validate');
+                if (vscodeConfig) {
+                    v.diagnostics.run = vscodeConfig.get('run', 'onType');
+                }
+            }
+        });
+        return settings;
+    }
+
     let middleware = <IntelephenseMiddleware>{
         workspace: {
             configuration: (
-                params: ConfigurationParams, 
-                token: CancellationToken, 
+                params: ConfigurationParams,
+                token: CancellationToken,
                 next: RequestHandler<ConfigurationParams, any[], void>
             ) => {
-                
+
                 let result = next(params, token);
-                if(!isThenable(result)) {
-                    result = Promise.resolve(result);
+                if (!isThenable(result)) {
+                    return Array.isArray(result) ? mergeSettings(result, params): result;
                 }
 
                 return (<Thenable<any>>result).then(r => {
-                    if(Array.isArray(r)) {
-                        r.forEach((v, i) => {
-                            if(v && v.files && v.files.associations) {
-                                v.files.associations = mergeAssociations(v.files.associations);
-                            }
-                            if(v && v.files && v.files.exclude) {
-                                v.files.exclude = mergeExclude(v.files.exclude, params.items[i].scopeUri);
-                            }
-                            if(v && v.telemetry === null) {
-                                v.telemetry.enabled = workspace.getConfiguration('telemetry').get('enableTelemetry');
-                            }
-                        });
-                    }
-                    return r;
+                    return Array.isArray(result) ? mergeSettings(result, params): result;
                 });
             }
         },
