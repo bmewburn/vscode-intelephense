@@ -10,7 +10,7 @@
     "version": "1.2.3",
     "publisher": "bmewburn",
     "engines": {
-        "vscode": "^1.33.0"
+        "vscode": "^1.37.0"
     },
     "categories": [
         "Programming Languages",
@@ -261,15 +261,18 @@
                     "scope": "window"
                 },
                 "intelephense.diagnostics.run": {
-                    "type":"string",
+                    "type": "string",
                     "default": "onType",
-                    "enum":["onType", "onSave"],
+                    "enum": [
+                        "onType",
+                        "onSave"
+                    ],
                     "enumDescriptions": [
                         "Diagnostics will run as changes are made to the document.",
                         "Diagnostics will run when the document is saved."
                     ],
                     "description": "Controls when diagnostics are run.",
-                    "scope":"window"
+                    "scope": "window"
                 },
                 "intelephense.diagnostics.undefinedSymbols": {
                     "type": "boolean",
