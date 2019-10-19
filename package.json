@@ -254,6 +254,12 @@
                     "description": "The include paths (as individual path items) as defined in the include_path ini setting. Used for resolving script inclusion.",
                     "scope": "window"
                 },
+                "intelephense.environment.phpVersion": {
+                    "type": "string",
+                    "default": "7.4.0",
+                    "description": "A semver compatible string that represents the target PHP version. Used for providing version appropriate suggestions and diagnostics.",
+                    "scope": "window"
+                },
                 "intelephense.diagnostics.enable": {
                     "type": "boolean",
                     "default": true,
