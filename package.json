@@ -318,12 +318,12 @@
                 },
                 "intelephense.runtime": {
                     "type": "string",
-                    "description": "Path to a Node.js executable. Use this if you wish to control memory usage or use a newer version of Node.js. Defaults to Node.js shipped with VSCode.",
+                    "description": "Path to a Node.js executable. Use this if you wish to use a different version of Node.js. Defaults to Node.js shipped with VSCode.",
                     "scope": "machine"
                 },
                 "intelephense.maxMemory": {
                     "type": "number",
-                    "description": "Maximum memory (in MB) that the server should use. Only applicable if runtime has been set. Minimum 256. Defaults to ~1500 when using default runtime.",
+                    "description": "Maximum memory (in MB) that the server should use. On some systems this may only have effect when runtime has been set. Minimum 256.",
                     "scope": "window"
                 },
                 "intelephense.licenceKey": {
