@@ -348,6 +348,117 @@
                     "description": "Glob patterns to exclude files and folders from having symbols renamed. Rename operation will fail if references and/or definitions are found in excluded files/folders.",
                     "scope": "resource"
                 },
+                "intelephense.phpdoc.returnVoid": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Adds or omits `@return void` from auto generated phpdoc.",
+                    "scope": "window"
+                },
+                "intelephense.phpdoc.textFormat": {
+                    "type": "string",
+                    "enum": [
+                        "snippet",
+                        "text"
+                    ],
+                    "default": "snippet",
+                    "enumDescriptions": [
+                        "Auto generated phpdoc is returned in snippet format. Templates are partially resolved by evaluating phpdoc specific variables only.",
+                        "Auto generated phpdoc is returned as plain text. Templates are resolved completely by the server."
+                    ],
+                    "scope": "window"
+                },
+                "intelephense.phpdoc.classTemplate": {
+                    "type": "object",
+                    "properties": {
+                        "summary": {
+                            "type": "string",
+                            "description": "A snippet string representing a phpdoc summary."
+                        },
+                        "description": {
+                            "type": "string",
+                            "description": "A snippet string representing a phpdoc description."
+                        },
+                        "tags": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            },
+                            "description": "An array of snippet strings representing phpdoc tags."
+                        }
+                    },
+                    "default": {
+                        "summary": "$1",
+                        "tags": [
+                            "@package ${1:$SYMBOL_NAMESPACE}"
+                        ]
+                    },
+                    "description": "An object that describes the format of generated class/interface/trait phpdoc. The following snippet variables are available: SYMBOL_NAME; SYMBOL_KIND; SYMBOL_TYPE; SYMBOL_NAMESPACE.",
+                    "scope": "window"
+                },
+                "intelephense.phpdoc.propertyTemplate": {
+                    "type": "object",
+                    "properties": {
+                        "summary": {
+                            "type": "string",
+                            "description": "A snippet string representing a phpdoc summary."
+                        },
+                        "description": {
+                            "type": "string",
+                            "description": "A snippet string representing a phpdoc description."
+                        },
+                        "tags": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            },
+                            "description": "An array of snippet strings representing phpdoc tags."
+                        }
+                    },
+                    "default": {
+                        "summary": "$1",
+                        "tags": [
+                            "@var ${1:$SYMBOL_TYPE}"
+                        ]
+                    },
+                    "description": "An object that describes the format of generated property phpdoc. The following snippet variables are available: SYMBOL_NAME; SYMBOL_KIND; SYMBOL_TYPE; SYMBOL_NAMESPACE.",
+                    "scope": "window"
+                },
+                "intelephense.phpdoc.functionTemplate": {
+                    "type": "object",
+                    "properties": {
+                        "summary": {
+                            "type": "string",
+                            "description": "A snippet string representing a phpdoc summary."
+                        },
+                        "description": {
+                            "type": "string",
+                            "description": "A snippet string representing a phpdoc description."
+                        },
+                        "tags": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            },
+                            "description": "An array of snippet strings representing phpdoc tags."
+                        }
+                    },
+                    "default": {
+                        "summary": "$1",
+                        "tags": [
+                            "@param ${1:$SYMBOL_TYPE} $SYMBOL_NAME $2",
+                            "@return ${1:$SYMBOL_TYPE} $2",
+                            "@throws ${1:$SYMBOL_TYPE} $2"
+                        ]
+                    },
+                    "description": "An object that describes the format of generated function/method phpdoc. The following snippet variables are available: SYMBOL_NAME; SYMBOL_KIND; SYMBOL_TYPE; SYMBOL_NAMESPACE.",
+                    "scope": "window"
+                },
+                "intelephense.phpdoc.useFullyQualifiedNames": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Fully qualified names will be used for types when true. When false short type names will be used and imported where appropriate.",
+                    "scope": "window"
+                },
                 "intelephense.trace.server": {
                     "type": "string",
                     "enum": [
