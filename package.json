@@ -456,7 +456,7 @@
                 "intelephense.phpdoc.useFullyQualifiedNames": {
                     "type": "boolean",
                     "default": false,
-                    "description": "Fully qualified names will be used for types when true. When false short type names will be used and imported where appropriate.",
+                    "description": "Fully qualified names will be used for types when true. When false short type names will be used and imported where appropriate. Overrides intelephense.completion.insertUseDeclaration.",
                     "scope": "window"
                 },
                 "intelephense.trace.server": {
