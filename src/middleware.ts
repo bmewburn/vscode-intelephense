@@ -19,8 +19,8 @@ import {
 
 export interface IntelephenseMiddleware extends Middleware, Disposable { }
 
-const DIAGNOSTIC_CODE_UNUSED = 10010;
-const DIAGNOSTIC_CODE_DEPRECATED = 10016;
+const DIAGNOSTIC_CODE_UNUSED = 1003;
+const DIAGNOSTIC_CODE_DEPRECATED = 1007;
 
 export function createMiddleware(): IntelephenseMiddleware {
 
@@ -87,7 +87,7 @@ export function createMiddleware(): IntelephenseMiddleware {
                     v.telemetry.enabled = vscodeConfig.get('enableTelemetry', true);
                 }
             }
-            if (v && v.diagnostics && v.diagnsotics.run === null) {
+            if (v && v.diagnostics && v.diagnostics.run === null) {
                 let vscodeConfig = workspace.getConfiguration('php.validate');
                 if (vscodeConfig) {
                     v.diagnostics.run = vscodeConfig.get('run', 'onType');
