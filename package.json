@@ -292,10 +292,10 @@
                     "description": "Enables unused variable, private member, and import diagnostics.",
                     "scope": "window"
                 },
-                "intelephense.diagnostics.parseErrors": {
+                "intelephense.diagnostics.unexpectedTokens": {
                     "type": "boolean",
                     "default": true,
-                    "description": "Enables parse error diagnostics.",
+                    "description": "Enables unexpected token diagnostics.",
                     "scope": "window"
                 },
                 "intelephense.diagnostics.duplicateSymbols": {
@@ -310,10 +310,16 @@
                     "description": "Enables argument count diagnostics.",
                     "scope": "window"
                 },
-                "intelephense.diagnostics.typeDeclarations": {
+                "intelephense.diagnostics.typeErrors": {
                     "type": "boolean",
                     "default": true,
                     "description": "Enables diagnostics on type compatibility of arguments, property assignments, and return statements where types have been declared.",
+                    "scope": "window"
+                },
+                "intelephense.diagnostics.deprecated": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enables deprecated diagnostics.",
                     "scope": "window"
                 },
                 "intelephense.runtime": {
