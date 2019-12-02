@@ -11,7 +11,8 @@ import {
 	LanguageClient, LanguageClientOptions, ServerOptions,
 	TransportKind,
 	NotificationType,
-	RequestType
+    RequestType,
+    RevealOutputChannelOn
 } from 'vscode-languageclient';
 import { createMiddleware, IntelephenseMiddleware } from './middleware';
 import * as fs from 'fs-extra';
@@ -145,7 +146,8 @@ function createClient(context:ExtensionContext, middleware:IntelephenseMiddlewar
 			{ language: PHP_LANGUAGE_ID, scheme: 'file' },
 			{ language: PHP_LANGUAGE_ID, scheme: 'untitled' }
 		],
-		initializationOptions: initializationOptions,
+        initializationOptions: initializationOptions,
+        revealOutputChannelOn: RevealOutputChannelOn.Never,
 		middleware: middleware
 	}
 
