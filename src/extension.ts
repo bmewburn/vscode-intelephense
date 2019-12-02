@@ -166,17 +166,17 @@ function showStartMessage(context: ExtensionContext) {
 		key = intelephenseConfig.get('licenceKey');
 	}
 	const lastVersion = context.globalState.get<string>(globalVersionMementoKey);
-	const open = 'Open';
+	const go = 'Go';
 	const dismiss = 'Dismiss';
 	if (key || (lastVersion && !semver.lt(lastVersion, VERSION))) {
 		return;
 	}
 	window.showInformationMessage(
-		`Intelephense updated to ${VERSION}.\nClick 'Open' to read about the latest features and fixes.`,
-		open, 
+		`Intelephense updated to ${VERSION}.\nAccess other great features at https://intelephense.com.`,
+		go, 
 		dismiss
 	).then(value => {
-		if(value === open) {
+		if(value === go) {
 			env.openExternal(Uri.parse('https://intelephense.com'));
 		} else {
 			context.globalState.update(globalVersionMementoKey, VERSION);
