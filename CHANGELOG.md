@@ -8,6 +8,7 @@
 - Arrow function return type always void.
 - Javascript completion not working.
 - Union type comparison always failing.
+- unary + and - expr should return specific type if possible.
 
 ## [1.3.0 - 2019-12-03]
 
