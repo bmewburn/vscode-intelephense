@@ -11,3 +11,4 @@ webpack.config.js
 **/*.ts
 .git/**
 node_modules/!(intelephense)/**
+!node_modules/intelephense/lib/*.d.ts
