@@ -11,13 +11,14 @@ import {
 	LanguageClient, LanguageClientOptions, ServerOptions,
 	TransportKind,
 	NotificationType,
-	RequestType
+    RequestType,
+    RevealOutputChannelOn
 } from 'vscode-languageclient';
 import { createMiddleware, IntelephenseMiddleware } from './middleware';
 import * as fs from 'fs-extra';
 
 const PHP_LANGUAGE_ID = 'php';
-const VERSION = '1.2.3';
+const VERSION = '1.3.0';
 const INDEXING_STARTED_NOTIFICATION = new NotificationType('indexingStarted');
 const INDEXING_ENDED_NOTIFICATION = new NotificationType('indexingEnded');
 const CANCEL_INDEXING_REQUEST = new RequestType('cancelIndexing');
@@ -69,7 +70,7 @@ export async function activate(context: ExtensionContext) {
 	let clearCache = false;
 	context.workspaceState.update('version', VERSION);
 
-	if (!versionMemento || (semver.lt(versionMemento, VERSION))) {
+	if (!versionMemento || (semver.neq(versionMemento, VERSION))) {
 		try {
 			await fs.remove(context.storagePath);
 		} catch (e) {
@@ -79,10 +80,7 @@ export async function activate(context: ExtensionContext) {
 		clearCache = true;
 	}
 
-	middleware = createMiddleware(() => {
-		return languageClient;
-	});
-
+	middleware = createMiddleware();
 	languageClient = createClient(context, middleware, clearCache);
 	
 	let indexWorkspaceCmdDisposable = commands.registerCommand(INDEX_WORKSPACE_CMD_NAME, indexWorkspace);
@@ -148,7 +146,8 @@ function createClient(context:ExtensionContext, middleware:IntelephenseMiddlewar
 			{ language: PHP_LANGUAGE_ID, scheme: 'file' },
 			{ language: PHP_LANGUAGE_ID, scheme: 'untitled' }
 		],
-		initializationOptions: initializationOptions,
+        initializationOptions: initializationOptions,
+        revealOutputChannelOn: RevealOutputChannelOn.Never,
 		middleware: middleware
 	}
 
@@ -175,7 +174,7 @@ function showStartMessage(context: ExtensionContext) {
 		return;
 	}
 	window.showInformationMessage(
-		`Intelephense updated to ${VERSION}.\nClick 'Open' to read about the latest features and fixes.`,
+		`Intelephense updated to ${VERSION}.\nAccess other great features at https://intelephense.com.`,
 		open, 
 		dismiss
 	).then(value => {
