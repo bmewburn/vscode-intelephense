@@ -70,7 +70,7 @@ export async function activate(context: ExtensionContext) {
 	let clearCache = false;
 	context.workspaceState.update('version', VERSION);
 
-	if (!versionMemento || (semver.lt(versionMemento, VERSION))) {
+	if (!versionMemento || (semver.neq(versionMemento, VERSION))) {
 		try {
 			await fs.remove(context.storagePath);
 		} catch (e) {
