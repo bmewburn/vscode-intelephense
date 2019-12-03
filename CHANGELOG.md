@@ -1,5 +1,14 @@
 # Change Log
 
+## [1.3.1 - 2019-12-04]
+
+#### Fixed
+- False undefined methods when `__call` and/or `__callStatic` is implemented.
+- Arrow functions failing to parse correctly when defined in argument lists.
+- Arrow function return type always void.
+- Javascript completion not working.
+- Union type comparison always failing.
+
 ## [1.3.0 - 2019-12-03]
 
 #### Added
