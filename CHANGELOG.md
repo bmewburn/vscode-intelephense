@@ -6,14 +6,16 @@
 - Relaxed type checking so that it behaves as in 1.2.
 - Moved licence key storage from config to global memento.
 - Unused catch clause variable diagnostic suppressed.
+- removed interbase, wddx, recode from default stubs.
+- Changed default file exclude pattern to `**/vendor/**/{Tests,tests}/**` to not exclude frmaework test classes.
 
 #### Fixed
 - False undefined var in arrow functions.
 - phpstorm meta not working when map contains empty string key.
-- variable type lost when in conditionals.
+- variable type lost when in single if statements.
 - False type error expected type callable. Found callable.
 - Types not assigned in short array destructure syntax.
-- Type inference breaking in logical expression type guards.
+- Type inference breaking in logical and/or expression type guards.
 - Type inference breaking in yoda conditions.
 - Flashing diagnostics in problem tab.
 - HTML/JS/CSS language intelligence not working in some files.
