@@ -1,5 +1,24 @@
 # Change Log
 
+## [1.3.2 - 2019-12-06]
+
+#### Changed
+- Relaxed type checking so that it behaves as in 1.2.
+- Moved licence key storage from config to global memento.
+- Unused catch clause variable diagnostic suppressed.
+
+#### Fixed
+- False undefined var in arrow functions.
+- phpstorm meta not working when map contains empty string key.
+- variable type lost when in conditionals.
+- False type error expected type callable. Found callable.
+- Types not assigned in short array destructure syntax.
+- Type inference breaking in logical expression type guards.
+- Type inference breaking in yoda conditions.
+- Flashing diagnostics in problem tab.
+- HTML/JS/CSS language intelligence not working in some files.
+- Phpdoc completion above variable creating function docblock.
+
 ## [1.3.1 - 2019-12-04]
 
 #### Fixed
