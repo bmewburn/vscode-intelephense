@@ -25,6 +25,7 @@ const CANCEL_INDEXING_REQUEST = new RequestType('cancelIndexing');
 const INDEX_WORKSPACE_CMD_NAME = 'intelephense.index.workspace';
 const CANCEL_INDEXING_CMD_NAME = 'intelephense.cancel.indexing';
 const ENTER_KEY_CMD_NAME = 'intelephense.enter.key';
+const LICENCE_MEMENTO_KEY = 'intelephense.licence.key';
 
 let languageClient: LanguageClient;
 let extensionContext: ExtensionContext;
@@ -32,6 +33,8 @@ let middleware:IntelephenseMiddleware;
 let clientDisposable:Disposable;
 
 export async function activate(context: ExtensionContext) {
+
+    await moveKeyToGlobalMemento(context);
 
 	languages.setLanguageConfiguration('php', {
 		wordPattern: /(-?\d*\.\d\w*)|([^\-\`\~\!\@\#\%\^\&\*\(\)\=\+\[\{\]\}\\\|\;\:\'\"\,\.\<\>\/\?\s]+)/g,
@@ -85,7 +88,7 @@ export async function activate(context: ExtensionContext) {
 	
 	let indexWorkspaceCmdDisposable = commands.registerCommand(INDEX_WORKSPACE_CMD_NAME, indexWorkspace);
 	let cancelIndexingCmdDisposable = commands.registerCommand(CANCEL_INDEXING_CMD_NAME, cancelIndexing);
-	let enterKeyCmdDisposable = commands.registerCommand(ENTER_KEY_CMD_NAME, enterLicenceKey)
+	let enterKeyCmdDisposable = commands.registerCommand(ENTER_KEY_CMD_NAME, () => enterLicenceKey(context));
 
 	//push disposables
 	context.subscriptions.push(
@@ -136,7 +139,8 @@ function createClient(context:ExtensionContext, middleware:IntelephenseMiddlewar
 	let initializationOptions = {
 		storagePath: context.storagePath,
 		clearCache: clearCache,
-		globalStoragePath: context.globalStoragePath,
+        globalStoragePath: context.globalStoragePath,
+        licenceKey: context.globalState.get<string>(LICENCE_MEMENTO_KEY),
 		isVscode: true
 	};
 
@@ -162,11 +166,7 @@ function createClient(context:ExtensionContext, middleware:IntelephenseMiddlewar
 
 function showStartMessage(context: ExtensionContext) {
 	const globalVersionMementoKey = 'intelephenseVersion';
-	let key:string|undefined;
-	let intelephenseConfig = workspace.getConfiguration('intelephense');
-	if(intelephenseConfig) {
-		key = intelephenseConfig.get('licenceKey');
-	}
+	let key = context.globalState.get<string>(LICENCE_MEMENTO_KEY);
 	const lastVersion = context.globalState.get<string>(globalVersionMementoKey);
 	const open = 'Open';
 	const dismiss = 'Dismiss';
@@ -208,9 +208,9 @@ function cancelIndexing() {
 	languageClient.sendRequest(CANCEL_INDEXING_REQUEST.method);
 }
 
-function enterLicenceKey() {
+function enterLicenceKey(context:ExtensionContext) {
 	
-	let currentValue = workspace.getConfiguration('intelephense').get<string>('licenceKey', '');
+	let currentValue = context.globalState.get<string>(LICENCE_MEMENTO_KEY);
 	let options:InputBoxOptions = {
 		prompt: 'Intelephense Licence Key',
 		ignoreFocusOut: true,
@@ -227,9 +227,16 @@ function enterLicenceKey() {
 		options.value = currentValue;
 	}
 
-	window.showInputBox(options).then(key => {
+	window.showInputBox(options).then(async key => {
 		if(key !== undefined) {
-			workspace.getConfiguration('intelephense').update('licenceKey', key, ConfigurationTarget.Global);
+            await context.globalState.update(LICENCE_MEMENTO_KEY, key);
+            //restart
+            if(languageClient && clientDisposable) {
+                await languageClient.stop();
+                clientDisposable.dispose();
+                languageClient = createClient(extensionContext, middleware, true);
+                clientDisposable = languageClient.start();
+            }
 		}
 	});
 }
@@ -250,4 +257,21 @@ function registerNotificationListeners() {
 		}
 		resolveIndexingPromise = undefined;
 	});
+}
+
+async function moveKeyToGlobalMemento(context:ExtensionContext)
+{
+    let section = workspace.getConfiguration('intelephense');
+    let keyFromConfig = section ? section.get('licenceKey') : undefined;
+    if (!keyFromConfig) {
+        return;
+    }
+
+    let keyFromMemento = context.globalState.get<string>(LICENCE_MEMENTO_KEY);
+    if(keyFromMemento) {
+        return;
+    }
+
+    await context.globalState.update(LICENCE_MEMENTO_KEY, keyFromConfig);
+    await section.update('licenceKey', undefined, ConfigurationTarget.Global);
 }
