@@ -269,6 +269,7 @@
                             "win32service",
                             "winbinder",
                             "wincache",
+                            "wordpress",
                             "xcache",
                             "xdebug",
                             "xhprof",
