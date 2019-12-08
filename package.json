@@ -441,7 +441,43 @@
                 "intelephense.diagnostics.undefinedSymbols": {
                     "type": "boolean",
                     "default": true,
-                    "description": "Enables undefined type, member, function, constant and variable diagnostics.",
+                    "description": "DEPRECATED. Use the setting for each symbol category.",
+                    "scope": "window"
+                },
+                "intelephense.diagnostics.undefinedVariables": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enables undefined variable diagnostics.",
+                    "scope": "window"
+                },
+                "intelephense.diagnostics.undefinedTypes": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enables undefined class, interface and trait diagnostics.",
+                    "scope": "window"
+                },
+                "intelephense.diagnostics.undefinedFunctions": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enables undefined function diagnostics.",
+                    "scope": "window"
+                },
+                "intelephense.diagnostics.undefinedConstants": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enables undefined constant diagnostics.",
+                    "scope": "window"
+                },
+                "intelephense.diagnostics.undefinedClassConstants": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enables undefined class constant diagnostics.",
+                    "scope": "window"
+                },
+                "intelephense.diagnostics.undefinedMethods": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enables undefined method diagnostics.",
                     "scope": "window"
                 },
                 "intelephense.diagnostics.unusedSymbols": {
