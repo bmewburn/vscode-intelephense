@@ -1,5 +1,26 @@
 # Change Log
 
+## [1.3.3 - 2019-12-10]
+
+#### Added
+
+- Config to enable/disable each of undefined types, functions, constants, methods, class constants, properties.
+- Config to enable/disable embedded language diagnostics.
+- Wordpress stubs which can be activated by adding `wordpress` to `intelephense.stubs`.
+
+#### Changed
+- Relaxed undefined method diagnostics when calling methods from within traits.
+- Relaxed undefined method diagnostics when mixed or object forms part of a union type.
+- Relaxed import undefined symbol diagnostics.
+
+#### Fixed
+- Duplicate type, function, constant completion suggestions when multiple symbol definitions are found in workspace
+- Signature help and argument type checking for built in function that have multiple signatures eg session_set_save_handler.
+- Variable has void type after used in ternary expression.
+- Variables losing original type after instanceof expr in conditions.
+- False unused variable when used in short form closure.
+- Variable type not inferred when it is an arg of a function call inside a short form closure.
+
 ## [1.3.2 - 2019-12-06]
 
 #### Changed
