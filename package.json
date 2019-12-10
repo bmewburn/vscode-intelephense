@@ -438,6 +438,12 @@
                     "description": "Controls when diagnostics are run.",
                     "scope": "window"
                 },
+                "intelephense.diagnostics.embeddedLanguages": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enables diagnostics in embedded languages.",
+                    "scope": "window"
+                },
                 "intelephense.diagnostics.undefinedSymbols": {
                     "type": "boolean",
                     "default": true,
@@ -478,6 +484,12 @@
                     "type": "boolean",
                     "default": true,
                     "description": "Enables undefined method diagnostics.",
+                    "scope": "window"
+                },
+                "intelephense.diagnostics.undefinedProperties": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enables undefined static property diagnostics.",
                     "scope": "window"
                 },
                 "intelephense.diagnostics.unusedSymbols": {
