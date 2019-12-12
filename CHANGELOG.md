@@ -1,5 +1,21 @@
 # Change Log
 
+## [1.3.4 - 2019-12-13]
+
+#### Changed
+- Parser is now backwards compatible regarding PHP 7.4 fn keyword.
+- Type hinting `/** @var Foo */` above variable and property assignments now works without variable name as well.
+
+#### Fixed
+- Stray backslash breaking type inference when using phpstorm metadata overrides.
+- Variables declared in conditional blocks missing from completion suggestions.
+- Don't assign unset type to variables and properties from unset vars. Assign mixed instead.
+- Argument type check not working at times for functions with multiple signatures.
+- Ctrl hover on phpdoc reference underlines whole doc block.
+- Don't type check undefined variables. Fixes issue when using extract.
+- Performance issue when running diagnostics on open files.
+- various read prop of undefined errors.
+
 ## [1.3.3 - 2019-12-10]
 
 #### Added
