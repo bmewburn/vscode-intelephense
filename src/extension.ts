@@ -18,7 +18,7 @@ import { createMiddleware, IntelephenseMiddleware } from './middleware';
 import * as fs from 'fs-extra';
 
 const PHP_LANGUAGE_ID = 'php';
-const VERSION = '1.3.3';
+const VERSION = '1.3.4';
 const INDEXING_STARTED_NOTIFICATION = new NotificationType('indexingStarted');
 const INDEXING_ENDED_NOTIFICATION = new NotificationType('indexingEnded');
 const CANCEL_INDEXING_REQUEST = new RequestType('cancelIndexing');
