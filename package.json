@@ -19,7 +19,8 @@
     ],
     "preview": false,
     "activationEvents": [
-        "onLanguage:php"
+        "onLanguage:php",
+        "onCommand:intelephense.enter.key"
     ],
     "keywords": [
         "php",
@@ -85,8 +86,7 @@
                     "when": "resourceLangId == php"
                 },
                 {
-                    "command": "intelephense.enter.key",
-                    "when": "resourceLangId == php"
+                    "command": "intelephense.enter.key"
                 }
             ]
         },
