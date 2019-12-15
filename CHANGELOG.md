@@ -1,5 +1,29 @@
 # Change Log
 
+## [1.3.5 - 2019-12-16]
+
+#### Changed
+- `define`d constants now show `define(NAME, VALUE);` in hover signature instead of `const`.
+- Constants now have `@var` annotation noting type.
+- Short names now used in documentation signatures.
+- Documentation function/methods signatures only wrap when they have more than 3 parameters.
+- Added activation event on enter licence key command.
+
+#### Fixed
+- Regression with type inference giving void type after last update.
+- Fixed problem when lexing double quoted strings that start with curly open.
+- Only first clode block highlighted on hover.
+- Undefined type when referencing parent in trait.
+- Use http proxy when activating licence.
+- Function overloads lost when restoring from cache.
+- phpdoc generation showing `@throws mixed`
+- PSR-12 formatting fixes.
+- Mixed php/html formatting fixes.
+- Unsued symbol not showing when there is a class and function with same name.
+- constructor hover param types different to method hover param types.
+- Invalid return type shown for nullable types in method documentation signature.
+- Trailing comma in `isset` and `unset`.
+
 ## [1.3.4 - 2019-12-13]
 
 #### Changed
