@@ -309,6 +309,7 @@
                         "FFI",
                         "fileinfo",
                         "filter",
+                        "fpm",
                         "ftp",
                         "gd",
                         "gettext",
@@ -360,6 +361,7 @@
                         "xmlrpc",
                         "xmlwriter",
                         "xsl",
+                        "Zend OPcache",
                         "zip",
                         "zlib"
                     ],
