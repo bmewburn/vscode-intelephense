@@ -294,6 +294,7 @@
                         ]
                     },
                     "default": [
+                        "apache",
                         "bcmath",
                         "bz2",
                         "calendar",
