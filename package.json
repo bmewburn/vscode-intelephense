@@ -321,6 +321,7 @@
                         "ldap",
                         "libxml",
                         "mbstring",
+                        "meta",
                         "mysqli",
                         "oci8",
                         "odbc",
