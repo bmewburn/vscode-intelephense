@@ -1,5 +1,19 @@
 # Change Log
 
+## [1.3.6 - 2019-12-18]
+
+#### Changed
+- Set default stubs to match current bundled php 7.4 extensions.
+- Some more hover/completion documentation polish.
+
+#### Fixed
+- Memory leak where large strings were retained.
+- Html/php formatting incorrectly adding large indents.
+- Functions imported using group clause syntax being marked as undefined.
+- Multiple `@` not being replaced in phpstorm metadata maps.
+- Variable hover/completion sometimes showing doc from wrong variable.
+- Overloaded functions getting lost when restoring from cache.
+
 ## [1.3.5 - 2019-12-16]
 
 #### Changed
