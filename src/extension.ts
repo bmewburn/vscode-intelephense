@@ -5,6 +5,10 @@
 
 import * as path from 'path';
 import * as semver from 'semver';
+import * as https from 'https';
+import * as querystring from 'querystring';
+import { createHash } from 'crypto';
+import * as os from 'os';
 
 import { ExtensionContext, window, commands, workspace, Disposable, languages, IndentAction, env, Uri, ConfigurationTarget, InputBoxOptions } from 'vscode';
 import {
@@ -230,6 +234,16 @@ function enterLicenceKey(context:ExtensionContext) {
 	window.showInputBox(options).then(async key => {
 		if(key !== undefined) {
             await context.globalState.update(LICENCE_MEMENTO_KEY, key);
+
+            if(key) {
+                try {
+                    await activateKey(context, key);
+                    window.showInformationMessage('Your Intelephense licence key has been activated.');
+                } catch (e) {
+                    window.showErrorMessage('Key could not be activated at this time. Please contact support.');
+                }
+            }
+            
             //restart
             if(languageClient && clientDisposable) {
                 await languageClient.stop();
@@ -274,4 +288,50 @@ async function moveKeyToGlobalMemento(context:ExtensionContext)
 
     await context.globalState.update(LICENCE_MEMENTO_KEY, keyFromConfig);
     await section.update('licenceKey', undefined, ConfigurationTarget.Global);
+}
+
+function activateKey(context: ExtensionContext, licenceKey: string): Promise<void> {
+
+    let postData = querystring.stringify({
+        machineId: createHash('sha256').update(os.homedir(), 'utf8').digest('hex'),
+        licenceKey: licenceKey
+    });
+
+    let options: https.RequestOptions = {
+        hostname: 'intelephense.com',
+        port: 443,
+        path: '/activate',
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Content-Length': postData.length
+        }
+    };
+
+    return new Promise((resolve, reject) => {
+        let responseBody: string = '';
+
+        let req = https.request(options, res => {
+
+            res.on('data', chunk => {
+                responseBody += chunk.toString();
+            });
+
+            res.on('end', () => {
+                if (res.statusCode === 200) {
+                    let filepath = path.join(context.globalStoragePath, 'intelephense_licence_key_' + licenceKey);
+                    fs.writeFile(filepath, responseBody).then(resolve, reject);
+                } else {
+                    reject(new Error('Failed to activate key'));
+                }
+            });
+
+            res.on('error', reject);
+        });
+
+        req.write(postData);
+        req.on('error', reject);
+        req.end();
+    });
+
 }
