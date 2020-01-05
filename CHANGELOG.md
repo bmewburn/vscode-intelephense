@@ -1,5 +1,25 @@
 # Change Log
 
+#### [1.3.7 - 2020-01-06]
+
+#### Changed
+- Updated stubs
+
+#### Fixed
+- Switch statements not folding
+- False undefined symbol for dynamic static function call
+- No hover for methods named `toString`.
+- Go to def when there are multiple class and methods with same name.
+- False unused variable when passed by ref.
+- Show diagnostic for all instances of an unused variable.
+- Show parse errors for use declarations, namespace definitons and const not in top statment list. 
+And function, trait, class, interface declarations not in inner statement list.
+- Handle overloaded methods.
+- Read prop of undefined error when indexing metadata.
+- De-dupe member completion suggestions.
+- Suppress false embedded language diagnostics.
+- Licence activation with proxy.
+
 ## [1.3.6 - 2019-12-18]
 
 #### Changed
