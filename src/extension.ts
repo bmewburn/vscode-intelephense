@@ -22,7 +22,7 @@ import { createMiddleware, IntelephenseMiddleware } from './middleware';
 import * as fs from 'fs-extra';
 
 const PHP_LANGUAGE_ID = 'php';
-const VERSION = '1.3.6';
+const VERSION = '1.3.7';
 const INDEXING_STARTED_NOTIFICATION = new NotificationType('indexingStarted');
 const INDEXING_ENDED_NOTIFICATION = new NotificationType('indexingEnded');
 const CANCEL_INDEXING_REQUEST = new RequestType('cancelIndexing');
@@ -240,6 +240,7 @@ function enterLicenceKey(context:ExtensionContext) {
                     await activateKey(context, key);
                     window.showInformationMessage('Your Intelephense licence key has been activated.');
                 } catch (e) {
+                    console.log(e);
                     window.showErrorMessage('Key could not be activated at this time. Please contact support.');
                 }
             }
