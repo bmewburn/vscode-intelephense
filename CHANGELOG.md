@@ -1,5 +1,30 @@
 # Change Log
 
+#### [1.3.8 - 2020-01-27]
+
+#### Added
+- Bottom type `exit` 
+
+#### Changed
+- Updated stubs.
+- Imports no longer shown in outline or document symbol search.
+
+#### Fixed
+- Problem with `$this` and `static` return types and inheritance.
+- Completion call chaining with `__invoke`.
+- Incorrect variable types in completions
+- Logical `&&` type guards with negated operand.
+- Metadata override map types parsed incorrectly.
+- Variables of type `bool` become `void` after type guard.
+- False type error for functions that throw exception or exit.
+- Element of `array` should be `mixed`.
+- Array of `array` should be `array` not `array[]`.
+- Removed phpstorm stubs helper symbols.
+- Auto phpdoc using type template instead of property template.
+- Private method used in callable array marked as unused.
+- Wrong type when using array access on variable with type `static`.
+- Auto phpdoc useFullyQualifiedNames not producing correct short names when false.
+
 #### [1.3.7 - 2020-01-06]
 
 #### Changed
