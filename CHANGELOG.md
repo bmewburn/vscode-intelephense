@@ -24,6 +24,7 @@
 - Private method used in callable array marked as unused.
 - Wrong type when using array access on variable with type `static`.
 - Auto phpdoc useFullyQualifiedNames not producing correct short names when false.
+- Auto phpdoc for constructors.
 
 #### [1.3.7 - 2020-01-06]
 
