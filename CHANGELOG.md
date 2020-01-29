@@ -1,6 +1,11 @@
 # Change Log
 
-#### [1.3.8 - 2020-01-27]
+## [1.3.9 - 2020-01-30]
+
+#### Fixed
+- Cannot read `name` of undefined.
+
+## [1.3.8 - 2020-01-27]
 
 #### Added
 - Bottom type `exit` 
@@ -26,7 +31,7 @@
 - Auto phpdoc useFullyQualifiedNames not producing correct short names when false.
 - Auto phpdoc for constructors.
 
-#### [1.3.7 - 2020-01-06]
+## [1.3.7 - 2020-01-06]
 
 #### Changed
 - Updated stubs
