@@ -1,5 +1,13 @@
 # Change Log
 
+## [1.3.10 - 2020-02-13]
+
+#### Fixed
+- Variable assignments in type guards.
+- Instanceof typeguard should preserve existing type where appropriate.
+- isIncomplete flag not getting set for member completions.
+- Files getting closed prematurely when deleted from disk but still open in editor.
+
 ## [1.3.9 - 2020-01-30]
 
 #### Fixed
