@@ -1,5 +1,13 @@
 # Change Log
 
+## [1.3.11 - 2020-02-15]
+
+#### Changed
+- Updated stubs.
+
+#### Fixed
+- Crash when reading state from cache.
+
 ## [1.3.10 - 2020-02-13]
 
 #### Fixed
