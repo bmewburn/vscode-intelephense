@@ -399,6 +399,22 @@
                     "description": "Enables formatting.",
                     "scope": "window"
                 },
+                "intelephense.format.braces": {
+                    "type": "string",
+                    "default": "psr12",
+                    "enum": [
+                        "psr12",
+                        "allman",
+                        "k&r"
+                    ],
+                    "enumDescriptions": [
+                        "PHP-FIG PSR-2 and PSR-12 style. A mix of Allman and K&R",
+                        "Allman. Opening brace on the next line.",
+                        "K&R (1TBS). Opening brace on the same line."
+                    ],
+                    "description": "Controls formatting style of braces",
+                    "scope": "window"
+                },
                 "intelephense.environment.documentRoot": {
                     "type": "string",
                     "description": "The directory of the entry point to the application (index.php). Defaults to the first workspace folder. Used for resolving script inclusion.",
