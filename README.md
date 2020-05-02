@@ -36,9 +36,9 @@ The language server (intelephense) is proprietary. Please see [here](https://git
     
     * Go to `Extensions`.
     * Search for `@builtin php`
-    * Disable `PHP Language Features`.
+    * Disable `PHP Language Features`. Leave `PHP Language Basics` enabled for syntax highlighting.
 
-    Note that other PHP extensions which provide similar functionality should also be disabled for best results.
+    Note that other (3rd party) PHP extensions which provide similar functionality should also be disabled for best results.
 2. Add glob patterns for non standard php file extensions to the `files.associations` setting.
 
     For example: `"files.associations": { "*.module": "php" }`.
