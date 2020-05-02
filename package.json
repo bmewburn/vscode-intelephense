@@ -434,6 +434,12 @@
                     "description": "A semver compatible string that represents the target PHP version. Used for providing version appropriate suggestions and diagnostics.",
                     "scope": "window"
                 },
+                "intelephense.environment.shortOpenTag": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "When enabled '<?' will be parsed as a PHP open tag. Defaults to false.",
+                    "scope": "window"
+                },
                 "intelephense.diagnostics.enable": {
                     "type": "boolean",
                     "default": true,
