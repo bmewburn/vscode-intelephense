@@ -19,25 +19,9 @@ import {
 
 export interface IntelephenseMiddleware extends Middleware, Disposable { }
 
-const DIAGNOSTIC_CODE_UNUSED = 1003;
-const DIAGNOSTIC_CODE_DEPRECATED = 1007;
-
 export function createMiddleware(): IntelephenseMiddleware {
 
     const toDispose: Disposable[] = [];
-
-    function addDiagnosticTags(diagnostics: Diagnostic[]) {
-        let d: Diagnostic;
-        for (let n = 0, l = diagnostics.length; n < l; ++n) {
-            d = diagnostics[n];
-            if (d.code === DIAGNOSTIC_CODE_UNUSED) {
-                d.tags = [DiagnosticTag.Unnecessary];
-            } else if (d.code === DIAGNOSTIC_CODE_DEPRECATED) {
-                d.tags = [DiagnosticTag.Deprecated];
-            }
-        }
-        return diagnostics;
-    }
 
     function mergeAssociations(intelephenseAssociations: string[]) {
         let vscodeConfig = workspace.getConfiguration('files');
@@ -114,10 +98,6 @@ export function createMiddleware(): IntelephenseMiddleware {
                     return Array.isArray(result) ? mergeSettings(result, params): result;
                 });
             }
-        },
-
-        handleDiagnostics: (uri: Uri, diagnostics: Diagnostic[], next: HandleDiagnosticsSignature) => {
-            next(uri, addDiagnosticTags(diagnostics));
         },
 
         dispose: Disposable.from(...toDispose).dispose
