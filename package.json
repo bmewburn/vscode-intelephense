@@ -103,7 +103,7 @@
                 "intelephense.compatibility.correctForArrayAccessArrayAndTraversableArrayUnionTypes": {
                     "type": "boolean",
                     "default": true,
-                    "description": "Resolves `ArrayAccess`, `Iterator` and `IteratorAggregate` implementations that are unioned with a typed array to generic syntax. eg `ArrayAccessOrTraversable|ElementType[]` => `ArrayAccessOrTraversable<mixed, ElementType>`.",
+                    "description": "Resolves `ArrayAccess` and `Traversable` implementations that are unioned with a typed array to generic syntax. eg `ArrayAccessOrTraversable|ElementType[]` => `ArrayAccessOrTraversable<mixed, ElementType>`.",
                     "scope": "window"
                 },
                 "intelephense.files.maxSize": {
@@ -561,6 +561,12 @@
                     "type": "boolean",
                     "default": true,
                     "description": "Enables deprecated diagnostics.",
+                    "scope": "window"
+                },
+                "intelephense.diagnostics.languageConstraints": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enables reporting of various language constraint errors.",
                     "scope": "window"
                 },
                 "intelephense.runtime": {
