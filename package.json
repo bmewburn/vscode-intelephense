@@ -579,7 +579,18 @@
                     "default": [
                         "**/vendor/**"
                     ],
-                    "description": "Glob patterns to exclude files and folders from having symbols renamed. Rename operation will fail if references and/or definitions are found in excluded files/folders.",
+                    "description": "Glob patterns matching files and folders that should be excluded when renaming symbols. Rename operation will fail if the symbol definition is found in the excluded files/folders.",
+                    "scope": "resource"
+                },
+                "intelephense.references.exclude": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "default": [
+                        "**/vendor/**"
+                    ],
+                    "description": "Glob patterns matching files and folders that should be excluded from references search.",
                     "scope": "resource"
                 },
                 "intelephense.phpdoc.returnVoid": {
