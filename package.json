@@ -596,7 +596,7 @@
                 "intelephense.phpdoc.returnVoid": {
                     "type": "boolean",
                     "default": true,
-                    "description": "Adds or omits `@return void` from auto generated phpdoc.",
+                    "description": "Adds `@return void` to auto generated phpdoc for definitions that do not return a value.",
                     "scope": "window"
                 },
                 "intelephense.phpdoc.textFormat": {
