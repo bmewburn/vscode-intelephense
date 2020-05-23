@@ -134,7 +134,8 @@
                         "**/.DS_Store/**",
                         "**/node_modules/**",
                         "**/bower_components/**",
-                        "**/vendor/**/{Tests,tests}/**"
+                        "**/vendor/**/{Tests,tests}/**",
+                        "**/.history/**"
                     ],
                     "description": "Configure glob patterns to exclude certain files and folders from all language server features. Inherits from files.exclude.",
                     "scope": "resource"
