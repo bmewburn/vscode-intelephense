@@ -94,6 +94,18 @@
             "type": "object",
             "title": "intelephense",
             "properties": {
+                "intelephense.compatibility.correctForBaseClassStaticUnionTypes": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Resolves `BaseClass|static` union types to `static` instead of `BaseClass`.",
+                    "scope": "window"
+                },
+                "intelephense.compatibility.correctForArrayAccessArrayAndTraversableArrayUnionTypes": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Resolves `ArrayAccess`, `Iterator` and `IteratorAggregate` implementations that are unioned with a typed array to generic syntax. eg `ArrayAccessOrTraversable|ElementType[]` => `ArrayAccessOrTraversable<mixed, ElementType>`.",
+                    "scope": "window"
+                },
                 "intelephense.files.maxSize": {
                     "type": "number",
                     "default": 1000000,
