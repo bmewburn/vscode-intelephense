@@ -1,5 +1,45 @@
 # Change Log
 
+## [1.4.0 - TBA]
+
+#### Added
+- Compatibility settings to enable working with some common type annotations that may not accurately reflect intended type.
+
+    * `intelephense.compatibility.correctForBaseClassStaticUnionTypes` resolves `BaseClass|static` to `static` instead of `BaseClass`.
+    * `intelephense.compatibility.correctForArrayAccessArrayAndTraversableArrayUnionTypes` resolves `ArrayAccessOrTraversable|ElementType[]` to `ArrayAccessOrTraversable<mixed, ElementType>`.
+
+- Added settings to control formatting of braces. Options are `psr12`, `allman`, `k&r`.
+- Go to definition and references for callable strings.
+- Completion suggestions marked with deprecated tag where appropriate.
+- Language constraint and version dependent (5.3+) diagnostics. Can be controlled with `intelephense.diagnostics.languageConstraints`.
+- Short open tag setting `intelephense.environment.shortOpenTag`. Defaults to `false`.
+- Added wordpress globals to built-in stubs.
+- Implemented smart select - `textDocument/SelectionRange`. **PREMIUM**
+
+#### Changed
+- Unions with `mixed` resolve to `mixed`. Previously the other types in the union were preserved.
+- Updated stubs.
+- Added `**/.history/**` to `intelephense.files.exclude` default.
+- Upgraded to node language server 6.
+
+#### Fixed
+- No space after `use` when formatting.
+- Division expressions not returning correct type.
+- Function static variables not suggested.
+- Unused try/catch variable.
+- False unused property when used in null coalesce assignment.
+- Array type inferrence incorrect and causing performance issues.
+- False undefined variable in ternary expressions.
+- Boolean addition should return integer.
+- Variables being included in auto generated function phpdoc.
+- Visibility not checked when determining member access.
+- Various `Generator` type inference issues.
+- Type inferrence problems when using `$this` in instanceof or as a pass by ref argument.
+- Method override completion not considering `static`.
+- False unused variables when using `func_get_args` and `get_defined_vars`.
+- Negative constants showing as 'expr' in hover.
+- Parser/rename bug for property access expressions inside double quoted strings.
+
 ## [1.3.11 - 2020-02-15]
 
 #### Changed
