@@ -14,6 +14,7 @@
 - Language constraint and version dependent (5.3+) diagnostics. Can be controlled with `intelephense.diagnostics.languageConstraints`.
 - Short open tag setting `intelephense.environment.shortOpenTag`. Defaults to `false`.
 - Added wordpress globals to built-in stubs.
+- Added `intelephense.references.exclude` setting to excluded files/folders from reference search. Defaults to `**/vendor/**`.
 - Implemented smart select - `textDocument/SelectionRange`. **PREMIUM**
 
 #### Changed
