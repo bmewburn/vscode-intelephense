@@ -15,6 +15,7 @@
 - Short open tag setting `intelephense.environment.shortOpenTag`. Defaults to `false`.
 - Added wordpress globals to built-in stubs.
 - Added `intelephense.references.exclude` setting to excluded files/folders from reference search. Defaults to `**/vendor/**`.
+- Added type diagnostics for LHS of member access expressions and foreach argument.
 - Implemented smart select - `textDocument/SelectionRange`. **PREMIUM**
 
 #### Changed
