@@ -1,6 +1,22 @@
 # Change Log
 
-## [1.4.0 - TBA]
+## [1.4.1 - 2020-06-01]
+
+#### Fixed
+- Signature help failing when call inside of an array element list.
+- Variables not being suggested when declared using annotations.
+- Variables not being suggested in subsequent branch when declared in sibling branch.
+- Type inferrence with loose null equality. 
+- Initialise problem with short tags.
+- Function return type incorrect when contains switch.
+- False undefined var for additional params in method override.
+- False undefined type err when using NAMESPACE::class.
+- Static member completion failing when php version cant be parsed.
+- Format inserting stray whitespace at beginning of file.
+- False error on foreach arg when type is `iterable`.
+- `@var` typehint failing if preceeded by `if` statement.
+
+## [1.4.0 - 2020-05-27]
 
 #### Added
 - Compatibility settings to enable working with some common type annotations that may not accurately reflect intended type.
