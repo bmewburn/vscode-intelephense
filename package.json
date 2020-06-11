@@ -135,7 +135,8 @@
                         "**/node_modules/**",
                         "**/bower_components/**",
                         "**/vendor/**/{Tests,tests}/**",
-                        "**/.history/**"
+                        "**/.history/**",
+                        "**/vendor/**/vendor/**"
                     ],
                     "description": "Configure glob patterns to exclude certain files and folders from all language server features. Inherits from files.exclude.",
                     "scope": "resource"
