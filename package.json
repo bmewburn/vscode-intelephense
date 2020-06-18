@@ -586,7 +586,7 @@
                     "scope": "application"
                 },
                 "intelephense.telemetry.enabled": {
-                    "type": "boolean",
+                    "type": ["boolean", "null"],
                     "description": "Anonymous usage and crash data will be sent to Azure Application Insights. Inherits from telemetry.enableTelemetry.",
                     "scope": "window",
                     "default": null
