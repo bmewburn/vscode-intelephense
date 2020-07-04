@@ -1,5 +1,40 @@
 # Change Log
 
+## [1.5.0 - TBA]
+
+#### Added
+- Folders can now be included from outside the workspace using the `intelephense.environment.includePaths` setting.
+- Class does not implement all abstract methods diagnostic.
+- Type check diagnostic on unpack operand.
+- Method override/implementation signature check diagnostic. 
+- Import symbol code action **[Premium](https:://intelephense.com)**
+- Implement all abstract methods code action **[Premium](https:://intelephense.com)**
+- Add PHPDoc code action (in addition to existing `/**` trigger) **[Premium](https:://intelephense.com)**
+
+#### Changed
+- Updated stubs.
+- **BREAKING** Workspace folders are now considered isolated from each other. Use the `intelephense.environment.includePaths` to allow sharing of symbols across workspace folders. 
+- Improved handling of methods with multiple signatures defined by `@method`.
+- Where symbol names clash then definitions that are _NOT_ vendor definitions are preferred. Previously a union of all definition types was used. This permits user overriding of vendor symbols through the use of helper stubs in the workspace.
+- `intelephense.environment.documentRoot` and `intelephense.environment.includePaths` are now resource (folder) scoped settings.
+- Method override/implementation completion will now add use declarations (if configured) instead of always using FQN for parameter and return type declarations.
+- Type FQN can be used in workspace symbol search.
+- Formatter no longer enforces single space between cast operator and operand as this is not specified by PSR12.
+- Region and comment code folding now folds to a single line.
+
+#### Fixed
+- no definition/hover for private and protected methods in some contexts with `self` or `$this`.
+- False unexpected heredoc indentation diagnostics.
+- `@var` annotations failing in consecutive foreach loops using same variable name.
+- Fomatting problem for `if` / `else` without braces.
+- False deprecated nested ternary when nested short ternary expressions are used.
+- False undefined variable for for subscript expressions in `isset`.
+- False return type error when return `$this` from trait.
+- Last region in a block cannot be folded.
+- `if`, `else` formatting with `allman` brace setting.
+- Fixed index state becoming corrupted during some add and remove operations.
+- False undefined method on interfaces when method call follows property access expression.
+
 ## [1.4.1 - 2020-06-01]
 
 #### Fixed
