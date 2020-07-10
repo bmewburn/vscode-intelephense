@@ -1,6 +1,6 @@
 # Change Log
 
-## [1.5.0 - TBA]
+## [1.5.0 - 2020-07-11]
 
 #### Added
 - Folders can now be included from outside the workspace using the `intelephense.environment.includePaths` setting.
@@ -34,6 +34,9 @@
 - `if`, `else` formatting with `allman` brace setting.
 - Fixed index state becoming corrupted during some add and remove operations.
 - False undefined method on interfaces when method call follows property access expression.
+- Method header completion missing ampersand and elipsis for reference and variadic params.
+- Incorrect type for annotated variadic parameters.
+- Diagnostics not clearing when files outside of workspace are closed.
 
 ## [1.4.1 - 2020-06-01]
 
