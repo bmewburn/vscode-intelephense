@@ -775,7 +775,7 @@
     },
     "dependencies": {
         "fs-extra": "^9.0.1",
-        "intelephense": "^1.4.1",
+        "intelephense": "^1.5.0",
         "semver": "^7.3.2",
         "vscode-languageclient": "^6.1.3"
     },

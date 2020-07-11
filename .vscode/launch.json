@@ -11,7 +11,8 @@
 			"stopOnEntry": false,
 			"sourceMaps": true,
 			"outFiles": [ "${workspaceRoot}/out/src/**/*.js" ],
-			"preLaunchTask": "npm"
+			"preLaunchTask": "npm",
+			"env": {"mode": "production"}
 		},
 		{
 			"name": "Debug",
