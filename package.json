@@ -7,7 +7,7 @@
         "email": "ben@mewburn.id.au"
     },
     "license": "SEE LICENSE IN LICENSE.txt",
-    "version": "1.5.0",
+    "version": "1.5.1",
     "publisher": "bmewburn",
     "engines": {
         "vscode": "^1.42.0"
@@ -447,7 +447,7 @@
                     "items": {
                         "type": "string"
                     },
-                    "description": "The include paths (as individual path items) as defined in the include_path ini setting or paths to external libraries. Used for resolving script inclusion and/or adding external symbols to folder.",
+                    "description": "The include paths (as individual absolute path items) as defined in the include_path ini setting or paths to external libraries. Used for resolving script inclusion and/or adding external symbols to folder.",
                     "scope": "resource"
                 },
                 "intelephense.environment.phpVersion": {
@@ -775,7 +775,7 @@
     },
     "dependencies": {
         "fs-extra": "^9.0.1",
-        "intelephense": "^1.5.0",
+        "intelephense": "^1.5.1",
         "semver": "^7.3.2",
         "vscode-languageclient": "^6.1.3"
     },

@@ -1,5 +1,11 @@
 # Change Log
 
+## [1.5.1 - 2020-07-12]
+
+#### Fixed
+- `} else ` formatting problem.
+- rename/references not working.
+
 ## [1.5.0 - 2020-07-11]
 
 #### Added
