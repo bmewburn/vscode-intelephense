@@ -13,9 +13,9 @@
 - Class does not implement all abstract methods diagnostic.
 - Type check diagnostic on unpack operand.
 - Method override/implementation signature check diagnostic. 
-- Import symbol code action **[Premium](https:://intelephense.com)**
-- Implement all abstract methods code action **[Premium](https:://intelephense.com)**
-- Add PHPDoc code action (in addition to existing `/**` trigger) **[Premium](https:://intelephense.com)**
+- Import symbol code action **[Premium](https://intelephense.com)**
+- Implement all abstract methods code action **[Premium](https://intelephense.com)**
+- Add PHPDoc code action (in addition to existing `/**` trigger) **[Premium](https://intelephense.com)**
 
 #### Changed
 - Updated stubs.
