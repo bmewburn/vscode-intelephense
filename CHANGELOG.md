@@ -1,5 +1,11 @@
 # Change Log
 
+## [1.5.2 - 2020-07-13]
+
+#### Fixed
+- Fix issue with included files getting forgotten on close.
+- Undefined symbols being shown when project first opened and indexing is in progress.
+
 ## [1.5.1 - 2020-07-12]
 
 #### Fixed
