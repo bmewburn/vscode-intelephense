@@ -1,5 +1,15 @@
 # Change Log
 
+## [1.5.3 - 2020-07-20]
+
+#### Fixed
+- User symbols declared with annotations not overriding vendor definitions.
+- Return type of anon function passed as argument is `Closure`.
+- Duplicate private method names not showing error.
+- Incorrect type assigned to variables passed to function with variadic by ref parameter.
+- `@var` ignored when declaring function static variable.
+- False undefined var/param when multiple methods declared with same name.
+
 ## [1.5.2 - 2020-07-13]
 
 #### Fixed
