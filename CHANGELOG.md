@@ -1,5 +1,19 @@
 # Change Log
 
+## [1.5.4 - 2020-08-16]
+
+#### Fixed
+- Parse error with prefix increment array dereference expressions which caused false undefined variable errors.
+- Intellisense fails when '@return self` used for interface methods.
+- Formatting errors with goto labels.
+- Signature diagnostics incorrectly checking against base annotated methods.
+- Crash when using reference array destructure eg `[&$var] = [$num];`.
+- False implementation errors when trait uses trait containing abstract method.
+- `@var` annotations and function static variables.
+- False undefined method when calling parent method that has `__call` defined eg `parent::magic()`.
+- False undefined global variable errors.
+- False type error when passing `$this` to a function call inside trait.
+
 ## [1.5.3 - 2020-07-20]
 
 #### Fixed
