@@ -38,8 +38,6 @@ let clientDisposable:Disposable;
 
 export async function activate(context: ExtensionContext) {
 
-    await moveKeyToGlobalMemento(context);
-
 	languages.setLanguageConfiguration('php', {
 		wordPattern: /(-?\d*\.\d\w*)|([^\-\`\~\!\@\#\%\^\&\*\(\)\=\+\[\{\]\}\\\|\;\:\'\"\,\.\<\>\/\?\s]+)/g,
 		onEnterRules: [
@@ -258,7 +256,7 @@ function enterLicenceKey(context:ExtensionContext) {
 function registerNotificationListeners() {
 	let resolveIndexingPromise: () => void;
 	languageClient.onNotification(INDEXING_STARTED_NOTIFICATION.method, () => {
-		window.setStatusBarMessage('$(sync~spin) intelephense ' + VERSION.toString() + ' indexing ...', new Promise((resolve, reject) => {
+		window.setStatusBarMessage('$(sync~spin) intelephense ' + VERSION.toString() + ' indexing ...', new Promise<void>((resolve, reject) => {
 			resolveIndexingPromise = () => {
 				resolve();
 			}
@@ -271,23 +269,6 @@ function registerNotificationListeners() {
 		}
 		resolveIndexingPromise = undefined;
 	});
-}
-
-async function moveKeyToGlobalMemento(context:ExtensionContext)
-{
-    let section = workspace.getConfiguration('intelephense');
-    let keyFromConfig = section ? section.get('licenceKey') : undefined;
-    if (!keyFromConfig) {
-        return;
-    }
-
-    let keyFromMemento = context.globalState.get<string>(LICENCE_MEMENTO_KEY);
-    if(keyFromMemento) {
-        return;
-    }
-
-    await context.globalState.update(LICENCE_MEMENTO_KEY, keyFromConfig);
-    await section.update('licenceKey', undefined, ConfigurationTarget.Global);
 }
 
 function activateKey(context: ExtensionContext, licenceKey: string): Promise<void> {
