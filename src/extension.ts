@@ -17,7 +17,7 @@ import {
 	NotificationType,
     RequestType,
     RevealOutputChannelOn
-} from 'vscode-languageclient';
+} from 'vscode-languageclient/node';
 import { createMiddleware, IntelephenseMiddleware } from './middleware';
 import * as fs from 'fs-extra';
 
