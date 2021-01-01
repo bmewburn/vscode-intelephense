@@ -34,7 +34,7 @@ By installing this software you agree to be bound by the provisions
 of this agreement.
 
 1. DEFINITIONS
-  a)  "Licensor" is Intelephense, Australia, ABN 93900829846.
+  a)  "Licensor" is Intelephense, Australia, ABN 30638949452.
   b)  "Software" is the software known as Intelephense.
   c)  "Licence Key" is the software key purchasable from the Licensor which 
       enables access to Premium Features.
