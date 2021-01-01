@@ -10,7 +10,7 @@
     "version": "1.5.4",
     "publisher": "bmewburn",
     "engines": {
-        "vscode": "^1.42.0"
+        "vscode": "^1.52.0"
     },
     "categories": [
         "Programming Languages",
@@ -146,6 +146,7 @@
                     "items": {
                         "type": "string",
                         "enum": [
+                            "aerospike",
                             "amqp",
                             "apache",
                             "apcu",
@@ -204,6 +205,7 @@
                             "libsodium",
                             "libxml",
                             "lua",
+                            "LuaSandbox",
                             "lzf",
                             "mailparse",
                             "mapscript",
@@ -276,6 +278,7 @@
                             "stomp",
                             "suhosin",
                             "superglobals",
+                            "svm",
                             "svn",
                             "sybase",
                             "sync",
@@ -296,6 +299,7 @@
                             "xcache",
                             "xdebug",
                             "xhprof",
+                            "xlswriter",
                             "xml",
                             "xmlreader",
                             "xmlrpc",
@@ -768,15 +772,15 @@
         "@types/semver": "~7.3.2",
         "rimraf": "~3.0.2",
         "ts-loader": "~8.0.2",
-        "typescript": "~3.9.7",
-        "@types/vscode": "~1.42.0",
-        "vscode-test": "~1.4.0",
+        "typescript": "~4.1.3",
+        "@types/vscode": "~1.52.0",
+        "vscode-test": "~1.4.1",
         "webpack": "~4.44.1",
         "webpack-cli": "~3.3.12"
     },
     "dependencies": {
         "fs-extra": "~9.0.1",
-        "intelephense": "1.5.4",
+        "intelephense": "file:../intelephense",
         "semver": "~7.3.2",
         "vscode-languageclient": "~7.0.0"
     },
