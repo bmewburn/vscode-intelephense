@@ -444,7 +444,7 @@
                 },
                 "intelephense.environment.documentRoot": {
                     "type": "string",
-                    "description": "The directory of the entry point to the application (directory of index.php). Can be absolute or relative to the workspace folder. Used for resolving script inclusion.",
+                    "description": "The directory of the entry point to the application (directory of index.php). Can be absolute or relative to the workspace folder. Used for resolving script inclusion and path suggestions.",
                     "scope": "resource"
                 },
                 "intelephense.environment.includePaths": {
@@ -452,7 +452,7 @@
                     "items": {
                         "type": "string"
                     },
-                    "description": "The include paths (as individual absolute path items) as defined in the include_path ini setting or paths to external libraries. Used for resolving script inclusion and/or adding external symbols to folder.",
+                    "description": "The include paths (as individual path items) as defined in the include_path ini setting or paths to external libraries. Can be absolute or relative to the workspace folder. Used for resolving script inclusion and/or adding external symbols to folder.",
                     "scope": "resource"
                 },
                 "intelephense.environment.phpVersion": {
