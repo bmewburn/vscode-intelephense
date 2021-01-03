@@ -1,5 +1,40 @@
 # Change Log
 
+## [1.6.0 - 2021-01-03]
+
+#### Added
+- PHP 8 support.
+- Rename functionality in embedded HTML/JS. **[Premium](https://intelephense.com)**
+
+#### Changed
+- `intelephense.environment.includePaths` can now be relative to workspace folder.
+- PHP 8 is now the default PHP version.
+- Updated stubs.
+- Updated to recent vscode html lang server.
+- Updated to jsbeautify 1.3.
+- Updated to node-language-server 7 and LSP 3.16.
+
+#### Fixed
+- Find all implementations fails after closing and reopening window.
+- User types named `Boolean`, `Integer`, `Resource` being confused with phpdoc lowercase types of same name.
+- Laravel `Str` not showing in suggestions.
+- False implementation diagnostic for method overrides with default params.
+- Declaring `$argv` in function scope always gives undefined variable.
+- If/else formatting where if/else do not have braces but nested statement does.
+- Wrong formatting when `default` is used as name of const, method etc.
+- Incorrect heredoc formatting error msg.
+- No folding for alternate if/else statements.
+- Incompatible method not diagnosed when base method param has default arg.
+- False static call of non static method when call scope is in type heirarchy.
+- No hover/goto/rename on static protect variables.
+- Protected static functions not found when in type heirarchy.
+- Trait methods not found when using `insteadof`.
+- Magic constants should be case insensitve.
+- False implementation error with multiple traits with same function where one is abstract.
+- Short ternary expr always resolving to the falsey type.
+- HTML/CSS path completion always relative to workspace folder.
+- Magic methods not suggested when visibility modifier is private.
+
 ## [1.5.4 - 2020-08-16]
 
 #### Fixed
