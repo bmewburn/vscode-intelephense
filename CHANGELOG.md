@@ -1,5 +1,19 @@
 # Change Log
 
+## [1.6.1 - 2021-01-04]
+
+#### Changed
+- Deeper code diagnostics will only be run if file is free of parse errors.
+
+#### Fixed
+- Endless parse loop when encountering parse error in argument lists in some contexts.
+- Named parameters not suggested in method, constructor, attribute calls.
+- Attribute formatting.
+- `false`, `null`, `mixed` reported as undefined types.
+- Attributes on methods breaks code intelligence.
+- False type error when return type is `static`.
+- `implements` name list always formatted on next line.
+
 ## [1.6.0 - 2021-01-03]
 
 #### Added
