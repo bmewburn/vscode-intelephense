@@ -1,5 +1,15 @@
 # Change Log
 
+## [1.6.2 - 2021-01-12]
+
+#### Fixed
+- Various cannot read prop of undefined.
+- Incorrect method compatibility diagnostics with union types.
+- User function named `string` not found.
+- Wrong type resolved for `static[]` return type in `IteratorAggregate::getIterator`.
+- Incorrect argument count diagnostics when required parameters follows optional.
+- `match` formatting.
+
 ## [1.6.1 - 2021-01-04]
 
 #### Changed
