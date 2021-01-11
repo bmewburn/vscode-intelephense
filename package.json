@@ -52,6 +52,9 @@
         "/LICENSE.txt",
         "/package.json"
     ],
+    "extensionKind": [
+        "workspace"
+    ],
     "contributes": {
         "languages": [
             {
