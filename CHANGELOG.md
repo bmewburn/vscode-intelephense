@@ -1,5 +1,19 @@
 # Change Log
 
+## [1.6.3 - 2021-01-31]
+
+#### Fixed
+- Multiline `unset` formatting.
+- Goto definition from callable arrays using `MyClass::class` expression.
+- Wrong `json_encode` parameter name.
+- PHPUnit metadata causing `createMock` to return `string`.
+- Indexing not working on Apple M1.
+- False diagnostics for some built in functions that have multiple signatures.
+- Format bug with shebang and `__halt_compiler`.
+- Intellisense breaks with doc blocked class inside namespace body.
+- `$/cancelRequest` not working.
+- Wrong range reported for duplicate symbol diagnostics with attributes.
+
 ## [1.6.2 - 2021-01-12]
 
 #### Fixed
