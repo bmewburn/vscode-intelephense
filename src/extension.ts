@@ -132,7 +132,7 @@ function createClient(context:ExtensionContext, middleware:IntelephenseMiddlewar
 		serverOptions.debug.runtime = runtime;
 	}
 
-	if (memory && memory > 256) {
+	if (memory && memory >= 256) {
 		let maxOldSpaceSize = '--max-old-space-size=' + memory.toString();
 		serverOptions.run.options = { execArgv: [maxOldSpaceSize] };
 		serverOptions.debug.options.execArgv.push(maxOldSpaceSize);
