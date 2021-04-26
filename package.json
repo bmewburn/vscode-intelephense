@@ -7,7 +7,7 @@
         "email": "ben@mewburn.id.au"
     },
     "license": "SEE LICENSE IN LICENSE.txt",
-    "version": "1.6.3",
+    "version": "1.7.0",
     "publisher": "bmewburn",
     "engines": {
         "vscode": "^1.52.0"
@@ -631,6 +631,20 @@
                     ],
                     "description": "Glob patterns matching files and folders that should be excluded when renaming symbols. Rename operation will fail if the symbol definition is found in the excluded files/folders.",
                     "scope": "resource"
+                },
+                "intelephense.rename.namespaceMode": {
+                    "type": "string",
+                    "enum": [
+                        "single",
+                        "all"
+                    ],
+                    "default": "single",
+                    "enumDescriptions": [
+                        "Only symbols defined in the current file are affected. For example, this makes a rename of a namespace the equivalent of a single move class operation.",
+                        "All symbols that share this namespace, not necessarily defined in the current file will be affected. For example it would move all classes that share this namespace to the new namespace."
+                    ],
+                    "description": "Controls the scope of a namespace rename operation.",
+                    "scope": "window"
                 },
                 "intelephense.references.exclude": {
                     "type": "array",
