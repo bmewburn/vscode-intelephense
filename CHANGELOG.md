@@ -1,5 +1,38 @@
 # Change Log
 
+## [1.7.0 - 2021-04-26]
+
+#### Added
+- `@mixin` support. **[Premium](https://intelephense.com)**
+- Signature help offset label support.
+- `SymbolTag.Deprecated` support for workspace and document symbol requests.
+- Added new setting `intelephense.rename.namespaceMode` that can be either `single` (default) or `all`. When set to `single` a rename of a namespace will only affect the symbols defined in that single file. This is the equivalent of a single 'move class' operation. Previously renaming a namespace would affect all symbols that shared that namespace across multiple files. Setting to the value to `all` will produce the old behaviour. **[Premium](https://intelephense.com)**
+
+#### Changed
+- Updated stubs.
+- Upgraded vscode-languageserver to 7.1 beta.
+- `intelephense.files.exclude` globs without path separators are no longer prefixed with `**/`. **BREAKING**
+- URIs are now normalised to vscode-uri format.
+- Rename requests that fail now return `ResponseError` with appropriate code and message rather than returning null and sending a separate notification.
+- `intelephense.environment.shortOpenTag` now defaults to true. **BREAKING**
+- Tolerate property annotations with missing `$` in property name. 
+
+#### Fixed
+- Parser failing on alternate switch syntax.
+- False `parent` static call warning in anon class.
+- Division returning `int` instead of `int|float`.
+- Refs not found when inside encapsulated expression used as member name.
+- Formatting of immediately invoked function expr following phpdoc.
+- Completion item detail showing `namespace ...` instead of `use ...` for existing imports.
+- Completion item not including additional import edit when symbol shares current namespace but symbol short name is already used.
+- Nested regions not folding.
+- Property doc inheritance.
+- Inline `{@inheritdoc}`.
+- Files that are excluded but have textDocument/didOpen sent are now ignored.
+- protected visibility when accessing subtype method from supertype.
+- `intelephense.phpdoc.useFullyQualifiedNames` not overriding `intelephense.completion.insertUseDeclaration`.
+- False not in object context error in arrow function.
+
 ## [1.6.3 - 2021-01-31]
 
 #### Fixed
