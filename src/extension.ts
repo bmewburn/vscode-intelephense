@@ -22,7 +22,7 @@ import { createMiddleware, IntelephenseMiddleware } from './middleware';
 import * as fs from 'fs-extra';
 
 const PHP_LANGUAGE_ID = 'php';
-const VERSION = '1.6.3';
+const VERSION = '1.7.0';
 const INDEXING_STARTED_NOTIFICATION = new NotificationType('indexingStarted');
 const INDEXING_ENDED_NOTIFICATION = new NotificationType('indexingEnded');
 const CANCEL_INDEXING_REQUEST = new RequestType('cancelIndexing');
@@ -176,7 +176,7 @@ function showStartMessage(context: ExtensionContext) {
 		return;
 	}
 	window.showInformationMessage(
-		`Intelephense updated to ${VERSION}.\nAccess other great features at https://intelephense.com.`,
+		`Intelephense updated to ${VERSION}.\nSupport the development of this extension and access other great features by purchasing a licence at https://intelephense.com.`,
 		open, 
 		dismiss
 	).then(value => {
