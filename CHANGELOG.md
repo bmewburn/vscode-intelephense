@@ -1,5 +1,19 @@
 # Change Log
 
+## [1.7.1 - 2021-05-02]
+
+#### Changed
+- Updated stubs
+
+#### Fixed
+- phpdoc `double` normalised to `float`.
+- Crash on fetching embedded language folding ranges.
+- False duplicate function name.
+- Concrete class method is allowed to have different signature to trait abstract method.
+- Doc block formatting.
+- Excluded files getting indexed on `workspace/didChangeWatchedFiles` notifications.
+- False type diagnostics for some built-in symbols.
+
 ## [1.7.0 - 2021-04-26]
 
 #### Added

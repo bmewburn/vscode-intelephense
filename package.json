@@ -7,7 +7,7 @@
         "email": "ben@mewburn.id.au"
     },
     "license": "SEE LICENSE IN LICENSE.txt",
-    "version": "1.7.0",
+    "version": "1.7.1",
     "publisher": "bmewburn",
     "engines": {
         "vscode": "^1.52.0"
@@ -802,7 +802,7 @@
     },
     "dependencies": {
         "fs-extra": "~9.0.1",
-        "intelephense": "1.7.0",
+        "intelephense": "1.7.1",
         "semver": "~7.3.2",
         "vscode-languageclient": "~7.0.0"
     },
