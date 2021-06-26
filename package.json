@@ -55,6 +55,14 @@
     "extensionKind": [
         "workspace"
     ],
+    "capabilities": {
+        "untrustedWorkspaces": {
+            "supported": "limited",
+            "description": "An alternate Node.js runtime or maximum memory value cannot be provided via workspace settings in an untrusted workspace.",
+            "restrictedConfigurations": ["intelephense.runtime", "intelephense.maxMemory"]
+        },
+        "virtualWorkspaces": true
+    },
     "contributes": {
         "languages": [
             {
