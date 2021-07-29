@@ -10,7 +10,7 @@ import * as querystring from 'querystring';
 import { createHash } from 'crypto';
 import * as os from 'os';
 
-import { ExtensionContext, window, commands, workspace, Disposable, languages, IndentAction, env, Uri, ConfigurationTarget, InputBoxOptions } from 'vscode';
+import { ExtensionContext, window, commands, workspace, Disposable, languages, IndentAction, env, Uri, ConfigurationTarget, InputBoxOptions, StatusBarItem, StatusBarAlignment } from 'vscode';
 import {
 	LanguageClient, LanguageClientOptions, ServerOptions,
 	TransportKind,
@@ -35,6 +35,7 @@ let languageClient: LanguageClient;
 let extensionContext: ExtensionContext;
 let middleware:IntelephenseMiddleware;
 let clientDisposable:Disposable;
+let statusBar: StatusBarItem;
 
 export async function activate(context: ExtensionContext) {
 
@@ -99,6 +100,13 @@ export async function activate(context: ExtensionContext) {
 		enterKeyCmdDisposable,
 		middleware
 	);
+
+	// Create a status bar item
+	statusBar = window.createStatusBarItem(StatusBarAlignment.Left);
+	statusBar.command = INDEX_WORKSPACE_CMD_NAME;
+	statusBar.text = '$(refresh)';
+	statusBar.tooltip = 'intelephense ' + VERSION.toString() + ' - Index workspace';
+	statusBar.show();
 
 	clientDisposable = languageClient.start();
 }
@@ -254,21 +262,30 @@ function enterLicenceKey(context:ExtensionContext) {
 }
 
 function registerNotificationListeners() {
-	let resolveIndexingPromise: () => void;
 	languageClient.onNotification(INDEXING_STARTED_NOTIFICATION.method, () => {
-		window.setStatusBarMessage('$(sync~spin) intelephense ' + VERSION.toString() + ' indexing ...', new Promise<void>((resolve, reject) => {
-			resolveIndexingPromise = () => {
-				resolve();
-			}
-		}));
+		statusBar.text = '$(sync~spin) intelephense ' + VERSION.toString() + ' indexing ...';
+		statusBar.command = CANCEL_INDEXING_CMD_NAME;
+	});
+	languageClient.onNotification(INDEXING_ENDED_NOTIFICATION.method, () => {
+		statusBar.command = INDEX_WORKSPACE_CMD_NAME;
+		statusBar.text = '$(refresh)';
 	});
 
-	languageClient.onNotification(INDEXING_ENDED_NOTIFICATION.method, () => {
-		if (resolveIndexingPromise) {
-			resolveIndexingPromise();
-		}
-		resolveIndexingPromise = undefined;
-	});
+	// let resolveIndexingPromise: () => void;
+	// languageClient.onNotification(INDEXING_STARTED_NOTIFICATION.method, () => {
+	// 	window.setStatusBarMessage('$(sync~spin) intelephense ' + VERSION.toString() + ' indexing ...', new Promise<void>((resolve, reject) => {
+	// 		resolveIndexingPromise = () => {
+	// 			resolve();
+	// 		}
+	// 	}));
+	// });
+
+	// languageClient.onNotification(INDEXING_ENDED_NOTIFICATION.method, () => {
+	// 	if (resolveIndexingPromise) {
+	// 		resolveIndexingPromise();
+	// 	}
+	// 	resolveIndexingPromise = undefined;
+	// });
 }
 
 function activateKey(context: ExtensionContext, licenceKey: string): Promise<void> {
