@@ -10,7 +10,7 @@ import * as querystring from 'querystring';
 import { createHash } from 'crypto';
 import * as os from 'os';
 
-import { ExtensionContext, window, commands, workspace, Disposable, languages, IndentAction, env, Uri, ConfigurationTarget, InputBoxOptions, StatusBarItem, StatusBarAlignment } from 'vscode';
+import { ExtensionContext, window, commands, workspace, Disposable, languages, IndentAction, env, Uri, ConfigurationTarget, InputBoxOptions, StatusBarItem } from 'vscode';
 import {
 	LanguageClient, LanguageClientOptions, ServerOptions,
 	TransportKind,
@@ -100,13 +100,6 @@ export async function activate(context: ExtensionContext) {
 		enterKeyCmdDisposable,
 		middleware
 	);
-
-	// Create a status bar item
-	statusBar = window.createStatusBarItem(StatusBarAlignment.Left);
-	statusBar.command = INDEX_WORKSPACE_CMD_NAME;
-	statusBar.text = '$(refresh)';
-	statusBar.tooltip = 'intelephense ' + VERSION.toString() + ' - Index workspace';
-	statusBar.show();
 
 	clientDisposable = languageClient.start();
 }
@@ -262,30 +255,21 @@ function enterLicenceKey(context:ExtensionContext) {
 }
 
 function registerNotificationListeners() {
+	if (!statusBar) {
+		statusBar = window.createStatusBarItem();
+		statusBar.command = INDEX_WORKSPACE_CMD_NAME;
+		statusBar.text = '$(refresh) intelephense';
+		statusBar.tooltip = 'intelephense ' + VERSION.toString() + ' - Index workspace';
+		statusBar.show();
+	}
 	languageClient.onNotification(INDEXING_STARTED_NOTIFICATION.method, () => {
-		statusBar.text = '$(sync~spin) intelephense ' + VERSION.toString() + ' indexing ...';
 		statusBar.command = CANCEL_INDEXING_CMD_NAME;
+		statusBar.text = '$(sync~spin) intelephense ' + VERSION.toString() + ' indexing ...';
 	});
 	languageClient.onNotification(INDEXING_ENDED_NOTIFICATION.method, () => {
 		statusBar.command = INDEX_WORKSPACE_CMD_NAME;
-		statusBar.text = '$(refresh)';
+		statusBar.text = '$(refresh) intelephense';
 	});
-
-	// let resolveIndexingPromise: () => void;
-	// languageClient.onNotification(INDEXING_STARTED_NOTIFICATION.method, () => {
-	// 	window.setStatusBarMessage('$(sync~spin) intelephense ' + VERSION.toString() + ' indexing ...', new Promise<void>((resolve, reject) => {
-	// 		resolveIndexingPromise = () => {
-	// 			resolve();
-	// 		}
-	// 	}));
-	// });
-
-	// languageClient.onNotification(INDEXING_ENDED_NOTIFICATION.method, () => {
-	// 	if (resolveIndexingPromise) {
-	// 		resolveIndexingPromise();
-	// 	}
-	// 	resolveIndexingPromise = undefined;
-	// });
 }
 
 function activateKey(context: ExtensionContext, licenceKey: string): Promise<void> {
