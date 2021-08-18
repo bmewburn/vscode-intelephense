@@ -231,8 +231,8 @@ function enterLicenceKey(context:ExtensionContext) {
 	}
 
 	window.showInputBox(options).then(async key => {
-        await context.globalState.update(LICENCE_MEMENTO_KEY, key);
         if(key !== undefined) {
+            await context.globalState.update(LICENCE_MEMENTO_KEY, key);
             if(key) {
                 try {
                     await activateKey(context, key);
