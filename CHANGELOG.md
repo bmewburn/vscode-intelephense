@@ -1,5 +1,33 @@
 # Change Log
 
+## [1.8.0 - 2021-12-05]
+
+#### Added
+- PHP 8.1 support
+
+#### Changed
+- Redundant unions are not reduced to minimal type as eagerly.
+- Added additional logging when indexing.
+- Diagnostics limited to parse errors only for non-file URIs.
+- PHP 8.1 is now the default version.
+- Updated stubs.
+
+#### Fixed
+- Iterator|Foo[] not corrected to Iterator<mixed, Foo> in some instances.
+- Auto import not working in namespace body when class imported in previous namespace.
+- Auto import indent in namespace body.
+- False parse error on null-safe object operator and keyword member name.
+- File rename incorrect when renaming namespace.
+- False undefined variable diagnostic when using named arg and param is by ref.
+- Encapsulated expr closing parenthesis format.
+- False method not compatible diagnostic when override has an addition parameter that is variadic.
+- False undefined variable on LHS of null coalesce compound assignment expr.
+- Expected type 'object|array'. Found 'iterable'.
+- Anonymous function parameter renaming.
+- False method not implement diagnostic when trait provides implementation required by another trait.
+- `implements` not suggested when extends class name contains backslash.
+- Parsing of nested generic array phpdoc syntax.
+
 ## [1.7.1 - 2021-05-02]
 
 #### Changed
