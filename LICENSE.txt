@@ -48,35 +48,40 @@ The Licensor grants you a personal, non-transferable, non-exclusive licence
 to use the Software on your devices in accordance with the terms of this 
 agreement.
 
-3. LICENCE KEYS
+3. INTENDED USE
+An individual end user may use the Software paired with a 
+Language Server Protocol compatible Integrated Development Environment or text editor
+to provide PHP code intelligence for said user.
+
+4. LICENCE KEYS
   a)  Purchase of a Licence Key grants a single end user access and use of all
       current and future Premium Features in perpetuity.
   b)  A Licence Key may be revoked if it is suspected that a user has breached 
-      restrictions detailed in item 4.
+      restrictions detailed in item 5 Restrictions.
 
-4. RESTRICTIONS
+5. RESTRICTIONS
 You are NOT permitted to:
   a)  Edit, alter, modify, adapt, translate or otherwise change the whole or any 
       part of the Software. 
   b)  Decompile, disassemble or reverse engineer the Software or attempt to do 
       any such things.
   c)  Reproduce, copy, distribute, resell or otherwise use the whole or any part 
-      of the Software for any commercial purpose.
+      of the Software for any purpose except where permitted by item 3 Intended Use.
   d)  Disable, modify or hide notifications sent by the Software.
   e)  Distribute, resell, or share Licence Keys.
   f)  Access or use Premium Features without a valid Licence Key.
 
-5. OWNERSHIP
+6. OWNERSHIP
 The Software, copyright, and other intellectual property rights of whatever 
 nature in the Software, including any modifications made thereto are and shall 
 remain the property of the Licensor.
 
-6. WARRANTY DISCLAIMER
+7. WARRANTY DISCLAIMER
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
 
-7. LIMITATION OF LIABILITY
+8. LIMITATION OF LIABILITY
 IN NO EVENT SHALL THE LICENSOR BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS 
