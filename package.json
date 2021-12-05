@@ -59,9 +59,15 @@
         "untrustedWorkspaces": {
             "supported": "limited",
             "description": "An alternate Node.js runtime or maximum memory value cannot be provided via workspace settings in an untrusted workspace.",
-            "restrictedConfigurations": ["intelephense.runtime", "intelephense.maxMemory"]
+            "restrictedConfigurations": [
+                "intelephense.runtime",
+                "intelephense.maxMemory"
+            ]
         },
-        "virtualWorkspaces": true
+        "virtualWorkspaces": {
+            "supported": "limited",
+            "description": "Virtual Workspaces are not indexed. As such language intelligence and symbol recognition is limited to open files."
+        }
     },
     "contributes": {
         "languages": [
