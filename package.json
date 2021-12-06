@@ -7,7 +7,7 @@
         "email": "ben@mewburn.id.au"
     },
     "license": "SEE LICENSE IN LICENSE.txt",
-    "version": "1.7.1",
+    "version": "1.8.0",
     "publisher": "bmewburn",
     "engines": {
         "vscode": "^1.52.0"
@@ -59,9 +59,15 @@
         "untrustedWorkspaces": {
             "supported": "limited",
             "description": "An alternate Node.js runtime or maximum memory value cannot be provided via workspace settings in an untrusted workspace.",
-            "restrictedConfigurations": ["intelephense.runtime", "intelephense.maxMemory"]
+            "restrictedConfigurations": [
+                "intelephense.runtime",
+                "intelephense.maxMemory"
+            ]
         },
-        "virtualWorkspaces": true
+        "virtualWorkspaces": {
+            "supported": "limited",
+            "description": "Virtual Workspaces are not indexed. As such language intelligence and symbol recognition is limited to open files."
+        }
     },
     "contributes": {
         "languages": [
@@ -473,7 +479,7 @@
                 },
                 "intelephense.environment.phpVersion": {
                     "type": "string",
-                    "default": "8.0.0",
+                    "default": "8.1.0",
                     "description": "A semver compatible string that represents the target PHP version. Used for providing version appropriate suggestions and diagnostics. PHP 5.3.0 and greater supported.",
                     "scope": "window"
                 },
@@ -810,7 +816,7 @@
     },
     "dependencies": {
         "fs-extra": "~9.0.1",
-        "intelephense": "1.7.1",
+        "intelephense": "1.8.0",
         "semver": "~7.3.2",
         "vscode-languageclient": "~7.0.0"
     },
