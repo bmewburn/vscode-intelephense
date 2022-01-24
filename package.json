@@ -176,7 +176,7 @@
                             "com_dotnet",
                             "Core",
                             "couchbase",
-                            "couchbase_v3",
+                            "couchbase_v2",
                             "crypto",
                             "ctype",
                             "cubrid",
