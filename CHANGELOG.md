@@ -1,5 +1,28 @@
 # Change Log
 
+## [1.8.1 - 2022-02-13]
+
+#### Fixed
+- False undefined variable when declared inside expression in conditional statement.
+- False non static method should not be called statically for `self::`.
+- Enums getting imported repeatedly.
+- Enums not suggested for completion in argument lists.
+- Type `string` lost from `$var` in conditional when using `!is_numeric($var)`.
+- Parsing of `@return Type` when following description starts with html tag.
+- Return types for some built in functions/methods incorrect.
+- Type inference problems with `break` and `continue`.
+- Type inference problems with unary not expr and properties.
+- Parameter attributes not analysed for usage.
+- Wrong parameter highlighted in signature help when first arg is a named arg.
+- Properties and promoted properties when declared with `readonly` and no visibility keyword.
+- Don't use > 31 bit numbers in `CompletionItem.data`.
+- Variable references within `@var` not getting renamed.
+- False diagnostic: Expected type `SimpleXMLElement`. Found `$1`.
+- Comment folding in array lists.
+- Various smart select issues.
+- Method override parameter hover not showing inherited doc.
+- Default php version.
+
 ## [1.8.0 - 2021-12-05]
 
 #### Added
