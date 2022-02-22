@@ -1,5 +1,13 @@
 # Change Log
 
+## [1.8.2 - 2022-02-23]
+
+#### Fixed
+- Incorrect completion suggestions for variables.
+- False undefined variables in do loop.
+- Completion resolve not working.
+- couchbase_v3 stub removed.
+
 ## [1.8.1 - 2022-02-13]
 
 #### Fixed
