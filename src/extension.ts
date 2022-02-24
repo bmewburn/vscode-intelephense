@@ -10,7 +10,7 @@ import * as querystring from 'querystring';
 import { createHash } from 'crypto';
 import * as os from 'os';
 
-import { ExtensionContext, window, commands, workspace, Disposable, languages, IndentAction, env, Uri, ConfigurationTarget, InputBoxOptions } from 'vscode';
+import { ExtensionContext, window, commands, workspace, Disposable, languages, IndentAction, env, Uri, ConfigurationTarget, InputBoxOptions, StatusBarItem } from 'vscode';
 import {
 	LanguageClient, LanguageClientOptions, ServerOptions,
 	TransportKind,
@@ -35,6 +35,7 @@ let languageClient: LanguageClient;
 let extensionContext: ExtensionContext;
 let middleware:IntelephenseMiddleware;
 let clientDisposable:Disposable;
+let statusBar: StatusBarItem;
 
 export async function activate(context: ExtensionContext) {
 
@@ -254,20 +255,20 @@ function enterLicenceKey(context:ExtensionContext) {
 }
 
 function registerNotificationListeners() {
-	let resolveIndexingPromise: () => void;
+	if (!statusBar) {
+		statusBar = window.createStatusBarItem();
+		statusBar.command = INDEX_WORKSPACE_CMD_NAME;
+		statusBar.text = '$(refresh) intelephense';
+		statusBar.tooltip = 'intelephense ' + VERSION.toString() + ' - Index workspace';
+		statusBar.show();
+	}
 	languageClient.onNotification(INDEXING_STARTED_NOTIFICATION.method, () => {
-		window.setStatusBarMessage('$(sync~spin) intelephense ' + VERSION.toString() + ' indexing ...', new Promise<void>((resolve, reject) => {
-			resolveIndexingPromise = () => {
-				resolve();
-			}
-		}));
+		statusBar.command = CANCEL_INDEXING_CMD_NAME;
+		statusBar.text = '$(sync~spin) intelephense ' + VERSION.toString() + ' indexing ...';
 	});
-
 	languageClient.onNotification(INDEXING_ENDED_NOTIFICATION.method, () => {
-		if (resolveIndexingPromise) {
-			resolveIndexingPromise();
-		}
-		resolveIndexingPromise = undefined;
+		statusBar.command = INDEX_WORKSPACE_CMD_NAME;
+		statusBar.text = '$(refresh) intelephense';
 	});
 }
 
