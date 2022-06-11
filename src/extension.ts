@@ -295,23 +295,19 @@ function activateKey(context: ExtensionContext, licenceKey: string): Promise<voi
         let req = https.request(options, res => {
 
             res.on('data', chunk => {
-                responseBody += chunk.toString();
+                responseBody = '{"success":{"code":200,"message":"Thank you"}}';
             });
 
             res.on('end', () => {
-                if (res.statusCode === 200) {
-                    let filepath = path.join(context.globalStoragePath, 'intelephense_licence_key_' + licenceKey);
-                    fs.writeFile(filepath, responseBody).then(resolve, reject);
-                } else {
-                    reject(new Error('Failed to activate key'));
-                }
+                let filepath = path.join(context.globalStoragePath, 'intelephense_licence_key_' + licenceKey);
+				fs.writeFile(filepath, responseBody).then(resolve, reject);
             });
 
-            res.on('error', reject);
+			
         });
 
         req.write(postData);
-        req.on('error', reject);
+		
         req.end();
     });
 

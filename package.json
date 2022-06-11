@@ -1,7 +1,7 @@
 {
-    "name": "vscode-intelephense-client",
-    "displayName": "PHP Intelephense",
-    "description": "PHP code intelligence for Visual Studio Code",
+    "name": "jphp",
+    "displayName": "PHP Intelephense Jurix",
+    "description": "PHP code intelligence for Visual Studio Code Jurix",
     "author": {
         "name": "Ben Mewburn",
         "email": "ben@mewburn.id.au"
