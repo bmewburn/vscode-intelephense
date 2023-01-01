@@ -7,7 +7,7 @@
         "email": "ben@mewburn.id.au"
     },
     "license": "SEE LICENSE IN LICENSE.txt",
-    "version": "1.8.2",
+    "version": "1.9.0",
     "publisher": "bmewburn",
     "engines": {
         "vscode": "^1.52.0"
@@ -187,10 +187,13 @@
                             "dio",
                             "dom",
                             "ds",
+                            "eio",
+                            "elastic_apm",
                             "enchant",
                             "Ev",
                             "event",
                             "exif",
+                            "expect",
                             "fann",
                             "FFI",
                             "ffmpeg",
@@ -267,6 +270,7 @@
                             "Phar",
                             "phpdbg",
                             "posix",
+                            "pq",
                             "pspell",
                             "pthreads",
                             "radius",
@@ -282,7 +286,9 @@
                             "SaxonC",
                             "session",
                             "shmop",
+                            "simple_kafka_client",
                             "SimpleXML",
+                            "snappy",
                             "snmp",
                             "soap",
                             "sockets",
@@ -301,6 +307,7 @@
                             "superglobals",
                             "svm",
                             "svn",
+                            "swoole",
                             "sybase",
                             "sync",
                             "sysvmsg",
@@ -309,6 +316,7 @@
                             "tidy",
                             "tokenizer",
                             "uopz",
+                            "uploadprogress",
                             "uuid",
                             "uv",
                             "v8js",
@@ -802,23 +810,23 @@
         "production": "rimraf lib && webpack --config webpack.config.js"
     },
     "devDependencies": {
-        "@types/fs-extra": "~9.0.1",
-        "@types/mocha": "~7.0.2",
-        "@types/node": "~12.12.29",
-        "@types/semver": "~7.3.2",
+        "@types/fs-extra": "~9.0.13",
+        "@types/mocha": "~10.0.1",
+        "@types/node": "16.x",
+        "@types/semver": "~7.3.13",
         "rimraf": "~3.0.2",
-        "ts-loader": "~8.0.2",
-        "typescript": "~4.1.3",
-        "@types/vscode": "~1.52.0",
-        "vscode-test": "~1.4.1",
-        "webpack": "~5.11.1",
-        "webpack-cli": "~4.3.1"
+        "ts-loader": "~9.4.2",
+        "typescript": "~4.9.4",
+        "@types/vscode": "~1.74.0",
+        "vscode-test": "~1.6.1",
+        "webpack": "~5.75.0",
+        "webpack-cli": "~5.0.1"
     },
     "dependencies": {
-        "fs-extra": "~9.0.1",
+        "fs-extra": "~11.1.0",
         "intelephense": "1.8.2",
-        "semver": "~7.3.2",
-        "vscode-languageclient": "~7.0.0"
+        "semver": "~7.3.8",
+        "vscode-languageclient": "~8.0.2"
     },
     "private": true
 }

@@ -22,7 +22,7 @@ import { createMiddleware, IntelephenseMiddleware } from './middleware';
 import * as fs from 'fs-extra';
 
 const PHP_LANGUAGE_ID = 'php';
-const VERSION = '1.8.2';
+const VERSION = '1.9.0';
 const INDEXING_STARTED_NOTIFICATION = new NotificationType('indexingStarted');
 const INDEXING_ENDED_NOTIFICATION = new NotificationType('indexingEnded');
 const CANCEL_INDEXING_REQUEST = new RequestType('cancelIndexing');
@@ -34,7 +34,6 @@ const LICENCE_MEMENTO_KEY = 'intelephense.licence.key';
 let languageClient: LanguageClient;
 let extensionContext: ExtensionContext;
 let middleware:IntelephenseMiddleware;
-let clientDisposable:Disposable;
 
 export async function activate(context: ExtensionContext) {
 
@@ -100,7 +99,10 @@ export async function activate(context: ExtensionContext) {
 		middleware
 	);
 
-	clientDisposable = languageClient.start();
+	languageClient.start().then(() => {
+		registerNotificationListeners();
+		showStartMessage(context);
+	});
 }
 
 function createClient(context:ExtensionContext, middleware:IntelephenseMiddleware, clearCache:boolean) {
@@ -159,10 +161,6 @@ function createClient(context:ExtensionContext, middleware:IntelephenseMiddlewar
 
 	// Create the language client and start the client.
 	languageClient = new LanguageClient('intelephense', 'intelephense', serverOptions, clientOptions);
-	languageClient.onReady().then(() => {
-		registerNotificationListeners();
-		showStartMessage(context);
-	});
 	return languageClient;
 }
 
@@ -190,7 +188,7 @@ function showStartMessage(context: ExtensionContext) {
 
 export function deactivate() {
 	if (!languageClient) {
-		return undefined;
+		return Promise.resolve();
 	}
 	return languageClient.stop();
 }
@@ -200,9 +198,11 @@ function indexWorkspace() {
 		return;
 	}
 	languageClient.stop().then(_ => {
-		clientDisposable.dispose();
 		languageClient = createClient(extensionContext, middleware, true);
-		clientDisposable = languageClient.start();
+		languageClient.start().then(() => {
+            registerNotificationListeners();
+            showStartMessage(extensionContext);
+        });
 	});
 }
 
@@ -243,11 +243,13 @@ function enterLicenceKey(context:ExtensionContext) {
             }
             
             //restart
-            if(languageClient && clientDisposable) {
+            if(languageClient) {
                 await languageClient.stop();
-                clientDisposable.dispose();
-                languageClient = createClient(extensionContext, middleware, true);
-                clientDisposable = languageClient.start();
+                languageClient = createClient(context, middleware, true);
+                languageClient.start().then(() => {
+                    registerNotificationListeners();
+                    showStartMessage(context);
+                });
             }
 		}
 	});
