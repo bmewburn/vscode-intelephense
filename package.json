@@ -327,6 +327,7 @@
                             "wordpress",
                             "xcache",
                             "xdebug",
+                            "xdiff",
                             "xhprof",
                             "xlswriter",
                             "xml",
