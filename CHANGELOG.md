@@ -1,5 +1,42 @@
 # Change Log
 
+## [1.9.0 - 2023-01-01]
+
+#### Added
+- PHP 8.2 support.
+- PHPDOC `@template` support.
+- Handle non-standard PHPDOC types like `list`. Internally `list<Foo>` is treated as `Foo[]`. 
+- PHPDOC `callable(Foo $foo): Bar`, `\Closure(Foo): Bar` support. Variadic and default args are not supported in the short form.
+- Added undefined property diagnostics. Can be disabled via the `intelephense.diagnostics.undefinedProperties` setting.
+
+#### Changed
+- Updated dependencies.
+- Updated stubs.
+- Signature help provider now returns null instead of empty signatures array as per LSP recommendations.
+- composer.json `autoload.psr-4` settings used if available for file renames when renaming namespace.
+- Added templated `array_map` stub in order to better infer return type.
+
+#### Fixed
+- Performance issue when workspace contains multiple symbols with same name.
+- Various issues when `__halt_compiler` appears in file.
+- False `never` return type when `die` used in logical expression.
+- False undefined method when static used in union return type.
+- Completion item documentation showing multiple times for namespace suggestions.
+- Type inference for return type of closures.
+- False unknown arg name when calling closure with named args.
+- False unused imports with enum implements.
+- False method compatibility error when overriding base method return type of self with static.
+- False method compatibility errors when overriding core methods when targeting PHP versions < 8.1 .
+- False undefined variable when variable declared as reference in anon function use clause where anon function is argument.
+- Incorrect type inferred when variable appears in nested logical expressions.
+- Type resolution when using `parent` keyword and `static` return types.
+- Unused private methods not detected if they call self.
+- False return type error when using `yield` in `for` expr. 
+- False duplicate symbol when importing same symbol in different namespace blocks of same name.
+- Undefined symbol not reported when import exists in other namespace block of same name.
+- False duplicate symbol when defined in match expr.
+- Local rename of excluded/stub definition should be allowed.
+
 ## [1.8.2 - 2022-02-23]
 
 #### Fixed
