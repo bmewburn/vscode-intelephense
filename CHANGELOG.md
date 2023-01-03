@@ -1,5 +1,16 @@
 # Change Log
 
+## [1.9.1 - 2023-01-03]
+
+#### Fixed
+- Missing `random` stubs.
+- Missing `xdiff` stubs.
+- Handle non-standard `non-empty-string`, `lowercase-string` , `non-empty-lowercase-string` PHPDOC types.
+- False error when assigning to readonly property within constructor.
+- Remove template/generics licence requirement.
+- Undefined methods showing where users may have multiple type definitions of same name in workspace folder.
+- Various template issues.
+
 ## [1.9.0 - 2023-01-01]
 
 #### Added
