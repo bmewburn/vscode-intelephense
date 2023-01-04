@@ -7,6 +7,7 @@
 - False undefined property for types that inherit `__get`, `__set` from super type or traits.
 - `intelephense.compatibility.correctForArrayAccessArrayAndTraversableArrayUnionTypes` not working for properties.
 - False readonly write error for writes to array/ArrayAccess element.
+- Namespace rename creating file renames containing backslashes.
 
 ## [1.9.1 - 2023-01-03]
 
