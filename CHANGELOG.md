@@ -1,5 +1,13 @@
 # Change Log
 
+## [1.9.2 - 2023-01-04]
+
+#### Fixed
+- False write to readonly property in `__get`.
+- False undefined property for types that inherit `__get`, `__set` from super type or traits.
+- `intelephense.compatibility.correctForArrayAccessArrayAndTraversableArrayUnionTypes` not working for properties.
+- False readonly write error for writes to array/ArrayAccess element.
+
 ## [1.9.1 - 2023-01-03]
 
 #### Fixed
