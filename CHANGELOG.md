@@ -1,5 +1,13 @@
 # Change Log
 
+## [1.9.3 - 2023-01-10]
+
+#### Fixed
+- False cannot modify readonly property errors.
+- Property hover when type is a union of intersection and null.
+- Method level `@template` PhpDoc inheritance.
+- Template resolution when user has provided overrides for non templated vendor definitions. 
+
 ## [1.9.2 - 2023-01-04]
 
 #### Fixed
