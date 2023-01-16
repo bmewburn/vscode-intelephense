@@ -15,6 +15,7 @@ Intelephense is a high performance PHP language server packed full of essential 
 * Embedded **HTML/JS/CSS code intelligence**.
 * Detailed **hover** with links to official PHP documentation.
 * Smart **highlight** of references and keywords.
+* Advanced PHPDoc type system supporting **templates and callable signatures**.
 * Reads **PHPStorm metadata** for improved type analysis and suggestions.
 * Easy **rename** of symbols. When appropriate, files/folders are automatically renamed too. [PREMIUM](https://intelephense.com)
 * Accurate **code folding** of definitions, blocks, use declarations, heredoc, comments, and custom regions. [PREMIUM](https://intelephense.com)

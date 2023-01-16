@@ -1,5 +1,14 @@
 # Change Log
 
+## [1.9.4 - 2023-01-17]
+
+#### Fixed
+- Template inheritance.
+- Suggestions when `$this` call chaining.
+- `static` type resolution when used as template type argument.
+- Nullable types showing incorrectly in hover.
+- Not all suggestions showing from types with multiple definitions.
+
 ## [1.9.3 - 2023-01-10]
 
 #### Fixed
