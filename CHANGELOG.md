@@ -1,5 +1,13 @@
 # Change Log
 
+## [1.9.5 - 2023-02-06]
+
+#### Fixed
+- Document symbol ranges when `SymbolInformation` is returned instead of `DocumentSymbol` (fixes sticky scroll).
+- Docblock types inherited too eagerly causing various param and return type issues. 
+- Templating issues when trait provides implementation of templated interface.
+- Exclude globs working incorrectly.
+
 ## [1.9.4 - 2023-01-17]
 
 #### Fixed
