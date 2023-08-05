@@ -71,7 +71,7 @@ export async function activate(context: ExtensionContext) {
 				previousLineText: /^\s*(((else ?)?if|for(each)?|while)\s*\(.*\)\s*|else\s*)$/,
 				// But make sure line doesn't have braces or is not another if statement
 				beforeText: /^\s+([^{i\s]|i(?!f\b))/,
-				action: { indent: IndentAction.Outdent }
+				action: { indentAction: IndentAction.Outdent }
 			}
 		]
 	});
