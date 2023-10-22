@@ -65,6 +65,13 @@ export async function activate(context: ExtensionContext) {
 				// e.g.  *-----*/|
 				beforeText: /^(\t|(\ \ ))*\ \*[^/]*\*\/\s*$/,
 				action: { indentAction: IndentAction.None, removeText: 1 }
+			},
+			{
+				// Decrease indentation after single line if/else if/else, for, foreach, or while
+				previousLineText: /^\s*(((else ?)?if|for(each)?|while)\s*\(.*\)\s*|else\s*)$/,
+				// But make sure line doesn't have braces or is not another if statement
+				beforeText: /^\s+([^{i\s]|i(?!f\b))/,
+				action: { indentAction: IndentAction.Outdent }
 			}
 		]
 	});
