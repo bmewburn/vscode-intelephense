@@ -1,5 +1,40 @@
 # Change Log
 
+## [1.10.0 - 2023-11-05]
+
+#### Added
+- PHP 8.3 support
+- Array/Object shapes via annotations. For example - `/** @param array{foo:string, bar:int} $arrayShape */`, `/** @return object{foo:string, bar:int} */`.
+- Improved type inference for `new $className` expressions where `$className` is of type `class-string`.
+- Annotation to ignore diagnostics/problems on statement level: `/** @disregard [OPTIONAL CODE] [OPTIONAL DESCRIPTION] */`. For example `/** @disregard P1013 method exists on runtime type */`.
+- Conditional return types. Must be encapsulated in parentheses. For example - `/** @return ($param is string ? string : object) */`, `/** @return (T is string ? string : object) */`
+
+#### Changed
+- Updated stubs.
+- Updated dependencies.
+- Problem/diagnostic codes are now strings, with the previous codes prefixed with 'P'.
+- Properties with a declared or annotated type are now only narrowed on assignment to a subset of the declared/annotated type.
+
+#### Fixed
+- Auto indexing on composer install/update
+- Signature help showing no parameters when there are multiple definitions in workspace.
+- Type lost when null coalescing with empty array.
+- Wrong type when bitwise expr operands are both strings.
+- PhpDoc being applied to consecutive symbol declarations when used with enum case.
+- Property attributes not suggested on constructor promoted properties.
+- `class-string<T>|T` type resolution.
+- Method definitions not found for method string in callable array function arguments when multiple definitions of class/method are in workspace.
+- Methods marked as undefined when packages provide ide helper stubs for other packages.
+- Enums not suggested in namespace use declarations.
+- Renaming the namespace of an enum not working correctly.
+- Renaming a namespace will affect unrelated namespaces with a similar name.
+- Rename symbol of variable will impact named parameter.
+- Type inference when iterating over `$this` in foreach.
+- Symbols being given Global* alias on autocomplete when multiple definitions exist in workspace including in the current file.
+- Missing `isIncomplete` flag on suggestion response in some contexts.
+- Usage of `self` in trait not resolving to class that trait used in.
+- Removal of line breaks when formatting nested parenthesised logical expressions.
+
 ## [1.9.5 - 2023-02-06]
 
 #### Fixed
