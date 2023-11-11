@@ -13,7 +13,7 @@
     "version": "1.10.0",
     "publisher": "bmewburn",
     "engines": {
-        "vscode": "^1.71.0"
+        "vscode": "^1.79.0"
     },
     "categories": [
         "Programming Languages",
@@ -22,8 +22,7 @@
     ],
     "preview": false,
     "activationEvents": [
-        "onLanguage:php",
-        "onCommand:intelephense.enter.key"
+        "onLanguage:php"
     ],
     "keywords": [
         "php",
