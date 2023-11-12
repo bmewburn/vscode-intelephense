@@ -1,5 +1,19 @@
 # Change Log
 
+## [1.10.1 - 2023-11-13]
+
+#### Fixed
+- Return types of some stubs
+- False error when array or object shape passed to function expecting array or object.
+- Array destructure of numeric indexed array shape.
+- False error when using argument unpacking.
+- False error when using array unpack on an array shape.
+- Crash when parsing malformed or unsupported conditional return type syntax.
+- Format only providing edit to remove closing tag even though other edits are applicable.
+- Method template resolution when method comes from `@mixin` class.
+- Expected pattern to be a non-empty string crash.
+- Declare correct min vscode version - 1.79
+
 ## [1.10.0 - 2023-11-05]
 
 #### Added
