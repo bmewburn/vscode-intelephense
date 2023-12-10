@@ -1,5 +1,13 @@
 # Change Log
 
+## [1.10.2 - 2023-12-10]
+
+#### Fixed
+- Crash when `self` not used inside class.
+- False cannot use parent in class with no parent diagnostics. 
+- Undefined class not reported when using `ClassName::class`.
+- Type inference when destructuring array shape with numeric or no keys.
+
 ## [1.10.1 - 2023-11-13]
 
 #### Fixed
