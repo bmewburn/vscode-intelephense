@@ -1,5 +1,28 @@
 # Change Log
 
+## [1.10.3 - 2024-03-25]
+
+#### Fixed
+- Incorrect return type when using null safe operator.
+- False undefined variable error in 3rd `for` control expression.
+- Incorrect return type for traits with method templates.
+- False return type error when method returns method or class template type.
+- Subclass constructor should not inherit phpdoc from superclass constructor.
+- Conditional return types when testing parameter in namespaced file. 
+- False unknown named argument diagnostic with closures.
+- Formatter adding extra space in method call where method named `catch`.
+- Nested heredoc parsing.
+- False unknown named argument diagnostic with trait method aliases.
+- Metadata overrides when named args are used.
+- Various version dependent stub type problems.
+- Array callback references not being found.
+- Type inference for const symbols with `new` object initialisers.
+- Type inference in switch/match with instanceof.
+- Trait template mapping when phpdoc provided above trait use declaration.
+- Object creation expression with variable returning `object` when more specific type could be inferred.
+- False method compatibility diagnostic with base class that has a trait method alias. 
+- False method not implemented diagnostics when enum implements interface that extends BackedEnum.
+
 ## [1.10.2 - 2023-12-10]
 
 #### Fixed
