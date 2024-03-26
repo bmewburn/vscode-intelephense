@@ -1,5 +1,10 @@
 # Change Log
 
+## [1.10.4 - 2024-03-26]
+
+#### Fixed
+- Cannot read properties of undefined (reading kind) with `for` loops which have parse errors.
+
 ## [1.10.3 - 2024-03-25]
 
 #### Fixed
