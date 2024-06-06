@@ -466,14 +466,14 @@
                 },
                 "intelephense.format.braces": {
                     "type": "string",
-                    "default": "psr12",
+                    "default": "per",
                     "enum": [
-                        "psr12",
+                        "per",
                         "allman",
                         "k&r"
                     ],
                     "enumDescriptions": [
-                        "PHP-FIG PSR-2 and PSR-12 style. A mix of Allman and K&R",
+                        "PHP-FIG PER style. A mix of Allman and K&R. https://www.php-fig.org/per/coding-style/",
                         "Allman. Opening brace on the next line.",
                         "K&R (1TBS). Opening brace on the same line."
                     ],
