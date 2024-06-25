@@ -464,6 +464,12 @@
                     "description": "The maximum number of completion items returned per request.",
                     "scope": "window"
                 },
+                "completion.suggestObjectOperatorStaticMethods": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "PHP permits the calling of static methods using the object operator eg `$obj->myStaticMethod();`. If you would prefer not to have static methods suggested in this context then set this value to `false`. Defaults to `true`.",
+                    "scope": "window"
+                },
                 "intelephense.format.enable": {
                     "type": "boolean",
                     "default": true,
