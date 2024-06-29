@@ -10,7 +10,7 @@
     "sponsor": {
         "url": "https://intelephense.com"
     },
-    "version": "1.10.4",
+    "version": "1.11.0",
     "publisher": "bmewburn",
     "engines": {
         "vscode": "^1.82.0"
@@ -846,17 +846,17 @@
         "@types/mocha": "~10.0.2",
         "@types/node": "20.x",
         "@types/semver": "~7.5.8",
+        "@types/vscode": "~1.82.0",
+        "@vscode/test-electron": "^2.4.0",
         "rimraf": "~5.0.7",
         "ts-loader": "~9.5.1",
         "typescript": "~5.4.5",
-        "@types/vscode": "~1.82.0",
-        "vscode-test": "~1.6.1",
         "webpack": "~5.92.1",
         "webpack-cli": "~5.1.4"
     },
     "dependencies": {
         "fs-extra": "~11.2.0",
-        "intelephense": "1.10.4",
+        "intelephense": "1.11.0",
         "semver": "~7.6.2",
         "vscode-languageclient": "9.0.1"
     },

@@ -1,5 +1,74 @@
 # Change Log
 
+## [1.11.0 - 2024-06-29]
+
+#### Added
+- Type Hierarchy. **[Premium](https://intelephense.com)**
+- Support for `key-of<Type>` utility type.
+- Support for `T[K]` index access utility types.
+- Completion suggestions for `$_SERVER` array keys.
+- `unset()` now set variable type to `unset`.
+- Phpdoc unsealed array shape syntax - `array{foo: 'bar', ...<int, object>}`.
+- Support PHP 8.3 enum and class constant dynamic access syntax.
+- Ability to turn formatter off/on with comments. Within PHP - `// @formatter:off`, `// @formatter:on`. Within HTML - `<!-- @formatter:off -->`. Within js/CSS - `/* @formatter:off */`.
+- New setting to prefer `@psalm-`, `@phpstan-` prefixed annotations when determining symbol type. Defaults to `false`. `intelephense.compatibility.preferPsalmPhpstanPrefixedAnnotations`.
+- Support for `@psalm-type` and `@psalm-import-type` type aliases. Set `intelephense.compatibility.preferPsalmPhpstanPrefixedAnnotations` to `true` to enable.
+- Support `@see`, `@uses`, `@link` annotations and inline variants.
+- Static member access completion/hover/references when scope is variable of type `class-string<Foo>`.
+- Hover on array shape string keys.
+- New `intelephense.diagnostics.relaxedTypeCheck` setting. Defaults to `true` (previous version behaviour). This setting makes type checking less thorough by allowing contravariant (wider) types to also satisfy a type constraint. This is useful for projects that may have incomplete or innacurate typings. Set to `false` for more thorough type checks. When this setting is `true`, the `noMixedTypeCheck` setting is ignored.
+- New `intelephense.diagnostics.noMixedTypeCheck` setting. Defaults to `true` (previous version behaviour). This setting turns off type checking for the `mixed` type. This is useful for projects that may have incomplete or innacurate typings. Set to `false` to make type checking more thorough by not allowing `mixed` to satisy any type constraint. This setting has no effect when `relaxedTypeCheck` is `true`.
+- New `completion.suggestObjectOperatorStaticMethods` setting. PHP permits the calling of static methods using the object operator eg `$obj->myStaticMethod();`. If you would prefer not to have static methods suggested in this context then set this value to `false`. Defaults to `true`.
+- Parameter types are now injected into inline closure arguments to functions from the corresponding parameter annotated callable type. For example declaring `function doCallback($myCallback) {}` with annotation `/** @param \Closure(Foo $param): void $myCallback **/` will result in type hints for `$param` inside `doCallback(function ($param) { /* $param type is known */ });`
+- Support `@var` annotated type above `define` constants.
+
+#### Changed
+- Minimum VSCode version 1.82.
+- Recommended nodejs version 20.
+- Literal types and array shapes are now used for constants. eg the type of `const FOO = 'bar';` is now `'bar'` instead of `string`, `const ARR = ['foo' => true]` is now `array{foo: true}` instead of `array`.
+- `$argv` is now type `string[]`.
+- `$http_response_header` is now type `array|unset`.
+- `$php_errmsg` is now type `string|unset`.
+- Updated stubs.
+- Formatter now aims to be [PER](https://www.php-fig.org/per/coding-style/) compliant. As such, `psr12` setting in `intelephense.format.braces` has been removed and `per` added.
+- Formatter now allows a single space or no space in unary logical negation.
+- Empty class, trait, interface, enum, function, method bodies are formatted to `{}` with a single space preceeding `{`.
+- Short anonymous functions are now formatted to have no space between `fn` and `(`.
+- Improved multiline `foreach` expression formatting.
+- Formatter now allows a single space or no space before colon in alternate control statements.
+- Formatter now allows a single space or newline + indent before opening brace in anonymous class.
+- Formatter now allows semicolon to be placed on a separate line in multiline chained expression statements.
+- Multiline arrays are now formatted to a single element per line.
+- Formatter will preserve wrapped attibutes in HTML.
+- When multiple method/function candidates are found for a call expression, the result will be a union of the return types of the functions/methods.
+
+#### Fixed
+- Template type resolution from args when arg is subtype of param type.
+- Various control flow fixes and improvements.
+- Missing or poorly displayed code blocks in hover/completion documentation for some built-in symbols.
+- Array destructure with skipped elements.
+- Shorthand ternary type inference.
+- Incorrect import folding range.
+- Param with optional array shape element not indicating element is optional when hovering.
+- Hover on named arg of closure showing incorrect type `unset`.
+- Incorrect type inferred for dynamic object creation expression when dynamic type is union.
+- Hover showing non php fenced codeblocks incorrectly.
+- Stack overflow with deeply nested string concatenation (TYPO3 PackageArtifact.php).
+- Incorrect return type for symbols with metadata and null default parameter value (Laravel `app()`);
+- Incorrect type when generating phpdoc for variadic params.
+- Declare statement should accept comma separated directive list.
+- Incorrect `$matches` type after `preg_match_all` call.
+- Promoted property highlight.
+- Code actions not showing when narrow or zero length range provided.
+- Unable to `@disregard` errors in method header.
+- Unnecessary match expr format when operand of binary expr.
+- Incorrect file rename if `composer.json` contains autoload paths without trailing `/`.
+- `static::class` resolving to parent class name rather than child class name.
+- Trait method `self` return type not resolving to consuming class when used as implementation for interface method.
+- Don't show `iterable` as interface.
+- Variables typed as `iterable<Foo>` not working with array access notation.
+- Array destructure with `ArrayAccess`.
+
 ## [1.10.4 - 2024-03-26]
 
 #### Fixed
