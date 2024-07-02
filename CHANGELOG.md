@@ -43,7 +43,7 @@
 - `$http_response_header` is now type `array|unset`.
 - `$php_errmsg` is now type `string|unset`.
 - Updated stubs.
-- Formatter now aims to be [PER](https://www.php-fig.org/per/coding-style/) compliant. As such, `psr12` setting in `intelephense.format.braces` has been removed and `per` added.
+- Formatter now aims to be [PER-CS](https://www.php-fig.org/per/coding-style/) compliant. As such, `psr12` setting in `intelephense.format.braces` has been removed and `per` added.
 - Formatter now allows a single space or no space in unary logical negation.
 - Empty class, trait, interface, enum, function, method bodies are formatted to `{}` with a single space preceeding `{`.
 - Short anonymous functions are now formatted to have no space between `fn` and `(`.
