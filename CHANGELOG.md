@@ -1,6 +1,19 @@
 # Change Log
 
-## [1.11.0 - 2024-06-29]
+## [1.11.1 - 2024-07-02] **Pre-Release**
+
+#### Changed
+- When a trait has an annotated or abstract method and the real method definition is supplied by a base class, then go to definition will now go to the base class definition instead of the trait method declaration.
+- Go to implementations now includes implementations provided by a trait where a class both uses the trait and implements the interface.
+
+#### Fixed
+- False diagnostic when type `class-string` passed to `string` constraint.
+- Setting `completion.suggestObjectOperatorStaticMethods` should be `intelephense.completion.suggestObjectOperatorStaticMethods`.
+- Crash when parsing incomplete phpdoc type with template type args.
+- Crash when encountering `trigger_error` call with `E_USER_ERROR` as argument.
+- Conditional return types with default parameter argument.
+
+## [1.11.0 - 2024-06-29] **Pre-Release**
 
 #### Added
 - Type Hierarchy. **[Premium](https://intelephense.com)**
