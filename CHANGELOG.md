@@ -1,5 +1,13 @@
 # Change Log
 
+## [1.11.2 - 2024-07-03] **Pre-Release**
+
+#### Fixed
+- Type inference for properties with default initialisers.
+- Performance degradation in code with many array read and writes.
+- False undefined variable after `while` loop with condition expression that resolves to `true` literal type.
+- Stack overflow when applying large text edits.
+
 ## [1.11.1 - 2024-07-02] **Pre-Release**
 
 #### Changed
