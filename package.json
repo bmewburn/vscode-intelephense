@@ -832,6 +832,30 @@
                     "default": "off",
                     "description": "Traces the communication between VSCode and the intelephense language server.",
                     "scope": "window"
+                },
+                "intelephense.codeLens.implementations.enable": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Enables a code lens that shows implementations of interfaces, abstract classes, interface methods, and abstract methods.",
+                    "scope": "window"
+                },
+                "intelephense.codeLens.overrides.enable": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Enables a code lens that shows method overrides.",
+                    "scope": "window"
+                },
+                "intelephense.codeLens.parent.enable": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Enables a code lens that shows the parent of a method.",
+                    "scope": "window"
+                },
+                "intelephense.codeLens.usages.enable": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Enables a code lens that shows trait usages.",
+                    "scope": "window"
                 }
             }
         }
@@ -856,7 +880,7 @@
     },
     "dependencies": {
         "fs-extra": "~11.2.0",
-        "intelephense": "1.11.4",
+        "intelephense": "file:../intelephense",
         "semver": "~7.6.2",
         "vscode-languageclient": "9.0.1"
     },
