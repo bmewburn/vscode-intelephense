@@ -1,5 +1,17 @@
 # Change Log
 
+## [1.11.4 - 2024-07-04] **Pre-Release**
+
+#### Fixed
+- Invalid Argument Error e.toLspSymbolKind lib/intelephense.js:2:3058335
+
+## [1.11.3 - 2024-07-04] **Pre-Release**
+
+#### Fixed
+- Laravel eloquent builder queries losing model type.
+- Template mapping between class with a base class method.
+- Cannot read properties of undefined (reading 'length') when encountering attributed property declared with `var`.
+
 ## [1.11.2 - 2024-07-03] **Pre-Release**
 
 #### Fixed
