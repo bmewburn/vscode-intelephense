@@ -1,5 +1,13 @@
 # Change Log
 
+## [1.11.5 - 2024-07-07] **Pre-Release**
+
+#### Fixed
+- Various control flow analysis issues.
+- Performance and type inference issues with array read/writes.
+- Type inference following `yield` expression.
+- False type error when unpacking templated type.
+
 ## [1.11.4 - 2024-07-04] **Pre-Release**
 
 #### Fixed
