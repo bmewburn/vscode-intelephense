@@ -1,5 +1,26 @@
 # Change Log
 
+## [1.11.6 - 2024-07-29] **Pre-Release**
+
+#### Added
+- Handle phpstan call site variance syntax.
+
+#### Changed
+- Template types and metadata return types will no longer resolve to an argument type of `never` in order to prevent code being unintentionally marked unreachable following function/method calls.
+- Undefined property diagnostic now suppressed in `isset`, `empty`, `unset`, LHS of null coalesce to match PHP behaviour.
+- Type check of LHS of property access expression suppressed in `isset`, `empty`, `unset`, LHS of null coalesce to match PHP behaviour.
+
+#### Fixed
+- `float` parameter should permit `int` as argument.
+- Type inference with `null` equality comparison.
+- Undefined variables not diagnosed inside closure.
+- False undefined method diagnostics with templated parameters.
+- Auto import function adding unnecessary `function` keyword when in group use list.
+- Variable type becoming mixed when passed by ref in closure use clause.
+- Circular reference problem when trait has `@mixin` of the same class that exhibits it.
+- False argument count error when trait provides implementation for an interface and gives params default args.
+- Unable to override variable type with `@var` if RHS of assignment contains closure.
+
 ## [1.11.5 - 2024-07-07] **Pre-Release**
 
 #### Fixed
