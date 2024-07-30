@@ -1,5 +1,14 @@
 # Change Log
 
+## [1.11.7 - 2024-07-30] **Pre-Release**
+
+#### Changed
+- Reducing to minimal union types is now less eager.
+
+#### Fixed
+- False undefined class constant in unreachable code.
+- Cannot read properties of undefined (reading 'length') intelephense.js:2:2322561
+
 ## [1.11.6 - 2024-07-29] **Pre-Release**
 
 #### Added
