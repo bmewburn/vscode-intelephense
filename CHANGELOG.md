@@ -1,5 +1,10 @@
 # Change Log
 
+## [1.11.8 - 2024-08-01] **Pre-Release**
+
+#### Fixed
+- Lost variable types after `xor` expr;
+
 ## [1.11.7 - 2024-07-30] **Pre-Release**
 
 #### Changed
