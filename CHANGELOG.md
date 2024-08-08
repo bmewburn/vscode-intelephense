@@ -1,5 +1,11 @@
 # Change Log
 
+## [1.12.2 - 2024-08-08]
+
+#### Fixed
+- Added missing code lens middleware
+- TypeError: Cannot read properties of undefined (reading 'scopeTypeDefinition')
+
 ## [1.12.1 - 2024-08-08]
 
 #### Fixed

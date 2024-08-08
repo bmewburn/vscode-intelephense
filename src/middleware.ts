@@ -10,11 +10,17 @@
 'use strict';
 
 import {
-    Middleware, HandleDiagnosticsSignature, ConfigurationParams, RequestHandler
+    Middleware, HandleDiagnosticsSignature, ConfigurationParams, RequestHandler,
+    CodeLens, Location as ILocation, Position as IPosition
 } from 'vscode-languageclient';
 import {
     CancellationToken, workspace, Disposable, Uri,
-    Diagnostic, DiagnosticTag
+    Diagnostic, DiagnosticTag,
+    Command,
+    Position,
+    Location,
+    Range,
+    CodeLens as VCodeLens
 } from 'vscode';
 
 export interface IntelephenseMiddleware extends Middleware, Disposable { }
@@ -25,7 +31,7 @@ export function createMiddleware(): IntelephenseMiddleware {
 
     function mergeAssociations(intelephenseAssociations: string[]) {
         let vscodeConfig = workspace.getConfiguration('files');
-        if(!vscodeConfig) {
+        if (!vscodeConfig) {
             return intelephenseAssociations;
         }
         let vscodeAssociations = vscodeConfig.get('associations') || {};
@@ -81,6 +87,39 @@ export function createMiddleware(): IntelephenseMiddleware {
         return settings;
     }
 
+    function transformCodeLensResolveResult(lens: CodeLens): CodeLens {
+
+        if (
+            lens.command &&
+            lens.command.command === 'editor.action.peekLocations' &&
+            lens.command.arguments
+        ) {
+            if (typeof lens.command.arguments[0] === 'string') {
+                lens.command.arguments[0] = Uri.parse(lens.command.arguments[0]);
+            }
+
+            if (IPosition.is(lens.command.arguments[1])) {
+                lens.command.arguments[1] = new Position(lens.command.arguments[1].line, lens.command.arguments[1].character);
+            }
+
+            if (Array.isArray(lens.command.arguments[2])) {
+                lens.command.arguments[2] = lens.command.arguments[2].map(
+                    l => ILocation.is(l)
+                        ? new Location(
+                            Uri.parse(l.uri),
+                            new Range(new Position(l.range.start.line, l.range.start.character), new Position(l.range.end.line, l.range.end.character))
+                        )
+                        : l
+                );
+            }
+        }
+        console.log('transformCodeLensResolveResult');
+        return new VCodeLens(
+            new Range(new Position(lens.range.start.line, lens.range.start.character), new Position(lens.range.end.line, lens.range.end.character)), 
+            lens.command
+        );
+    }
+
     let middleware = <IntelephenseMiddleware>{
         workspace: {
             configuration: (
@@ -91,13 +130,20 @@ export function createMiddleware(): IntelephenseMiddleware {
 
                 let result = next(params, token);
                 if (!isThenable(result)) {
-                    return Array.isArray(result) ? mergeSettings(result, params): result;
+                    return Array.isArray(result) ? mergeSettings(result, params) : result;
                 }
 
                 return (<Thenable<any>>result).then(r => {
-                    return Array.isArray(result) ? mergeSettings(result, params): result;
+                    return Array.isArray(result) ? mergeSettings(result, params) : result;
                 });
             }
+        },
+        resolveCodeLens: (codeLens, token, next) => {
+            let result = next(codeLens, token);
+            if (!isThenable(result)) {
+                return result ? transformCodeLensResolveResult(result) : result;
+            }
+            return result.then(r => r ? transformCodeLensResolveResult(r) : r);
         },
 
         dispose: Disposable.from(...toDispose).dispose
@@ -107,6 +153,6 @@ export function createMiddleware(): IntelephenseMiddleware {
 
 }
 
-function isThenable(obj: any) {
+function isThenable(obj: any): obj is Thenable<any> {
     return obj && obj.then !== undefined;
 }
