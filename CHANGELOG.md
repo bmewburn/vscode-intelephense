@@ -1,5 +1,10 @@
 # Change Log
 
+## [1.12.1 - 2024-08-08]
+
+#### Fixed
+- Added missing code lens settings.
+
 ## [1.12.0 - 2024-08-08]
 
 See 1.11.x Pre-Release

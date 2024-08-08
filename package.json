@@ -10,7 +10,7 @@
     "sponsor": {
         "url": "https://intelephense.com"
     },
-    "version": "1.12.0",
+    "version": "1.12.1",
     "publisher": "bmewburn",
     "engines": {
         "vscode": "^1.82.0"
@@ -832,6 +832,36 @@
                     "default": "off",
                     "description": "Traces the communication between VSCode and the intelephense language server.",
                     "scope": "window"
+                },
+                "intelephense.codeLens.references.enable" : {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Enable a code lens that shows a reference count and command to peek locations.",
+                    "scope": "window"
+                },
+                "intelephense.codeLens.implementations.enable" : {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Enable a code lens that shows an abstract and interface implementations count and command to peek locations.",
+                    "scope": "window"
+                },
+                "intelephense.codeLens.usages.enable" : {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Enable a code lens that shows a trait usages count and command to peek locations.",
+                    "scope": "window"
+                }, 
+                "intelephense.codeLens.overrides.enable" : {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Enable a code lens that shows method override count and command to peek locations.",
+                    "scope": "window"
+                }, 
+                "intelephense.codeLens.parent.enable" : {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Enable a code lens that indicates if a method has a parent implementation and command to peek location.",
+                    "scope": "window"
                 }
             }
         }
@@ -856,7 +886,7 @@
     },
     "dependencies": {
         "fs-extra": "~11.2.0",
-        "intelephense": "1.12.0",
+        "intelephense": "1.12.1",
         "semver": "~7.6.2",
         "vscode-languageclient": "9.0.1"
     },
