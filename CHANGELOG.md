@@ -1,5 +1,23 @@
 # Change Log
 
+## [1.12.0 - 2024-08-08]
+
+See 1.11.x Pre-Release
+
+#### Added
+- Code lens for references, abstract/interface implementations, trait usages, method overrides, method parent. Code lenses are disabled by default and can be enabled by setting the `intelephense.codeLens.references.enable`, `intelephense.codeLens.implementations.enable`, `intelephense.codeLens.usages.enable`, `intelephense.codeLens.overrides.enable`, `intelephense.codeLens.parent.enable` settings to `true` respectively. **[Premium](https://intelephense.com)**
+- Find all references for `__construct`. 
+- Object shape property hover.
+
+#### Changed
+- Built in array function stubs now have templated definitions.
+- Improved DOMNodeList::getIterator stub
+
+#### Fixed
+- Comparing class-string in conditional return yielding incorrect type when subject is subtype of test type.
+- No type inference and false undefined property when accessing property of intersection type with object shape component.
+- `@internal` annotation missing description in hover.
+
 ## [1.11.8 - 2024-08-01] **Pre-Release**
 
 #### Fixed
