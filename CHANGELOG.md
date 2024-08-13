@@ -1,5 +1,16 @@
 # Change Log
 
+## [1.12.3 - 2024-08-13]
+
+#### Fixed
+- Hover, go to definition not working on phpdoc `@see` FQSEN. 
+- Callable signatures with `static` typed parameter resolving to incorrect type.
+- Type inference within `for` statements with no control expression.
+- Should not do additional type checks on variables that have `unset` type.
+- Variables with type `null` not taking on by ref parameter type when passed as argument.
+- Anonymous function parameters showing as undefined when function declared inside array.
+- Variables assigned to in `try` block have type `unset` in `catch` clause.
+
 ## [1.12.2 - 2024-08-08]
 
 #### Fixed
