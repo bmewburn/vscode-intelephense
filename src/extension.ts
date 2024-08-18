@@ -29,7 +29,8 @@ const CANCEL_INDEXING_REQUEST = new RequestType('cancelIndexing');
 const INDEX_WORKSPACE_CMD_NAME = 'intelephense.index.workspace';
 const CANCEL_INDEXING_CMD_NAME = 'intelephense.cancel.indexing';
 const ENTER_KEY_CMD_NAME = 'intelephense.enter.key';
-const LICENCE_MEMENTO_KEY = 'intelephense.licence.key';
+const GLOBAL_STATE_LICENCE_KEY = 'intelephense.licence.key';
+const GLOBAL_STATE_VERSION_KEY = 'intelephenseVersion';
 
 let languageClient: LanguageClient;
 let extensionContext: ExtensionContext;
@@ -76,6 +77,7 @@ export async function activate(context: ExtensionContext) {
 		]
 	});
 
+    context.globalState.setKeysForSync([GLOBAL_STATE_LICENCE_KEY, GLOBAL_STATE_VERSION_KEY]);
 	extensionContext = context;
 	let versionMemento = context.workspaceState.get<string>('version');
 	let clearCache = false;
@@ -105,6 +107,8 @@ export async function activate(context: ExtensionContext) {
 		enterKeyCmdDisposable,
 		middleware
 	);
+
+    
 
 	languageClient.start().then(() => {
 		registerNotificationListeners();
@@ -151,7 +155,7 @@ function createClient(context:ExtensionContext, middleware:IntelephenseMiddlewar
 		storagePath: context.storagePath,
 		clearCache: clearCache,
         globalStoragePath: context.globalStoragePath,
-        licenceKey: context.globalState.get<string>(LICENCE_MEMENTO_KEY),
+        licenceKey: context.globalState.get<string>(GLOBAL_STATE_LICENCE_KEY),
 		isVscode: true
 	};
 
@@ -172,9 +176,8 @@ function createClient(context:ExtensionContext, middleware:IntelephenseMiddlewar
 }
 
 function showStartMessage(context: ExtensionContext) {
-	const globalVersionMementoKey = 'intelephenseVersion';
-	let key = context.globalState.get<string>(LICENCE_MEMENTO_KEY);
-	const lastVersion = context.globalState.get<string>(globalVersionMementoKey);
+	let key = context.globalState.get<string>(GLOBAL_STATE_LICENCE_KEY);
+	const lastVersion = context.globalState.get<string>(GLOBAL_STATE_VERSION_KEY);
 	const open = 'Open';
 	const dismiss = 'Dismiss';
 	if (key || (lastVersion && !semver.lt(lastVersion, VERSION))) {
@@ -188,7 +191,7 @@ function showStartMessage(context: ExtensionContext) {
 		if(value === open) {
 			env.openExternal(Uri.parse('https://intelephense.com'));
 		} else {
-			context.globalState.update(globalVersionMementoKey, VERSION);
+			context.globalState.update(GLOBAL_STATE_VERSION_KEY, VERSION);
 		}
 	});
 }
@@ -219,7 +222,7 @@ function cancelIndexing() {
 
 function enterLicenceKey(context:ExtensionContext) {
 	
-	let currentValue = context.globalState.get<string>(LICENCE_MEMENTO_KEY);
+	let currentValue = context.globalState.get<string>(GLOBAL_STATE_LICENCE_KEY);
 	let options:InputBoxOptions = {
 		prompt: 'Intelephense Licence Key',
 		ignoreFocusOut: true,
@@ -238,7 +241,7 @@ function enterLicenceKey(context:ExtensionContext) {
 
 	window.showInputBox(options).then(async key => {
         if(key !== undefined) {
-            await context.globalState.update(LICENCE_MEMENTO_KEY, key);
+            await context.globalState.update(GLOBAL_STATE_LICENCE_KEY, key);
             if(key) {
                 try {
                     await activateKey(context, key);
