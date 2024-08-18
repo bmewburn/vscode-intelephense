@@ -588,7 +588,7 @@
                 "intelephense.diagnostics.undefinedProperties": {
                     "type": "boolean",
                     "default": true,
-                    "description": "Enables undefined static property diagnostics.",
+                    "description": "Enables undefined property diagnostics.",
                     "scope": "window"
                 },
                 "intelephense.diagnostics.unusedSymbols": {
