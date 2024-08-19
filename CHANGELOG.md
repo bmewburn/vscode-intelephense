@@ -1,5 +1,13 @@
 # Change Log
 
+## [1.12.4 - 2024-08-19]
+
+#### Fixed
+- Parameter type showing `unset` for anonymous functions declared within an unpacked array.
+- Callable signatures with `static` typed parameter losing template type args.
+- Parameter type showing `unset` for anonymous functions declared within an anonymous class header.
+- Licence key not syncing across machines in VSCode.
+
 ## [1.12.3 - 2024-08-13]
 
 #### Fixed
