@@ -1,5 +1,17 @@
 # Change Log
 
+## [1.12.5 - 2024-08-29]
+
+#### Fixed
+- Performance issue with large arrays. Array shapes are now only generated internally on arrays with 20 or less elements.
+- Go to type definition not working when origin is an assignment expression.
+- Type lost when built in constants `true`, `false`, and `null` are prefixed with backslash.
+- `static` as a template type argument resolving to wrong type.
+- False method signature compatibility errors for built-in PHP symbols when targeting PHP versions < 8.1.
+- Incorrect and cut-off completion suggestions when triggered by `use` inside a top level anonymous function.
+- Don't eagerly reduce unions when substituting templated types.
+- False return type error diagnostics when calling templated parent methods. 
+
 ## [1.12.4 - 2024-08-19]
 
 #### Fixed
