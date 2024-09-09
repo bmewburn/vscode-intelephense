@@ -1,5 +1,16 @@
 # Change Log
 
+## [1.12.6 - 2024-09-09]
+
+#### Fixed
+- Template types incorrect when implementing `Iterator`.
+- `Traverable` template types lost.
+- `assert` not working when fully qualified.
+- False `unset` variables after logical expression when using `or` operator.
+- No completion suggestions for variables declared in array destructure.
+- Don't reduce function return types to minimal type as eagerly.
+- False unused symbol diagnostic for promoted property with no visibility modifier.
+
 ## [1.12.5 - 2024-08-29]
 
 #### Fixed
