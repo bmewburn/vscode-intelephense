@@ -113,7 +113,6 @@ export function createMiddleware(): IntelephenseMiddleware {
                 );
             }
         }
-        console.log('transformCodeLensResolveResult');
         return new VCodeLens(
             new Range(new Position(lens.range.start.line, lens.range.start.character), new Position(lens.range.end.line, lens.range.end.character)), 
             lens.command

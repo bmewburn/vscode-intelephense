@@ -1,5 +1,36 @@
 # Change Log
 
+## [1.13.0 - 2024-12-17] Pre-release
+
+#### Added
+- PHP 8.4 class member access on instantiation without parentheses.
+- PHP 8.4 property hooks.
+- PHP 8.4 asymmetric visibility.
+- PHP 8.4 deprecated diagnostic for implict nullable parameters.
+- Support `@mixin` template types. This improves type inference when using Laravel 11.
+- `intelephense.diagnostics.memberAccess` setting that controls whether to show diagnostics relating to member access. Defaults to `true`.
+
+#### Changed
+- Default PHP version now 8.4.
+- Updated stubs.
+- Parent and Overrides code lens no longer shown above methods that have no parent or overrides to reduce clutter.
+
+#### Fixed
+- Crash when parsing phpdoc with conditional type containing newlines.
+- `Traversable` not treated as covariant to `iterable`.
+- Incorrect types for some `$_SERVER` elements.
+- Enums not recognised as implementations of interfaces.
+- Incorrect parse error for empty heredoc.
+- Type not narrowed when using nullsafe operator.
+- Template types not resolved for `__invoke`.
+- Go to type definition not working for foreach value.
+- Incorrect formatting of comments above `default` in match expression.
+- False method signature diagnostics when using older versions of PHP.
+- Variable type incorrectly inferred as `never` inside while loops with logical conditional expression.
+- False readonly property error when initialising trait declared property in exhibiting class.
+- Bad range formatting when selecting part of a multiline call chain.
+- Template types not resolved when passing `Iterator` to `iterable` constraint.
+
 ## [1.12.6 - 2024-09-09]
 
 #### Fixed
