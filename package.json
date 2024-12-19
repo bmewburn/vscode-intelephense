@@ -508,7 +508,7 @@
                 },
                 "intelephense.environment.phpVersion": {
                     "type": "string",
-                    "default": "8.3.0",
+                    "default": "8.4.0",
                     "description": "A semver compatible string that represents the target PHP version. Used for providing version appropriate suggestions and diagnostics. PHP 5.3.0 and greater supported.",
                     "scope": "window"
                 },
