@@ -1,5 +1,15 @@
 # Change Log
 
+## [1.13.1 - 2024-12-30] Pre-release
+
+#### Fixed
+- False parse errors when editing open tags and `intelephense.environment.shortOpenTag` is enabled.
+- Default PHP version should be 8.4.
+- Missing `frakenphp` from stubs enum.
+- False implicit nullable parameter diagnostic when type is `mixed`.
+- False abstract not allowed error for PHP8.4 abstract properties.
+- Union of `Traversable` and empty array losing traversable template type.
+
 ## [1.13.0 - 2024-12-17] Pre-release
 
 #### Added
