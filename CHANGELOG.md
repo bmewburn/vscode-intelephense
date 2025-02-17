@@ -1,5 +1,429 @@
 # Change Log
 
+## [1.13.1 - 2024-12-30] Pre-release
+
+#### Fixed
+- False parse errors when editing open tags and `intelephense.environment.shortOpenTag` is enabled.
+- Default PHP version should be 8.4.
+- Missing `frakenphp` from stubs enum.
+- False implicit nullable parameter diagnostic when type is `mixed`.
+- False abstract not allowed error for PHP8.4 abstract properties.
+- Union of `Traversable` and empty array losing traversable template type.
+
+## [1.13.0 - 2024-12-17] Pre-release
+
+#### Added
+- PHP 8.4 class member access on instantiation without parentheses.
+- PHP 8.4 property hooks.
+- PHP 8.4 asymmetric visibility.
+- PHP 8.4 deprecated diagnostic for implict nullable parameters.
+- Support `@mixin` template types. This improves type inference when using Laravel 11.
+- `intelephense.diagnostics.memberAccess` setting that controls whether to show diagnostics relating to member access. Defaults to `true`.
+
+#### Changed
+- Default PHP version now 8.4.
+- Updated stubs.
+- Parent and Overrides code lens no longer shown above methods that have no parent or overrides to reduce clutter.
+
+#### Fixed
+- Crash when parsing phpdoc with conditional type containing newlines.
+- `Traversable` not treated as covariant to `iterable`.
+- Incorrect types for some `$_SERVER` elements.
+- Enums not recognised as implementations of interfaces.
+- Incorrect parse error for empty heredoc.
+- Type not narrowed when using nullsafe operator.
+- Template types not resolved for `__invoke`.
+- Go to type definition not working for foreach value.
+- Incorrect formatting of comments above `default` in match expression.
+- False method signature diagnostics when using older versions of PHP.
+- Variable type incorrectly inferred as `never` inside while loops with logical conditional expression.
+- False readonly property error when initialising trait declared property in exhibiting class.
+- Bad range formatting when selecting part of a multiline call chain.
+- Template types not resolved when passing `Iterator` to `iterable` constraint.
+
+## [1.12.6 - 2024-09-09]
+
+#### Fixed
+- Template types incorrect when implementing `Iterator`.
+- `Traverable` template types lost.
+- `assert` not working when fully qualified.
+- False `unset` variables after logical expression when using `or` operator.
+- No completion suggestions for variables declared in array destructure.
+- Don't reduce function return types to minimal type as eagerly.
+- False unused symbol diagnostic for promoted property with no visibility modifier.
+
+## [1.12.5 - 2024-08-29]
+
+#### Fixed
+- Performance issue with large arrays. Array shapes are now only generated internally on arrays with 20 or less elements.
+- Go to type definition not working when origin is an assignment expression.
+- Type lost when built in constants `true`, `false`, and `null` are prefixed with backslash.
+- `static` as a template type argument resolving to wrong type.
+- False method signature compatibility errors for built-in PHP symbols when targeting PHP versions < 8.1.
+- Incorrect and cut-off completion suggestions when triggered by `use` inside a top level anonymous function.
+- Don't eagerly reduce unions when substituting templated types.
+- False return type error diagnostics when calling templated parent methods. 
+
+## [1.12.4 - 2024-08-19]
+
+#### Fixed
+- Parameter type showing `unset` for anonymous functions declared within an unpacked array.
+- Callable signatures with `static` typed parameter losing template type args.
+- Parameter type showing `unset` for anonymous functions declared within an anonymous class header.
+- Licence key not syncing across machines in VSCode.
+
+## [1.12.3 - 2024-08-13]
+
+#### Fixed
+- Hover, go to definition not working on phpdoc `@see` FQSEN. 
+- Callable signatures with `static` typed parameter resolving to incorrect type.
+- Type inference within `for` statements with no control expression.
+- Should not do additional type checks on variables that have `unset` type.
+- Variables with type `null` not taking on by ref parameter type when passed as argument.
+- Anonymous function parameters showing as undefined when function declared inside array.
+- Variables assigned to in `try` block have type `unset` in `catch` clause.
+
+## [1.12.2 - 2024-08-08]
+
+#### Fixed
+- Added missing code lens middleware
+- TypeError: Cannot read properties of undefined (reading 'scopeTypeDefinition')
+
+## [1.12.1 - 2024-08-08]
+
+#### Fixed
+- Added missing code lens settings.
+
+## [1.12.0 - 2024-08-08]
+
+See 1.11.x Pre-Release
+
+#### Added
+- Code lens for references, abstract/interface implementations, trait usages, method overrides, method parent. Code lenses are disabled by default and can be enabled by setting the `intelephense.codeLens.references.enable`, `intelephense.codeLens.implementations.enable`, `intelephense.codeLens.usages.enable`, `intelephense.codeLens.overrides.enable`, `intelephense.codeLens.parent.enable` settings to `true` respectively. **[Premium](https://intelephense.com)**
+- Find all references for `__construct`. 
+- Object shape property hover.
+
+#### Changed
+- Built in array function stubs now have templated definitions.
+- Improved DOMNodeList::getIterator stub
+
+#### Fixed
+- Comparing class-string in conditional return yielding incorrect type when subject is subtype of test type.
+- No type inference and false undefined property when accessing property of intersection type with object shape component.
+- `@internal` annotation missing description in hover.
+
+## [1.11.8 - 2024-08-01] **Pre-Release**
+
+#### Fixed
+- Lost variable types after `xor` expr;
+
+## [1.11.7 - 2024-07-30] **Pre-Release**
+
+#### Changed
+- Reducing to minimal union types is now less eager.
+
+#### Fixed
+- False undefined class constant in unreachable code.
+- Cannot read properties of undefined (reading 'length') intelephense.js:2:2322561
+
+## [1.11.6 - 2024-07-29] **Pre-Release**
+
+#### Added
+- Handle phpstan call site variance syntax.
+
+#### Changed
+- Template types and metadata return types will no longer resolve to an argument type of `never` in order to prevent code being unintentionally marked unreachable following function/method calls.
+- Undefined property diagnostic now suppressed in `isset`, `empty`, `unset`, LHS of null coalesce to match PHP behaviour.
+- Type check of LHS of property access expression suppressed in `isset`, `empty`, `unset`, LHS of null coalesce to match PHP behaviour.
+
+#### Fixed
+- `float` parameter should permit `int` as argument.
+- Type inference with `null` equality comparison.
+- Undefined variables not diagnosed inside closure.
+- False undefined method diagnostics with templated parameters.
+- Auto import function adding unnecessary `function` keyword when in group use list.
+- Variable type becoming mixed when passed by ref in closure use clause.
+- Circular reference problem when trait has `@mixin` of the same class that exhibits it.
+- False argument count error when trait provides implementation for an interface and gives params default args.
+- Unable to override variable type with `@var` if RHS of assignment contains closure.
+
+## [1.11.5 - 2024-07-07] **Pre-Release**
+
+#### Fixed
+- Various control flow analysis issues.
+- Performance and type inference issues with array read/writes.
+- Type inference following `yield` expression.
+- False type error when unpacking templated type.
+
+## [1.11.4 - 2024-07-04] **Pre-Release**
+
+#### Fixed
+- Invalid Argument Error e.toLspSymbolKind lib/intelephense.js:2:3058335
+
+## [1.11.3 - 2024-07-04] **Pre-Release**
+
+#### Fixed
+- Laravel eloquent builder queries losing model type.
+- Template mapping between class with a base class method.
+- Cannot read properties of undefined (reading 'length') when encountering attributed property declared with `var`.
+
+## [1.11.2 - 2024-07-03] **Pre-Release**
+
+#### Fixed
+- Type inference for properties with default initialisers.
+- Performance degradation in code with many array read and writes.
+- False undefined variable after `while` loop with condition expression that resolves to `true` literal type.
+- Stack overflow when applying large text edits.
+
+## [1.11.1 - 2024-07-02] **Pre-Release**
+
+#### Changed
+- When a trait has an annotated or abstract method and the real method definition is supplied by a base class, then go to definition will now go to the base class definition instead of the trait method declaration.
+- Go to implementations now includes implementations provided by a trait where a class both uses the trait and implements the interface.
+
+#### Fixed
+- False diagnostic when type `class-string` passed to `string` constraint.
+- Setting `completion.suggestObjectOperatorStaticMethods` should be `intelephense.completion.suggestObjectOperatorStaticMethods`.
+- Crash when parsing incomplete phpdoc type with template type args.
+- Crash when encountering `trigger_error` call with `E_USER_ERROR` as argument.
+- Conditional return types with default parameter argument.
+
+## [1.11.0 - 2024-06-29] **Pre-Release**
+
+#### Added
+- Type Hierarchy. **[Premium](https://intelephense.com)**
+- Support for `key-of<Type>` utility type.
+- Support for `T[K]` index access utility types.
+- Completion suggestions for `$_SERVER` array keys.
+- `unset()` now set variable type to `unset`.
+- Phpdoc unsealed array shape syntax - `array{foo: 'bar', ...<int, object>}`.
+- Support PHP 8.3 enum and class constant dynamic access syntax.
+- Ability to turn formatter off/on with comments. Within PHP - `// @formatter:off`, `// @formatter:on`. Within HTML - `<!-- @formatter:off -->`. Within js/CSS - `/* @formatter:off */`.
+- New setting to prefer `@psalm-`, `@phpstan-` prefixed annotations when determining symbol type. Defaults to `false`. `intelephense.compatibility.preferPsalmPhpstanPrefixedAnnotations`.
+- Support for `@psalm-type` and `@psalm-import-type` type aliases. Set `intelephense.compatibility.preferPsalmPhpstanPrefixedAnnotations` to `true` to enable.
+- Support `@see`, `@uses`, `@link` annotations and inline variants.
+- Static member access completion/hover/references when scope is variable of type `class-string<Foo>`.
+- Hover on array shape string keys.
+- New `intelephense.diagnostics.relaxedTypeCheck` setting. Defaults to `true` (previous version behaviour). This setting makes type checking less thorough by allowing contravariant (wider) types to also satisfy a type constraint. This is useful for projects that may have incomplete or innacurate typings. Set to `false` for more thorough type checks. When this setting is `true`, the `noMixedTypeCheck` setting is ignored.
+- New `intelephense.diagnostics.noMixedTypeCheck` setting. Defaults to `true` (previous version behaviour). This setting turns off type checking for the `mixed` type. This is useful for projects that may have incomplete or innacurate typings. Set to `false` to make type checking more thorough by not allowing `mixed` to satisy any type constraint. This setting has no effect when `relaxedTypeCheck` is `true`.
+- New `completion.suggestObjectOperatorStaticMethods` setting. PHP permits the calling of static methods using the object operator eg `$obj->myStaticMethod();`. If you would prefer not to have static methods suggested in this context then set this value to `false`. Defaults to `true`.
+- Parameter types are now injected into inline closure arguments to functions from the corresponding parameter annotated callable type. For example declaring `function doCallback($myCallback) {}` with annotation `/** @param \Closure(Foo $param): void $myCallback **/` will result in type hints for `$param` inside `doCallback(function ($param) { /* $param type is known */ });`
+- Support `@var` annotated type above `define` constants.
+
+#### Changed
+- Minimum VSCode version 1.82.
+- Recommended nodejs version 20.
+- Literal types and array shapes are now used for constants. eg the type of `const FOO = 'bar';` is now `'bar'` instead of `string`, `const ARR = ['foo' => true]` is now `array{foo: true}` instead of `array`.
+- `$argv` is now type `string[]`.
+- `$http_response_header` is now type `array|unset`.
+- `$php_errmsg` is now type `string|unset`.
+- Updated stubs.
+- Formatter now aims to be [PER-CS](https://www.php-fig.org/per/coding-style/) compliant. As such, `psr12` setting in `intelephense.format.braces` has been removed and `per` added.
+- Formatter now allows a single space or no space in unary logical negation.
+- Empty class, trait, interface, enum, function, method bodies are formatted to `{}` with a single space preceeding `{`.
+- Short anonymous functions are now formatted to have no space between `fn` and `(`.
+- Improved multiline `foreach` expression formatting.
+- Formatter now allows a single space or no space before colon in alternate control statements.
+- Formatter now allows a single space or newline + indent before opening brace in anonymous class.
+- Formatter now allows semicolon to be placed on a separate line in multiline chained expression statements.
+- Multiline arrays are now formatted to a single element per line.
+- Formatter will preserve wrapped attibutes in HTML.
+- When multiple method/function candidates are found for a call expression, the result will be a union of the return types of the functions/methods.
+
+#### Fixed
+- Template type resolution from args when arg is subtype of param type.
+- Various control flow fixes and improvements.
+- Missing or poorly displayed code blocks in hover/completion documentation for some built-in symbols.
+- Array destructure with skipped elements.
+- Shorthand ternary type inference.
+- Incorrect import folding range.
+- Param with optional array shape element not indicating element is optional when hovering.
+- Hover on named arg of closure showing incorrect type `unset`.
+- Incorrect type inferred for dynamic object creation expression when dynamic type is union.
+- Hover showing non php fenced codeblocks incorrectly.
+- Stack overflow with deeply nested string concatenation (TYPO3 PackageArtifact.php).
+- Incorrect return type for symbols with metadata and null default parameter value (Laravel `app()`);
+- Incorrect type when generating phpdoc for variadic params.
+- Declare statement should accept comma separated directive list.
+- Incorrect `$matches` type after `preg_match_all` call.
+- Promoted property highlight.
+- Code actions not showing when narrow or zero length range provided.
+- Unable to `@disregard` errors in method header.
+- Unnecessary match expr format when operand of binary expr.
+- Incorrect file rename if `composer.json` contains autoload paths without trailing `/`.
+- `static::class` resolving to parent class name rather than child class name.
+- Trait method `self` return type not resolving to consuming class when used as implementation for interface method.
+- Don't show `iterable` as interface.
+- Variables typed as `iterable<Foo>` not working with array access notation.
+- Array destructure with `ArrayAccess`.
+
+## [1.10.4 - 2024-03-26]
+
+#### Fixed
+- Cannot read properties of undefined (reading kind) with `for` loops which have parse errors.
+
+## [1.10.3 - 2024-03-25]
+
+#### Fixed
+- Incorrect return type when using null safe operator.
+- False undefined variable error in 3rd `for` control expression.
+- Incorrect return type for traits with method templates.
+- False return type error when method returns method or class template type.
+- Subclass constructor should not inherit phpdoc from superclass constructor.
+- Conditional return types when testing parameter in namespaced file. 
+- False unknown named argument diagnostic with closures.
+- Formatter adding extra space in method call where method named `catch`.
+- Nested heredoc parsing.
+- False unknown named argument diagnostic with trait method aliases.
+- Metadata overrides when named args are used.
+- Various version dependent stub type problems.
+- Array callback references not being found.
+- Type inference for const symbols with `new` object initialisers.
+- Type inference in switch/match with instanceof.
+- Trait template mapping when phpdoc provided above trait use declaration.
+- Object creation expression with variable returning `object` when more specific type could be inferred.
+- False method compatibility diagnostic with base class that has a trait method alias. 
+- False method not implemented diagnostics when enum implements interface that extends BackedEnum.
+
+## [1.10.2 - 2023-12-10]
+
+#### Fixed
+- Crash when `self` not used inside class.
+- False cannot use parent in class with no parent diagnostics. 
+- Undefined class not reported when using `ClassName::class`.
+- Type inference when destructuring array shape with numeric or no keys.
+
+## [1.10.1 - 2023-11-13]
+
+#### Fixed
+- Return types of some stubs
+- False error when array or object shape passed to function expecting array or object.
+- Array destructure of numeric indexed array shape.
+- False error when using argument unpacking.
+- False error when using array unpack on an array shape.
+- Crash when parsing malformed or unsupported conditional return type syntax.
+- Format only providing edit to remove closing tag even though other edits are applicable.
+- Method template resolution when method comes from `@mixin` class.
+- Expected pattern to be a non-empty string crash.
+- Declare correct min vscode version - 1.79
+
+## [1.10.0 - 2023-11-05]
+
+#### Added
+- PHP 8.3 support
+- Array/Object shapes via annotations. For example - `/** @param array{foo:string, bar:int} $arrayShape */`, `/** @return object{foo:string, bar:int} */`.
+- Improved type inference for `new $className` expressions where `$className` is of type `class-string`.
+- Annotation to ignore diagnostics/problems on statement level: `/** @disregard [OPTIONAL CODE] [OPTIONAL DESCRIPTION] */`. For example `/** @disregard P1013 method exists on runtime type */`.
+- Conditional return types. Must be encapsulated in parentheses. For example - `/** @return ($param is string ? string : object) */`, `/** @return (T is string ? string : object) */`
+
+#### Changed
+- Updated stubs.
+- Updated dependencies.
+- Problem/diagnostic codes are now strings, with the previous codes prefixed with 'P'.
+- Properties with a declared or annotated type are now only narrowed on assignment to a subset of the declared/annotated type.
+
+#### Fixed
+- Auto indexing on composer install/update
+- Signature help showing no parameters when there are multiple definitions in workspace.
+- Type lost when null coalescing with empty array.
+- Wrong type when bitwise expr operands are both strings.
+- PhpDoc being applied to consecutive symbol declarations when used with enum case.
+- Property attributes not suggested on constructor promoted properties.
+- `class-string<T>|T` type resolution.
+- Method definitions not found for method string in callable array function arguments when multiple definitions of class/method are in workspace.
+- Methods marked as undefined when packages provide ide helper stubs for other packages.
+- Enums not suggested in namespace use declarations.
+- Renaming the namespace of an enum not working correctly.
+- Renaming a namespace will affect unrelated namespaces with a similar name.
+- Rename symbol of variable will impact named parameter.
+- Type inference when iterating over `$this` in foreach.
+- Symbols being given Global* alias on autocomplete when multiple definitions exist in workspace including in the current file.
+- Missing `isIncomplete` flag on suggestion response in some contexts.
+- Usage of `self` in trait not resolving to class that trait used in.
+- Removal of line breaks when formatting nested parenthesised logical expressions.
+
+## [1.9.5 - 2023-02-06]
+
+#### Fixed
+- Document symbol ranges when `SymbolInformation` is returned instead of `DocumentSymbol` (fixes sticky scroll).
+- Docblock types inherited too eagerly causing various param and return type issues. 
+- Templating issues when trait provides implementation of templated interface.
+- Exclude globs working incorrectly.
+
+## [1.9.4 - 2023-01-17]
+
+#### Fixed
+- Template inheritance.
+- Suggestions when `$this` call chaining.
+- `static` type resolution when used as template type argument.
+- Nullable types showing incorrectly in hover.
+- Not all suggestions showing from types with multiple definitions.
+
+## [1.9.3 - 2023-01-10]
+
+#### Fixed
+- False cannot modify readonly property errors.
+- Property hover when type is a union of intersection and null.
+- Method level `@template` PhpDoc inheritance.
+- Template resolution when user has provided overrides for non templated vendor definitions. 
+
+## [1.9.2 - 2023-01-04]
+
+#### Fixed
+- False write to readonly property in `__get`.
+- False undefined property for types that inherit `__get`, `__set` from super type or traits.
+- `intelephense.compatibility.correctForArrayAccessArrayAndTraversableArrayUnionTypes` not working for properties.
+- False readonly write error for writes to array/ArrayAccess element.
+- Namespace rename creating file renames containing backslashes.
+
+## [1.9.1 - 2023-01-03]
+
+#### Fixed
+- Missing `random` stubs.
+- Missing `xdiff` stubs.
+- Handle non-standard `non-empty-string`, `lowercase-string` , `non-empty-lowercase-string` PHPDOC types.
+- False error when assigning to readonly property within constructor.
+- Remove template/generics licence requirement.
+- Undefined methods showing where users may have multiple type definitions of same name in workspace folder.
+- Various template issues.
+
+## [1.9.0 - 2023-01-01]
+
+#### Added
+- PHP 8.2 support.
+- PHPDOC `@template` support.
+- Handle non-standard PHPDOC types like `list`. Internally `list<Foo>` is treated as `Foo[]`. 
+- PHPDOC `callable(Foo $foo): Bar`, `\Closure(Foo): Bar` support. Variadic and default args are not supported in the short form.
+- Added undefined property diagnostics. Can be disabled via the `intelephense.diagnostics.undefinedProperties` setting.
+
+#### Changed
+- Updated dependencies.
+- Updated stubs.
+- Signature help provider now returns null instead of empty signatures array as per LSP recommendations.
+- composer.json `autoload.psr-4` settings used if available for file renames when renaming namespace.
+- Added templated `array_map` stub in order to better infer return type.
+
+#### Fixed
+- Performance issue when workspace contains multiple symbols with same name.
+- Various issues when `__halt_compiler` appears in file.
+- False `never` return type when `die` used in logical expression.
+- False undefined method when static used in union return type.
+- Completion item documentation showing multiple times for namespace suggestions.
+- Type inference for return type of closures.
+- False unknown arg name when calling closure with named args.
+- False unused imports with enum implements.
+- False method compatibility error when overriding base method return type of self with static.
+- False method compatibility errors when overriding core methods when targeting PHP versions < 8.1 .
+- False undefined variable when variable declared as reference in anon function use clause where anon function is argument.
+- Incorrect type inferred when variable appears in nested logical expressions.
+- Type resolution when using `parent` keyword and `static` return types.
+- Unused private methods not detected if they call self.
+- False return type error when using `yield` in `for` expr. 
+- False duplicate symbol when importing same symbol in different namespace blocks of same name.
+- Undefined symbol not reported when import exists in other namespace block of same name.
+- False duplicate symbol when defined in match expr.
+- Local rename of excluded/stub definition should be allowed.
+
 ## [1.8.2 - 2022-02-23]
 
 #### Fixed

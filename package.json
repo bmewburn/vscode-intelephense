@@ -7,10 +7,13 @@
         "email": "ben@mewburn.id.au"
     },
     "license": "SEE LICENSE IN LICENSE.txt",
-    "version": "1.8.2",
+    "sponsor": {
+        "url": "https://intelephense.com"
+    },
+    "version": "1.13.1",
     "publisher": "bmewburn",
     "engines": {
-        "vscode": "^1.52.0"
+        "vscode": "^1.82.0"
     },
     "categories": [
         "Programming Languages",
@@ -19,8 +22,7 @@
     ],
     "preview": false,
     "activationEvents": [
-        "onLanguage:php",
-        "onCommand:intelephense.enter.key"
+        "onLanguage:php"
     ],
     "keywords": [
         "php",
@@ -66,7 +68,7 @@
         },
         "virtualWorkspaces": {
             "supported": "limited",
-            "description": "Virtual Workspaces are not indexed. As such language intelligence and symbol recognition is limited to open files."
+            "description": "Virtual Workspaces are not indexed. Language intelligence and symbol recognition is limited to open files."
         }
     },
     "contributes": {
@@ -121,6 +123,12 @@
                     "type": "boolean",
                     "default": true,
                     "description": "Resolves `ArrayAccess` and `Traversable` implementations that are unioned with a typed array to generic syntax. eg `ArrayAccessOrTraversable|ElementType[]` => `ArrayAccessOrTraversable<mixed, ElementType>`.",
+                    "scope": "window"
+                },
+                "intelephense.compatibility.preferPsalmPhpstanPrefixedAnnotations": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Prefer `@psalm-` and `@phpstan-` prefixed `@return`, `@var`, `@param` tags when determining symbol types.",
                     "scope": "window"
                 },
                 "intelephense.files.maxSize": {
@@ -187,16 +195,20 @@
                             "dio",
                             "dom",
                             "ds",
+                            "eio",
+                            "elastic_apm",
                             "enchant",
                             "Ev",
                             "event",
                             "exif",
+                            "expect",
                             "fann",
                             "FFI",
                             "ffmpeg",
                             "fileinfo",
                             "filter",
                             "fpm",
+                            "frankenphp",
                             "ftp",
                             "gd",
                             "gearman",
@@ -252,6 +264,8 @@
                             "oci8",
                             "odbc",
                             "openssl",
+                            "opentelemetry",
+                            "pam",
                             "parallel",
                             "Parle",
                             "pcntl",
@@ -267,9 +281,11 @@
                             "Phar",
                             "phpdbg",
                             "posix",
+                            "pq",
                             "pspell",
                             "pthreads",
                             "radius",
+                            "random",
                             "rar",
                             "rdkafka",
                             "readline",
@@ -277,12 +293,15 @@
                             "redis",
                             "Reflection",
                             "regex",
+                            "relay",
                             "rpminfo",
                             "rrd",
                             "SaxonC",
                             "session",
                             "shmop",
+                            "simple_kafka_client",
                             "SimpleXML",
+                            "snappy",
                             "snmp",
                             "soap",
                             "sockets",
@@ -301,6 +320,7 @@
                             "superglobals",
                             "svm",
                             "svn",
+                            "swoole",
                             "sybase",
                             "sync",
                             "sysvmsg",
@@ -309,6 +329,7 @@
                             "tidy",
                             "tokenizer",
                             "uopz",
+                            "uploadprogress",
                             "uuid",
                             "uv",
                             "v8js",
@@ -319,6 +340,7 @@
                             "wordpress",
                             "xcache",
                             "xdebug",
+                            "xdiff",
                             "xhprof",
                             "xlswriter",
                             "xml",
@@ -388,6 +410,7 @@
                         "Phar",
                         "posix",
                         "pspell",
+                        "random",
                         "readline",
                         "Reflection",
                         "session",
@@ -442,6 +465,12 @@
                     "description": "The maximum number of completion items returned per request.",
                     "scope": "window"
                 },
+                "intelephense.completion.suggestObjectOperatorStaticMethods": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "PHP permits the calling of static methods using the object operator eg `$obj->myStaticMethod();`. If you would prefer not to have static methods suggested in this context then set this value to `false`. Defaults to `true`.",
+                    "scope": "window"
+                },
                 "intelephense.format.enable": {
                     "type": "boolean",
                     "default": true,
@@ -450,14 +479,14 @@
                 },
                 "intelephense.format.braces": {
                     "type": "string",
-                    "default": "psr12",
+                    "default": "per",
                     "enum": [
-                        "psr12",
+                        "per",
                         "allman",
                         "k&r"
                     ],
                     "enumDescriptions": [
-                        "PHP-FIG PSR-2 and PSR-12 style. A mix of Allman and K&R",
+                        "PHP-FIG PER-CS style. A mix of Allman and K&R. https://www.php-fig.org/per/coding-style/",
                         "Allman. Opening brace on the next line.",
                         "K&R (1TBS). Opening brace on the same line."
                     ],
@@ -479,7 +508,7 @@
                 },
                 "intelephense.environment.phpVersion": {
                     "type": "string",
-                    "default": "8.1.0",
+                    "default": "8.4.0",
                     "description": "A semver compatible string that represents the target PHP version. Used for providing version appropriate suggestions and diagnostics. PHP 5.3.0 and greater supported.",
                     "scope": "window"
                 },
@@ -560,7 +589,7 @@
                 "intelephense.diagnostics.undefinedProperties": {
                     "type": "boolean",
                     "default": true,
-                    "description": "Enables undefined static property diagnostics.",
+                    "description": "Enables undefined property diagnostics.",
                     "scope": "window"
                 },
                 "intelephense.diagnostics.unusedSymbols": {
@@ -609,6 +638,24 @@
                     "type": "boolean",
                     "default": true,
                     "description": "Enables reporting of problems associated with method and class implementations. For example, unimplemented methods or method signature incompatibilities.",
+                    "scope": "window"
+                },
+                "intelephense.diagnostics.relaxedTypeCheck": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "This setting makes type checking less thorough by allowing contravariant (wider) types to also satisfy a type constraint. This is useful for projects that may have incomplete or innacurate typings. Set to `false` for more thorough type checks. When this setting is `true`, the `noMixedTypeCheck` setting is ignored.",
+                    "scope": "window"
+                },
+                "intelephense.diagnostics.noMixedTypeCheck": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "This setting turns off type checking for the `mixed` type. This is useful for projects that may have incomplete or innacurate typings. Set to `false` to make type checking more thorough by not allowing `mixed` to satisy any type constraint. This setting has no effect when `relaxedTypeCheck` is `true`.",
+                    "scope": "window"
+                },
+                "intelephense.diagnostics.memberAccess": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enables reporting of errors associated with type member access.",
                     "scope": "window"
                 },
                 "intelephense.runtime": {
@@ -792,6 +839,36 @@
                     "default": "off",
                     "description": "Traces the communication between VSCode and the intelephense language server.",
                     "scope": "window"
+                },
+                "intelephense.codeLens.references.enable" : {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Enable a code lens that shows a reference count and command to peek locations.",
+                    "scope": "window"
+                },
+                "intelephense.codeLens.implementations.enable" : {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Enable a code lens that shows an abstract and interface implementations count and command to peek locations.",
+                    "scope": "window"
+                },
+                "intelephense.codeLens.usages.enable" : {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Enable a code lens that shows a trait usages count and command to peek locations.",
+                    "scope": "window"
+                }, 
+                "intelephense.codeLens.overrides.enable" : {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Enable a code lens that shows method override count and command to peek locations.",
+                    "scope": "window"
+                }, 
+                "intelephense.codeLens.parent.enable" : {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Enable a code lens that indicates if a method has a parent implementation and command to peek location.",
+                    "scope": "window"
                 }
             }
         }
@@ -802,23 +879,23 @@
         "production": "rimraf lib && webpack --config webpack.config.js"
     },
     "devDependencies": {
-        "@types/fs-extra": "~9.0.1",
-        "@types/mocha": "~7.0.2",
-        "@types/node": "~12.12.29",
-        "@types/semver": "~7.3.2",
-        "rimraf": "~3.0.2",
-        "ts-loader": "~8.0.2",
-        "typescript": "~4.1.3",
-        "@types/vscode": "~1.52.0",
-        "vscode-test": "~1.4.1",
-        "webpack": "~5.11.1",
-        "webpack-cli": "~4.3.1"
+        "@types/fs-extra": "~11.0.4",
+        "@types/mocha": "~10.0.2",
+        "@types/node": "20.x",
+        "@types/semver": "~7.5.8",
+        "@types/vscode": "~1.82.0",
+        "@vscode/test-electron": "^2.4.0",
+        "rimraf": "~5.0.7",
+        "ts-loader": "~9.5.1",
+        "typescript": "~5.4.5",
+        "webpack": "~5.92.1",
+        "webpack-cli": "~5.1.4"
     },
     "dependencies": {
-        "fs-extra": "~9.0.1",
-        "intelephense": "1.8.2",
-        "semver": "~7.3.2",
-        "vscode-languageclient": "~7.0.0"
+        "fs-extra": "~11.2.0",
+        "intelephense": "1.13.1-beta.1",
+        "semver": "~7.6.2",
+        "vscode-languageclient": "9.0.1"
     },
     "private": true
 }

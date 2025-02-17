@@ -22,19 +22,19 @@ import { createMiddleware, IntelephenseMiddleware } from './middleware';
 import * as fs from 'fs-extra';
 
 const PHP_LANGUAGE_ID = 'php';
-const VERSION = '1.8.2';
+const VERSION = '1.13.1';
 const INDEXING_STARTED_NOTIFICATION = new NotificationType('indexingStarted');
 const INDEXING_ENDED_NOTIFICATION = new NotificationType('indexingEnded');
 const CANCEL_INDEXING_REQUEST = new RequestType('cancelIndexing');
 const INDEX_WORKSPACE_CMD_NAME = 'intelephense.index.workspace';
 const CANCEL_INDEXING_CMD_NAME = 'intelephense.cancel.indexing';
 const ENTER_KEY_CMD_NAME = 'intelephense.enter.key';
-const LICENCE_MEMENTO_KEY = 'intelephense.licence.key';
+const GLOBAL_STATE_LICENCE_KEY = 'intelephense.licence.key';
+const GLOBAL_STATE_VERSION_KEY = 'intelephenseVersion';
 
 let languageClient: LanguageClient;
 let extensionContext: ExtensionContext;
 let middleware:IntelephenseMiddleware;
-let clientDisposable:Disposable;
 
 export async function activate(context: ExtensionContext) {
 
@@ -66,10 +66,18 @@ export async function activate(context: ExtensionContext) {
 				// e.g.  *-----*/|
 				beforeText: /^(\t|(\ \ ))*\ \*[^/]*\*\/\s*$/,
 				action: { indentAction: IndentAction.None, removeText: 1 }
+			},
+			{
+				// Decrease indentation after single line if/else if/else, for, foreach, or while
+				previousLineText: /^\s*(((else ?)?if|for(each)?|while)\s*\(.*\)\s*|else\s*)$/,
+				// But make sure line doesn't have braces or is not another if statement
+				beforeText: /^\s+([^{i\s]|i(?!f\b))/,
+				action: { indentAction: IndentAction.Outdent }
 			}
 		]
 	});
 
+    context.globalState.setKeysForSync([GLOBAL_STATE_LICENCE_KEY, GLOBAL_STATE_VERSION_KEY]);
 	extensionContext = context;
 	let versionMemento = context.workspaceState.get<string>('version');
 	let clearCache = false;
@@ -100,7 +108,12 @@ export async function activate(context: ExtensionContext) {
 		middleware
 	);
 
-	clientDisposable = languageClient.start();
+    
+
+	languageClient.start().then(() => {
+		registerNotificationListeners();
+		showStartMessage(context);
+	});
 }
 
 function createClient(context:ExtensionContext, middleware:IntelephenseMiddleware, clearCache:boolean) {
@@ -142,7 +155,7 @@ function createClient(context:ExtensionContext, middleware:IntelephenseMiddlewar
 		storagePath: context.storagePath,
 		clearCache: clearCache,
         globalStoragePath: context.globalStoragePath,
-        licenceKey: context.globalState.get<string>(LICENCE_MEMENTO_KEY),
+        licenceKey: context.globalState.get<string>(GLOBAL_STATE_LICENCE_KEY),
 		isVscode: true
 	};
 
@@ -159,17 +172,12 @@ function createClient(context:ExtensionContext, middleware:IntelephenseMiddlewar
 
 	// Create the language client and start the client.
 	languageClient = new LanguageClient('intelephense', 'intelephense', serverOptions, clientOptions);
-	languageClient.onReady().then(() => {
-		registerNotificationListeners();
-		showStartMessage(context);
-	});
 	return languageClient;
 }
 
 function showStartMessage(context: ExtensionContext) {
-	const globalVersionMementoKey = 'intelephenseVersion';
-	let key = context.globalState.get<string>(LICENCE_MEMENTO_KEY);
-	const lastVersion = context.globalState.get<string>(globalVersionMementoKey);
+	let key = context.globalState.get<string>(GLOBAL_STATE_LICENCE_KEY);
+	const lastVersion = context.globalState.get<string>(GLOBAL_STATE_VERSION_KEY);
 	const open = 'Open';
 	const dismiss = 'Dismiss';
 	if (key || (lastVersion && !semver.lt(lastVersion, VERSION))) {
@@ -183,14 +191,14 @@ function showStartMessage(context: ExtensionContext) {
 		if(value === open) {
 			env.openExternal(Uri.parse('https://intelephense.com'));
 		} else {
-			context.globalState.update(globalVersionMementoKey, VERSION);
+			context.globalState.update(GLOBAL_STATE_VERSION_KEY, VERSION);
 		}
 	});
 }
 
 export function deactivate() {
 	if (!languageClient) {
-		return undefined;
+		return Promise.resolve();
 	}
 	return languageClient.stop();
 }
@@ -200,9 +208,11 @@ function indexWorkspace() {
 		return;
 	}
 	languageClient.stop().then(_ => {
-		clientDisposable.dispose();
 		languageClient = createClient(extensionContext, middleware, true);
-		clientDisposable = languageClient.start();
+		languageClient.start().then(() => {
+            registerNotificationListeners();
+            showStartMessage(extensionContext);
+        });
 	});
 }
 
@@ -212,7 +222,7 @@ function cancelIndexing() {
 
 function enterLicenceKey(context:ExtensionContext) {
 	
-	let currentValue = context.globalState.get<string>(LICENCE_MEMENTO_KEY);
+	let currentValue = context.globalState.get<string>(GLOBAL_STATE_LICENCE_KEY);
 	let options:InputBoxOptions = {
 		prompt: 'Intelephense Licence Key',
 		ignoreFocusOut: true,
@@ -231,7 +241,7 @@ function enterLicenceKey(context:ExtensionContext) {
 
 	window.showInputBox(options).then(async key => {
         if(key !== undefined) {
-            await context.globalState.update(LICENCE_MEMENTO_KEY, key);
+            await context.globalState.update(GLOBAL_STATE_LICENCE_KEY, key);
             if(key) {
                 try {
                     await activateKey(context, key);
@@ -243,11 +253,13 @@ function enterLicenceKey(context:ExtensionContext) {
             }
             
             //restart
-            if(languageClient && clientDisposable) {
+            if(languageClient) {
                 await languageClient.stop();
-                clientDisposable.dispose();
-                languageClient = createClient(extensionContext, middleware, true);
-                clientDisposable = languageClient.start();
+                languageClient = createClient(context, middleware, true);
+                languageClient.start().then(() => {
+                    registerNotificationListeners();
+                    showStartMessage(context);
+                });
             }
 		}
 	});

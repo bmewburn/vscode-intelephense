@@ -15,6 +15,7 @@ Intelephense is a high performance PHP language server packed full of essential 
 * Embedded **HTML/JS/CSS code intelligence**.
 * Detailed **hover** with links to official PHP documentation.
 * Smart **highlight** of references and keywords.
+* Advanced PHPDoc type system supporting **templates and callable signatures**.
 * Reads **PHPStorm metadata** for improved type analysis and suggestions.
 * Easy **rename** of symbols. When appropriate, files/folders are automatically renamed too. [PREMIUM](https://intelephense.com)
 * Accurate **code folding** of definitions, blocks, use declarations, heredoc, comments, and custom regions. [PREMIUM](https://intelephense.com)
@@ -24,6 +25,8 @@ Intelephense is a high performance PHP language server packed full of essential 
 * Configurable **auto PHPDoc** creation that infers return types and identifies thrown exceptions. [PREMIUM](https://intelephense.com)
 * Syntax tree driven **smart select** to intelligently expand/shrink selection. [PREMIUM](https://intelephense.com)
 * Helpful **code actions** to import symbols, add PHPDoc, and implement all abstract methods. [PREMIUM](https://intelephense.com)
+* Concise **type hierarchy**. Easily view and navigate to subtypes and supertypes. [PREMIUM](https://intelephense.com)
+* Insightful **code lens** that shows references, abstract and interface implementations, trait usages, method parent and overrides. [PREMIUM](https://intelephense.com)
 
 ## Licence
 Purchase a licence at https://intelephense.com to access PREMIUM features. Licence keys grant a single user access to all current and future premium features on multiple devices _forever_. Licence keys must be activated (automatically) via https before use. Features not marked as PREMIUM are free and always will be free.
@@ -51,6 +54,8 @@ Further configuration options are available in the `intelephense` section of set
 
 ## Support
 
+Try the [Intelephense Documentation](https://github.com/bmewburn/intelephense-docs).
+
 Found a bug? Got a feature request? [Create an issue](https://github.com/bmewburn/vscode-intelephense/issues).
 
 ## Acknowledgements
@@ -58,14 +63,18 @@ Found a bug? Got a feature request? [Create an issue](https://github.com/bmewbur
 A big thank you to supporters who have bought a premium licence and have enabled the continued development and maintenance of this extension.
 
 Intelephense uses the following open source libraries. Please see the following links for source code and licences.
+
 * [vscode-languageserver-node](https://github.com/Microsoft/vscode-languageserver-node)
 * [micromatch](https://github.com/micromatch/micromatch)
 * [fs-extra](https://github.com/jprichardson/node-fs-extra)
 * [fast-glob](https://github.com/mrmlnc/fast-glob)
 * [lru-cache](https://github.com/isaacs/node-lru-cache)
-* [turndown](https://github.com/domchristie/turndown)
+* [turndown](https://github.com/mixmark-io/turndown)
 * [protobufjs](https://github.com/dcodeIO/ProtoBuf.js/)
 * [phpstorm-stubs](https://github.com/JetBrains/phpstorm-stubs)
 * [js-beautify](https://github.com/beautify-web/js-beautify)
 * [vscode-uri](https://github.com/microsoft/vscode-uri)
-* [vscode-html-languageserver](https://github.com/vscode-langservers/vscode-html-languageserver)
+* [vscode-html-languageserver](https://github.com/microsoft/vscode)
+* [node-html-to-text](https://github.com/html-to-text/node-html-to-text)
+* [semver](https://github.com/npm/node-semver)
+* [applicationinsights](https://github.com/microsoft/ApplicationInsights-node.js)
