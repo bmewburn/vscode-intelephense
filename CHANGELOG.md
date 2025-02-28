@@ -1,5 +1,37 @@
 # Change Log
 
+## [1.14.0 - 2025-02-28]
+
+#### Added
+- Templated definitions for `array_find`, `array_find_key`, `array_any`, `array_all`, `uasort`, `uksort`, `array_walk`, `array_walk_recursive`.
+- Array shape key completion suggestions in return statement, function/method argument, destructuring contexts.
+- `default` added to keyword completion suggestions in match expr.
+- Property declaration name suggestions generated from type declaration and from base class.
+- Support insert and replace completion suggestion ranges.
+- Completion suggestion for type definition name based on file name.
+- Completion suggestion for namespace based on file and composer.json.
+
+#### Changed
+- Updated stubs
+- PHPDoc for variadic params where the ellipsis (`...`) has been omitted and the type is an array are now considered to describe the type of the parameter within the function body, not the type being passed to the function.
+- Passing names of PHP non-object built-in types (eg `string`, `int`) to a function that expects `class-string<T>` now resolves `T` to that built-in type instead of a user class with that name.
+- Expanded variety of parameter declaration name suggestions to include snake case and shorter name variations.
+
+#### Fixed
+- Cannot `@disregard` diagnostics on property declarations.
+- Return type diagnostics in traits.
+- False return type error in generator.
+- Property type inference when redundant `SubClass|SuperClass` scope types encountered.
+- Type narrowing with null coalesce assignment in conditional expression.
+- False type error when assigning `$this` to property.
+- Array type lost when assigning empty array to multidimensional array element.
+- False unused method diagnostic when method called in `$this instanceof` conditional block.
+- `list<>` key should be `int` not `int|string`.
+- False method compatibility error when override declares variadic parameter.
+- Range format provider should format token and leading trivia if only leading trivia falls in range.
+- Named argument completion suggestions should not be case sensitive.
+- Should consider composer.json autoload-dev when generating file renames.
+
 ## [1.13.1 - 2024-12-30] Pre-release
 
 #### Fixed
