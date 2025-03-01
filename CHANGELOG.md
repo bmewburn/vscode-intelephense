@@ -1,5 +1,12 @@
 # Change Log
 
+## [1.14.2 - 2025-03-01]
+
+#### Fixed
+- Spurious parser errors when editing mixed html/php containing short echo tags.
+- False not all paths return a value with try/finally.
+- False method compatibility error when overriding a method with optional parameters with a method with a variadic parameter.
+
 ## [1.14.1 - 2025-02-28]
 
 #### Fixed
