@@ -35,3 +35,28 @@ jobs:
         with:
           name: vscode-extension
           path: "*.vsix"
+
+      - name: .vsix Dosyasını Bul
+        id: find_vsix
+        run: echo "VSIX_FILE=$(ls *.vsix)" >> $GITHUB_ENV
+
+      - name: Create GitHub Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: ${{ github.ref }}
+          draft: false
+          prerelease: false
+
+      - name: Add .vsic to Release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ env.VSIX_FILE }}
+          asset_name: ${{ env.VSIX_FILE }}
+          asset_content_type: application/octet-stream
