@@ -1,5 +1,10 @@
 # Change Log
 
+## [1.14.3 - 2025-03-05]
+
+#### Fixed
+- Spurious parser errors when editing adjacent to `if` or `try` blocks.
+
 ## [1.14.2 - 2025-03-01]
 
 #### Fixed
