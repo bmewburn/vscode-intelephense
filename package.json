@@ -46,14 +46,6 @@
     },
     "icon": "images/elephpant.png",
     "main": "./lib/extension",
-    "files": [
-        "/lib",
-        "/images",
-        "/CHANGELOG.md",
-        "/README.md",
-        "/LICENSE.txt",
-        "/package.json"
-    ],
     "extensionKind": [
         "workspace"
     ],

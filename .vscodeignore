@@ -1,0 +1,14 @@
+.vscode/**
+typings/**
+test/**
+src/**
+**/*.map
+.gitignore
+tsconfig.json
+vsc-extension-quickstart.md
+out/**
+webpack.config.js
+**/*.ts
+.git/**
+node_modules/!(intelephense)/**
+!node_modules/intelephense/lib/*.d.ts
