@@ -26,9 +26,6 @@ jobs:
 
       - name: Setup VSCE
         run: npm install -g @vscode/vsce
-
-      - name: .vscodeignore remove
-        run: rm -f .vscodeignore
         
       - name: Build
         run: vsce package
