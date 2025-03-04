@@ -10,7 +10,7 @@
     "sponsor": {
         "url": "https://intelephense.com"
     },
-    "version": "1.14.3",
+    "version": "1.14.4",
     "publisher": "bmewburn",
     "engines": {
         "vscode": "^1.82.0"
