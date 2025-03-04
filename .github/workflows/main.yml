@@ -38,8 +38,8 @@ jobs:
 
       - name: .vsix Dosyasını Bul
         id: find_vsix
-        run: echo "VSIX_FILE=$(ls *.vsix)" >> $GITHUB_ENV
-
+        run: echo "VSIX_FILE=\"$(find . -maxdepth 1 -name '*.vsix' | head -n 1)\"" >> $GITHUB_ENV
+                
       - name: Create GitHub Release
         id: create_release
         uses: actions/create-release@v1
