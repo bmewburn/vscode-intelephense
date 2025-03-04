@@ -41,15 +41,11 @@ jobs:
         run: echo "VSIX_FILE=\"$(find . -maxdepth 1 -name '*.vsix' | head -n 1)\"" >> $GITHUB_ENV
                 
       - name: Create GitHub Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+        uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ github.ref }}
-          release_name: ${{ github.ref }}
-          draft: false
-          prerelease: false
+          tag_name: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
+          files: "*.vsix"
 
       - name: Add .vsic to Release
         uses: actions/upload-release-asset@v1
