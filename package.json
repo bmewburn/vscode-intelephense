@@ -10,7 +10,7 @@
     "sponsor": {
         "url": "https://intelephense.com"
     },
-    "version": "1.13.1",
+    "version": "1.14.3",
     "publisher": "bmewburn",
     "engines": {
         "vscode": "^1.82.0"
@@ -179,6 +179,7 @@
                             "ast",
                             "bcmath",
                             "blackfire",
+                            "brotli",
                             "bz2",
                             "calendar",
                             "cassandra",
@@ -231,6 +232,7 @@
                             "interbase",
                             "intl",
                             "json",
+                            "jsonpath",
                             "judy",
                             "ldap",
                             "leveldb",
@@ -257,8 +259,8 @@
                             "msgpack",
                             "mssql",
                             "mysql",
-                            "mysql_xdevapi",
                             "mysqli",
+                            "mysql_xdevapi",
                             "ncurses",
                             "newrelic",
                             "oauth",
@@ -274,10 +276,6 @@
                             "pcre",
                             "pdflib",
                             "PDO",
-                            "pdo_ibm",
-                            "pdo_mysql",
-                            "pdo_pgsql",
-                            "pdo_sqlite",
                             "pgsql",
                             "Phar",
                             "phpdbg",
@@ -300,6 +298,7 @@
                             "SaxonC",
                             "session",
                             "shmop",
+                            "simdjson",
                             "simple_kafka_client",
                             "SimpleXML",
                             "snappy",
@@ -354,9 +353,9 @@
                             "yaml",
                             "yar",
                             "zend",
-                            "Zend OPcache",
                             "ZendCache",
                             "ZendDebugger",
+                            "Zend OPcache",
                             "ZendUtils",
                             "zip",
                             "zlib",
@@ -403,10 +402,6 @@
                         "pcntl",
                         "pcre",
                         "PDO",
-                        "pdo_ibm",
-                        "pdo_mysql",
-                        "pdo_pgsql",
-                        "pdo_sqlite",
                         "pgsql",
                         "Phar",
                         "posix",
@@ -841,31 +836,31 @@
                     "description": "Traces the communication between VSCode and the intelephense language server.",
                     "scope": "window"
                 },
-                "intelephense.codeLens.references.enable" : {
+                "intelephense.codeLens.references.enable": {
                     "type": "boolean",
                     "default": false,
                     "description": "Enable a code lens that shows a reference count and command to peek locations.",
                     "scope": "window"
                 },
-                "intelephense.codeLens.implementations.enable" : {
+                "intelephense.codeLens.implementations.enable": {
                     "type": "boolean",
                     "default": false,
                     "description": "Enable a code lens that shows an abstract and interface implementations count and command to peek locations.",
                     "scope": "window"
                 },
-                "intelephense.codeLens.usages.enable" : {
+                "intelephense.codeLens.usages.enable": {
                     "type": "boolean",
                     "default": false,
                     "description": "Enable a code lens that shows a trait usages count and command to peek locations.",
                     "scope": "window"
-                }, 
-                "intelephense.codeLens.overrides.enable" : {
+                },
+                "intelephense.codeLens.overrides.enable": {
                     "type": "boolean",
                     "default": false,
                     "description": "Enable a code lens that shows method override count and command to peek locations.",
                     "scope": "window"
-                }, 
-                "intelephense.codeLens.parent.enable" : {
+                },
+                "intelephense.codeLens.parent.enable": {
                     "type": "boolean",
                     "default": false,
                     "description": "Enable a code lens that indicates if a method has a parent implementation and command to peek location.",
@@ -894,7 +889,7 @@
     },
     "dependencies": {
         "fs-extra": "~11.2.0",
-        "intelephense": "1.13.1-beta.1",
+        "intelephense": "1.14.3",
         "semver": "~7.6.2",
         "vscode-languageclient": "9.0.1"
     },
