@@ -20,8 +20,10 @@ import {
 } from 'vscode-languageclient/node';
 import { createMiddleware, IntelephenseMiddleware } from './middleware';
 import * as fs from 'fs-extra';
+import { vscodeLocalSettings } from './phpVersion/vscodeLocalSettings';
 
 const PHP_LANGUAGE_ID = 'php';
+const VERSION = '1.14.1';
 const VERSION = '1.14.3';
 const INDEXING_STARTED_NOTIFICATION = new NotificationType('indexingStarted');
 const INDEXING_ENDED_NOTIFICATION = new NotificationType('indexingEnded');
@@ -113,6 +115,11 @@ export async function activate(context: ExtensionContext) {
 	languageClient.start().then(() => {
 		registerNotificationListeners();
 		showStartMessage(context);
+		vscodeLocalSettings(
+			workspace.workspaceFolders
+				? workspace.workspaceFolders[0].uri.fsPath
+				: ''
+		)
 	});
 }
 

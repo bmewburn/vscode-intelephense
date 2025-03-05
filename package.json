@@ -74,7 +74,8 @@
     "contributes": {
         "languages": [
             {
-                "id": "php"
+                "id": "php",
+                "extensions": [".php"]
             }
         ],
         "commands": [
