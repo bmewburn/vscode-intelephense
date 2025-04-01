@@ -1,5 +1,20 @@
 # Change Log
 
+## [1.14.4 - 2025-04-01]
+
+#### Fixed
+- Completion suggestions not showing in phpdoc.
+- False not all paths return value error when returning result of void returning function call.
+- False calling non-static method statically for parent property hook calls.
+- String literals where the value is a namespaced class not resolved to class when passed to `class-string<T>`.
+- Trait `self` not resolved to exhibiting class when used as a type argument for templated class.
+- False return type error when using templates and returning `static`.
+- DocBlock indent should be inline with following switch case/default statement.
+- False unused import when used in typedef annotation.
+- No `$this` suggestion inside anonymous function defined within a type definition.
+- Typedef types not expanded when appearing in passed by-ref parameters.
+- Spurious undefined method/function diagnostics appearing after indexing workspace.
+
 ## [1.14.3 - 2025-03-05]
 
 #### Fixed
