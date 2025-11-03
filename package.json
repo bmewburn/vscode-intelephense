@@ -466,6 +466,34 @@
                     "description": "PHP permits the calling of static methods using the object operator eg `$obj->myStaticMethod();`. If you would prefer not to have static methods suggested in this context then set this value to `false`. Defaults to `true`.",
                     "scope": "window"
                 },
+                "intelephense.completion.parameterCase": {
+                    "type": "string",
+                    "default": "camel",
+                    "enum": [
+                        "camel",
+                        "snake"
+                    ],
+                    "enumDescriptions": [
+                        "camelCase",
+                        "snake_case"
+                    ],
+                    "description": "The preferred font case to use when suggesting parameter names. Defaults to camel case.",
+                    "scope": "window"
+                },
+                "intelephense.completion.propertyCase": {
+                    "type": "string",
+                    "default": "snake",
+                    "enum": [
+                        "camel",
+                        "snake"
+                    ],
+                    "enumDescriptions": [
+                        "camelCase",
+                        "snake_case"
+                    ],
+                    "description": "The preferred font case to use when suggesting property names. Defaults to snake case.",
+                    "scope": "window"
+                },
                 "intelephense.format.enable": {
                     "type": "boolean",
                     "default": true,
