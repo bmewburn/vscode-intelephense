@@ -892,14 +892,19 @@
                     "default": false,
                     "description": "Enable a code lens that indicates if a method has a parent implementation and command to peek location.",
                     "scope": "window"
+                },
+                "intelephense.shortOpenEchoAutoClose": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Will auto-close short open echo tags (`<?=`).",
+                    "scope": "window"
                 }
             }
         }
     },
     "scripts": {
-        "vscode:prepublish": "npm run production",
-        "compile": "rimraf out/* && tsc -p ./",
-        "production": "rimraf lib && webpack --config webpack.config.js"
+        "vscode:prepublish": "npm run compile",
+        "compile": "rimraf lib && webpack --config webpack.config.js"
     },
     "devDependencies": {
         "@types/fs-extra": "~11.0.4",

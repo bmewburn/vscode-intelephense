@@ -10,7 +10,7 @@ import * as querystring from 'querystring';
 import { createHash } from 'crypto';
 import * as os from 'os';
 
-import { ExtensionContext, window, commands, workspace, Disposable, languages, IndentAction, env, Uri, ConfigurationTarget, InputBoxOptions } from 'vscode';
+import { ExtensionContext, window, commands, workspace, Disposable, languages, IndentAction, env, Uri, ConfigurationTarget, InputBoxOptions, TextDocumentChangeReason, Range, WorkspaceEdit, Position, TextEditorEdit, Selection } from 'vscode';
 import {
 	LanguageClient, LanguageClientOptions, ServerOptions,
 	TransportKind,
@@ -96,24 +96,111 @@ export async function activate(context: ExtensionContext) {
 	middleware = createMiddleware();
 	languageClient = createClient(context, middleware, clearCache);
 	
-	let indexWorkspaceCmdDisposable = commands.registerCommand(INDEX_WORKSPACE_CMD_NAME, indexWorkspace);
-	let cancelIndexingCmdDisposable = commands.registerCommand(CANCEL_INDEXING_CMD_NAME, cancelIndexing);
-	let enterKeyCmdDisposable = commands.registerCommand(ENTER_KEY_CMD_NAME, () => enterLicenceKey(context));
+	const indexWorkspaceCmdDisposable = commands.registerCommand(INDEX_WORKSPACE_CMD_NAME, indexWorkspace);
+	const cancelIndexingCmdDisposable = commands.registerCommand(CANCEL_INDEXING_CMD_NAME, cancelIndexing);
+	const enterKeyCmdDisposable = commands.registerCommand(ENTER_KEY_CMD_NAME, () => enterLicenceKey(context));
+    const shortOpenEchoAutoCloseDisposable = registerShortOpenEchoAutoClose(context);
 
 	//push disposables
 	context.subscriptions.push(
 		indexWorkspaceCmdDisposable,
 		cancelIndexingCmdDisposable,
 		enterKeyCmdDisposable,
-		middleware
-	);
-
-    
+		middleware,
+        ...shortOpenEchoAutoCloseDisposable
+	);  
 
 	languageClient.start().then(() => {
 		registerNotificationListeners();
 		showStartMessage(context);
 	});
+}
+
+function registerShortOpenEchoAutoClose(context: ExtensionContext): Disposable[] {
+
+    let enableAutoClose = workspace.getConfiguration('intelephense').get('shortOpenEchoAutoClose');
+
+    const onConfigChangeDispose = workspace.onDidChangeConfiguration(e => {
+        enableAutoClose = workspace.getConfiguration('intelephense').get('shortOpenEchoAutoClose');
+    });
+
+    const onDocChangeDispose = workspace.onDidChangeTextDocument(async e => {
+
+        const editor = window.activeTextEditor;
+        if (!editor) {
+            return;
+        }
+
+        const changes = e.contentChanges;
+        const reason = e.reason;
+        const doc = e.document;
+
+        if (
+            !enableAutoClose ||
+            doc.languageId !== 'php' ||
+            editor.document !== doc || 
+            reason === TextDocumentChangeReason.Redo ||
+            reason === TextDocumentChangeReason.Undo ||
+            changes.length === 0 ||
+            changes[0].text !== '='
+        ) {
+            return;
+        }
+
+        let insertPositions: Position[] = [];
+        const lines: number[] = [];
+        for (let i = 0, l = changes.length; i < l; ++i) {
+            const change = changes[i];
+            if (change.text !== '=' || !change.range.isEmpty) {
+                return;
+            }
+            const {line, character} = change.range.start;
+            const lineText = doc.lineAt(line);
+            if (
+                lineText.text.slice(character - 2, character) !== '<?' ||
+                lines.includes(line)
+            ) {
+                return;
+            }
+            
+            const insertPosition = new Position(line, character + 1);
+            insertPositions.push(insertPosition);
+            lines.push(line);
+        }
+
+        if (insertPositions.length === 0) {
+            return;
+        }
+
+        const result = await editor.edit(builder => {
+            for (let i of insertPositions) {
+                builder.insert(i, '  ?>');
+            }
+        });
+
+        if (!result) {
+            return;
+        }
+
+        //move cursor inside <?=  ?>
+        const newSelections: Selection[] = [];
+        const selections = editor.selections;
+        if (selections.length !== insertPositions.length) {
+            return;
+        }
+
+        for (let i = 0, l = selections.length; i < l; ++i) {
+            const selection = selections[i];
+            if (!selection.isEmpty || selection.active.character < 7) {
+                return;
+            }
+            const cursorPosition = new Position(selection.active.line, selection.active.character - 3);
+            newSelections.push(new Selection(cursorPosition, cursorPosition));
+        }
+        editor.selections = newSelections;
+    });
+
+    return [onConfigChangeDispose, onDocChangeDispose];
 }
 
 function createClient(context:ExtensionContext, middleware:IntelephenseMiddleware, clearCache:boolean) {
