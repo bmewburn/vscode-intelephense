@@ -896,7 +896,7 @@
                 "intelephense.shortOpenEchoAutoClose": {
                     "type": "boolean",
                     "default": true,
-                    "description": "Will auto-close short open echo tags (`<?=`).",
+                    "description": "Will auto-close short open echo tags (`<?=`). VSCode only.",
                     "scope": "window"
                 }
             }
