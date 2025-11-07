@@ -494,6 +494,12 @@
                     "description": "The preferred font case to use when suggesting property names. Defaults to snake case.",
                     "scope": "window"
                 },
+                "intelephense.completion.suggestRelativeToPartialUseDeclaration": {
+                    "type": "number",
+                    "default": 0,
+                    "description": "Inserted text will be relative to any existing partial use declarations that may match the symbol. The value is the maximum number of namespace segments that may appear in the inserted text. Defaults to 0 (disabled).",
+                    "scope": "window"
+                },
                 "intelephense.format.enable": {
                     "type": "boolean",
                     "default": true,
