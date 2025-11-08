@@ -1,0 +1,21 @@
+{
+     "->": {
+        "body": [
+            "->"
+        ],
+        "description": "Insert ->"
+    },
+    "=>": {
+        "body": [
+            "=>"
+        ],
+        "description": "Insert =>"
+    },
+    "<?= ?>": {
+        "prefix": ["<?="],
+        "body": [
+            "<?= $0 ?>"
+        ],
+        "description": "Insert <?= ?>"
+    }
+}

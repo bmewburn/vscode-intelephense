@@ -1,0 +1,26 @@
+[
+    {
+        "key": "alt+shift+-",
+        "command": "editor.action.insertSnippet",
+        "args": {
+            "name": "->"
+        },
+        "when": "editorTextFocus && editorLangId == php"
+    },
+    {
+        "key": "alt+shift+=",
+        "command": "editor.action.insertSnippet",
+        "args": {
+            "name": "=>"
+        },
+        "when": "editorTextFocus && editorLangId == php"
+    },
+    {
+        "key": "ctrl+alt+=",
+        "command": "editor.action.insertSnippet",
+        "args": {
+            "name": "<?= ?>"
+        },
+        "when": "editorTextFocus && editorLangId == php"
+    }
+]
