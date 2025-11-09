@@ -500,6 +500,20 @@
                     "description": "Inserted text will be relative to any existing partial use declarations that may match the symbol. The value is the maximum number of namespace segments that may appear in the inserted text. Defaults to 0 (disabled).",
                     "scope": "window"
                 },
+                "intelephense.completion.sortText": {
+                    "type": "string",
+                    "default": "multi-factor",
+                    "enum": [
+                        "none",
+                        "multi-factor"
+                    ],
+                    "enumDescriptions": [
+                        "No `sortText` property will be provided. The client is solely responsible for sorting based on the `label` property.",
+                        "A `sortText` property will be included based on factors like query match, kind of suggestion, location of symbol, name of symbol."
+                    ],
+                    "description": "Controls whether suggestions will include a `sortText` property that may influence sort order.",
+                    "scope": "window"
+                },
                 "intelephense.format.enable": {
                     "type": "boolean",
                     "default": true,
@@ -915,20 +929,20 @@
     "devDependencies": {
         "@types/fs-extra": "~11.0.4",
         "@types/mocha": "~10.0.2",
-        "@types/node": "20.x",
-        "@types/semver": "~7.5.8",
+        "@types/node": "22.x",
+        "@types/semver": "~7.7.1",
         "@types/vscode": "~1.82.0",
         "@vscode/test-electron": "^2.4.0",
-        "rimraf": "~5.0.7",
-        "ts-loader": "~9.5.1",
-        "typescript": "~5.4.5",
-        "webpack": "~5.92.1",
-        "webpack-cli": "~5.1.4"
+        "rimraf": "~6.1.0",
+        "ts-loader": "~9.5.4",
+        "typescript": "~5.9.3",
+        "webpack": "~5.102.1",
+        "webpack-cli": "~6.0.1"
     },
     "dependencies": {
-        "fs-extra": "~11.2.0",
+        "fs-extra": "~11.3.2",
         "intelephense": "1.14.4",
-        "semver": "~7.6.2",
+        "semver": "~7.7.3",
         "vscode-languageclient": "9.0.1"
     },
     "private": true

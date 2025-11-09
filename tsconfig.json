@@ -1,10 +1,10 @@
 {
 	"compilerOptions": {
-		"target": "es6",
-		"module": "commonjs",
-		"moduleResolution": "node",
+		"target": "es2022",
+		"module": "node20",
+		"moduleResolution": "node16",
 		"outDir": "out",
-		"lib": [ "es2016" ],
+		"lib": [ "es2022" ],
 		"sourceMap": true
 	},
 	"include": [
