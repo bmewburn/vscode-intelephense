@@ -38,10 +38,9 @@ of this agreement.
   b)  "Software" is the software known as Intelephense.
   c)  "Licence Key" is the software key purchasable from the Licensor which 
       enables access to Premium Features.
-  d)  "Premium Features" are those features only accessible and permitted for 
-      use by holders of a Licence Key.
-      That is: rename; code folding; find all implementations; 
-      go to type definition; go to declaration.
+  d)  "Premium Features" are those features only accessible and permitted for use by holders of a Licence Key. 
+  That is: rename; code folding; find all implementations; go to type definition; go to declaration; smart select; code actions; code lens; type hierarchy;
+  inlay hints; document links.
 
 2. GRANT OF LICENCE
 The Licensor grants you a personal, non-transferable, non-exclusive licence 
@@ -54,10 +53,15 @@ Language Server Protocol compatible Integrated Development Environment or text e
 to provide PHP code intelligence for said user.
 
 4. LICENCE KEYS
-  a)  Purchase of a Licence Key grants a single end user access and use of all
-      current and future Premium Features in perpetuity.
-  b)  A Licence Key may be revoked if it is suspected that a user has breached 
-      restrictions detailed in item 5 Restrictions.
+a) Purchase of a Licence Key grants end user(s) of the Licence Key lifetime access and use of Premium Features and to unlimited updates within the major version of the Software at the time of purchase.
+b) A Personal Licence Key may only be used by the individual who purchased the licence.
+c) A Business Solo, Business Team or Business Unlimited Licence Key may only be used by employees of the business that purchased the Licence Key. The number of employees which may use the Licence Key at any one time is as follows.
+
+    i) A Business Solo Licence Key can only be used by a single employee at any one time.  
+    ii) A Business Team Licence Key may only be used by up to five employees at any one time.  
+    iii) A Business Unlimited Licence Key may be used by an unlimited number of employees at any one time.
+
+d) A Licence Key may be revoked if it is suspected that a user has breached restrictions detailed in item 5 RESTRICTIONS.
 
 5. RESTRICTIONS
 You are NOT permitted to:
@@ -66,10 +70,11 @@ You are NOT permitted to:
   b)  Decompile, disassemble or reverse engineer the Software or attempt to do 
       any such things.
   c)  Reproduce, copy, distribute, resell or otherwise use the whole or any part 
-      of the Software for any purpose except where permitted by item 3 Intended Use.
+      of the Software for any purpose except where permitted by item 3 INTENDED USE.
   d)  Disable, modify or hide notifications sent by the Software.
-  e)  Distribute, resell, or share Licence Keys.
-  f)  Access or use Premium Features without a valid Licence Key.
+  e)  Resell Licence Keys.
+  f)  Distribute or share Licence Keys beyond that which is permitted by item 4 LICENCE KEYS.
+  g)  Access or use Premium Features without a valid Licence Key.
 
 6. OWNERSHIP
 The Software, copyright, and other intellectual property rights of whatever 
