@@ -922,7 +922,26 @@
                     "default": true,
                     "description": "Will auto-close short open echo tags (`<?=`). VSCode only.",
                     "scope": "window"
+                },
+                "intelephense.inlayHint.returnTypes": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Will show an inlay hint for call declaration return type if not already declared.",
+                    "scope": "window"
+                },
+                "intelephense.inlayHint.parameterTypes": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Will show inlay hints for anonymous function declaration parameter types if not already declared.",
+                    "scope": "window"
+                },
+                "intelephense.inlayHint.parameterNames": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Will show inlay hints for call argument parameter names if named arguments are not already in use.",
+                    "scope": "window"
                 }
+
             }
         }
     },
