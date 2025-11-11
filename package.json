@@ -10,10 +10,10 @@
     "sponsor": {
         "url": "https://intelephense.com"
     },
-    "version": "1.14.4",
+    "version": "1.15.0",
     "publisher": "bmewburn",
     "engines": {
-        "vscode": "^1.82.0"
+        "vscode": "^1.91.0"
     },
     "categories": [
         "Programming Languages",
@@ -954,7 +954,7 @@
         "@types/mocha": "~10.0.2",
         "@types/node": "22.x",
         "@types/semver": "~7.7.1",
-        "@types/vscode": "~1.82.0",
+        "@types/vscode": "~1.91.0",
         "@vscode/test-electron": "^2.4.0",
         "rimraf": "~6.1.0",
         "ts-loader": "~9.5.4",
@@ -964,7 +964,7 @@
     },
     "dependencies": {
         "fs-extra": "~11.3.2",
-        "intelephense": "1.14.4",
+        "intelephense": "1.15.0-beta.1",
         "semver": "~7.7.3",
         "vscode-languageclient": "9.0.1"
     },

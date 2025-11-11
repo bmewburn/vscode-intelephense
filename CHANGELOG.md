@@ -1,5 +1,70 @@
 # Change Log
 
+## [1.15.0 - 2025-11-11] Pre-release
+
+#### Added
+- Support for LSP `CompletionItemLabelDetails`.
+- Support parsing inline comments in array shapes.
+- Diagnostic when accessing members that are not visible from scope. Previously they were reported as undefined members.
+- Completion suggestions for outer scope variables, with additional use clause edits, when inside anonymous functions.
+- Suggestions for anonymous function signature is call argument context. 
+- Fallback to an appropriate type for `non-empty-mixed`.
+- Support conditional types for parameters.
+- `is_subclass_of` type narrowing.
+- Suggestions when comparing to a variable with literal union type in switch, match, equality contexts.
+- Array key suggestions when assigning sub-array to array shape.
+- Setting to control font case for parameter and property name suggestions. `intelephense.completion.parameterCase` (default `camel`) and `intelephense.completion.propertyCase` (default `snake`).
+- Support for `@param-closure-this`.
+- Support for `@param-out`.
+- Support relative links in PHPDoc. Relative URIs wil be resolved to an absolute URI relative to the current file. URIs without any `.` or `..` prefix will be resolved relative to the workspace folder.
+- Added completion suggestions relative to existing partial use declarations. Must be enabled with `intelephense.completion.suggestRelativeToPartialUseDeclaration`. The setting value is the maximum number of namespace segments which can appear in the suggested edit. Defaults to `0` (disabled).
+- Support for `MyClass::*` wildcard and non-wildcard syntax for class constant union types in PHPDoc.
+- Support for constants in PHPDoc union types. Constants must be UPPERCASE and must be fully qualified to avoid name resolution ambiguities with object types.
+- Auto-closing of short tag echo (`<?=`). Can be turned off with `intelephense.shortOpenEchoAutoClose`. VSCode only.
+- Support for inlay hints. Hints are shown for call declaration return types, anonymous function parameter types, and call argument parameter names. Can be turned off with `intelephense.inlayHint.returnTypes`, `intelephense.inlayHint.parameterTypes`, and `intelephense.inlayHint.parameterNames` respectively. **[Premium](https://intelephense.com)**
+- Visiblity modifiers are now shown in outline.
+- Support for `SignatureHelp.activeSignature`.
+- Suggest variable names in `compact`.
+- Support for `class_alias`.
+- Added a document link provider to navigate on click to required/included files. **[Premium](https://intelephense.com)**
+
+
+#### Changed
+- Removed workspace file limitation. Larger workspaces will consume more resources.
+- Suggest trait names in all contexts not just in `use` clauses.
+- Type, function, constant suggestions now use contiguous substring searching.
+- Modified suggestion sort order via sortText property to improve suggestion order 🤞.
+- Now more tolerant of FQSENs that aren't fully qualified in `@see`, `@uses`.
+- Override suggestions are now shown without having to first qualify the context with a visibility modifier or `function`.
+- Improved Workspace symbol search. Search now uses contiguous substring matching. For example `mfc` would find `my_function`. Searching can also be done using the fully qualified structural element name (FQSEN) (or part there-of) of the symbol. This can narrow down the type of symbol as well. For example `mc:f(` would find the method `MyClass::foo()`.
+- Updated and improved various stubs.
+- For performance reasons, only named function call expressions will be analysed for `never` return types (eg `dd()`). Previously, all call expressions were analysed. A workaround for this limitation is to use the patterns `return $foo->never();` or `$test || throw $foo->never()` to declare that the path exits. **! BREAKING !**
+- Method override/implementation suggestions now include a parent call and not implemented throw respectively.
+
+#### Fixed
+- Renaming a constant reference not renaming the declaration.
+- Type suggestions following `@method static`.
+- Template with union type restriction not inferred properly.
+- Type aliases not resolved in some contexts.
+- Inline `@see` not hiding url when description provided.
+- Statement keyword suggestions not appearing for control structures without braces.
+- PHPDoc not formatted correctly above enum cases.
+- Type inference inconsistent with `ArrayAccess` and subtypes.
+- Keyword suggestions missing in switch expression.
+- `readonly` on anonymous class causing parse error.
+- Array key suggestions not showing in constructor calls.
+- False method signature not compatible diagnostics.
+- Various control flow analysis issues within loops.
+- Not warning on unused private promoted properties.
+- Incorrect Generator type arguments when exiting before yield.
+- Incorrect diagnostic message when `readonly` used with property hook.
+- Using `self` in call signature in traits doesn't resolve to exhibiting class.
+- Intersected object types not producing intersected type for property.
+- False type errors for PHP math extensions that have operator overloading.
+- Magic method implementation suggestions produce invalid code if abstract modifier is present.
+- Smart select bugged if selecting at end of a file that doesn't end in an empty line.
+- Some stub symbols being excluded, resulting in undefined symbol errors, when the symbol has a phpdoc with no tags.
+
 ## [1.14.4 - 2025-04-01]
 
 #### Fixed
