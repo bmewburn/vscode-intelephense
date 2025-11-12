@@ -1,6 +1,18 @@
 # Change Log
 
-## [1.15.0 - 2025-11-11] Pre-release
+## [1.15.1 - 2025-11-12]
+
+#### Fixed
+- Formatting broken for mixed PHP/HTML when PHPDoc used.
+- Undefined variables in functions and methods when preceeding code edited to add/remove new lines.
+- `class_alias()` not working if class name argument is a string literal instead of `::class` constant.
+- `@method` parsing broken for `static` methods.
+- PHPDoc that follows an abstract method being ignored (causing CI4 Builder undefined methods).
+- `global $argv` declaration showing undefined variable.
+- Function reported as undefined when defined in an encapsulating function.
+- False not all paths return value diagnostic when a custom `never` function is called.
+
+## [1.15.0 - 2025-11-11]
 
 #### Added
 - Support for LSP `CompletionItemLabelDetails`.
