@@ -1,5 +1,14 @@
 # Change Log
 
+## [1.15.2 - 2025-11-13]
+
+#### Fixed
+- Several cannot read prop of undefined and range errors.
+- Incorrect suggestion for function when class of same name has been imported.
+- Incorrect indentation when accepting override/implementation suggestion.
+- Incorrect type inference when iterating ArrayIterator and subclasses.
+- False type error, wrong type inlay hint and bad anon function suggestion when expected signature has a variadic parameter.
+
 ## [1.15.1 - 2025-11-12]
 
 #### Fixed

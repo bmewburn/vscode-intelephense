@@ -27,6 +27,8 @@ Intelephense is a high performance PHP language server packed full of essential 
 * Helpful **code actions** to import symbols, add PHPDoc, and implement all abstract methods. [PREMIUM](https://intelephense.com)
 * Concise **type hierarchy**. Easily view and navigate to subtypes and supertypes. [PREMIUM](https://intelephense.com)
 * Insightful **code lens** that shows references, abstract and interface implementations, trait usages, method parent and overrides. [PREMIUM](https://intelephense.com)
+* Informative **inlay hints** to indicate parameter names, return types and anonymous function parameter types. [PREMIUM](https://intelephense.com)
+* Convenient **document links** to quickly navigate to include/require files. [PREMIUM](https://intelephense.com)
 
 ## Licence
 Purchase a licence at https://intelephense.com to access PREMIUM features. Licence keys grant a single user access to all current and future premium features on multiple devices _forever_. Licence keys must be activated (automatically) via https before use. Features not marked as PREMIUM are free and always will be free.
