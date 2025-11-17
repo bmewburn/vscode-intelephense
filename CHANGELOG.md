@@ -1,5 +1,23 @@
 # Change Log
 
+## [1.15.3 - 2025-11-17]
+
+#### Fixed
+- Template constraints not resolving properly if constraint contains reference to another template.
+- Template types not resolving properly in conditional types.
+- Undefined superglobals after indexing with files open.
+- `array_map` callback parameters inferred as `mixed` if they have a type declaration.
+- PHPDoc leaking to subsequent statements.
+- Anonymous class properties showing as undefined.
+- `[]` as an `@method` parameter default value not parsed.
+- `void` being included as part of union in inlay hint return type.
+- Return types from duplicate methods/functions being reduced to minimal type when unioned instead of previous version behaviour of non-minimal unions.
+- Property types not being inferred from constructor as a fallback when no type is declared/annotated.
+- HTML/JS/CSS language features not working until edits made to the HTML/JS/CSS.
+- `$this` type narrowing not working.
+- Go to definition from a callable array using `__CLASS__` as the scope not working.
+- Removed space at end of `<?php` suggestion.
+
 ## [1.15.2 - 2025-11-13]
 
 #### Fixed
