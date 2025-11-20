@@ -113,16 +113,10 @@
             "type": "object",
             "title": "intelephense",
             "properties": {
-                "intelephense.compatibility.correctForBaseClassStaticUnionTypes": {
-                    "type": "boolean",
-                    "default": true,
-                    "markdownDescription": "Resolves `BaseClass|static` union types to `static` instead of `BaseClass`.",
-                    "scope": "window"
-                },
                 "intelephense.compatibility.correctForArrayAccessArrayAndTraversableArrayUnionTypes": {
                     "type": "boolean",
                     "default": true,
-                    "markdownDescription": "Resolves `ArrayAccess` and `Traversable` implementations that are unioned with a typed array to generic syntax. eg `ArrayAccessOrTraversable|ElementType[]` => `ArrayAccessOrTraversable<mixed, ElementType>`.",
+                    "markdownDescription": "Resolves `ArrayAccess` and `Traversable` implementations that are unioned with a typed array to generic syntax.\n\nFor example: `ArrayAccessAndTraversable|Element[]` => `ArrayAccessAndTraversable&ArrayAccess<int, Element>&Traversable<int, Element>`.",
                     "scope": "window"
                 },
                 "intelephense.compatibility.preferPsalmPhpstanPrefixedAnnotations": {
