@@ -1,5 +1,25 @@
 # Change Log
 
+## [1.16.0 - 2025-11-20]
+
+#### Added
+- Initial support for PHP 8.5.
+
+#### Changed
+- Default PHP version now 8.5.
+- Settings now uses `markdownDescription` property. Thanks @rchl .
+
+#### Fixed
+- False undefined variables when declared in a `for` loop initialser and referenced in the following `for` loop initialser.
+- False undefined variables when declared in an argument list and referenced in the following argument.
+- Modifying a variable array type after a loop can affect the variable array element type within the loop.
+- `@param-out` and `@param-closure-this` details not showing in hover.
+- Hover links not wrapped in `<>` and therefore not clickable.
+- Document links not working for URI in `@see` and `@link`.
+- Symbol outline failing if `@property` property names are missing `$` prefix.
+- False type errors when assigning a generic type to a declared type which does not have type arguments.
+- Omitting template type arguments causing type errors because of unresolved template.
+
 ## [1.15.3 - 2025-11-17]
 
 #### Fixed
