@@ -1,5 +1,15 @@
 # Change Log
 
+## [1.16.1 - 2025-11-22]
+
+#### Fixed
+- Stack overflow when determining return type of dynamic call.
+- PHPDoc with `$this` as a type not recognised.
+- False cannot access member from scope diagnostics when `__call` and `__get` could be used to access non public members.
+- Only the first class constant shown as completion suggestion when using comma separated declarations and PHPDoc.
+- Variables declared in an array element showing as undefined in subsequent elements.
+- Promoted property with setter hook showing `$value` parameter as undefined.
+
 ## [1.16.0 - 2025-11-20]
 
 #### Added
