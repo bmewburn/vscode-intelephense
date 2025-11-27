@@ -1,5 +1,18 @@
 # Change Log
 
+## [1.16.2 - 2025-11-27]
+
+#### Fixed
+- Type aliases not expanded in foreach when used as type arguments for iterators.
+- Global scoped definitions showing as undefined.
+- Shorthand nullable parse error in `@method` tags.
+- Undefined variable when defined in previous call of call chain.
+- Undefined variable when defined in `if` expression.
+- Templated closure parameter showing as mixed even if a type has been declared when type arguments not supplied for scope.
+- Type narrowing `$this` in traits not working.
+- When both an annotated member and a declared member share the same name, visibility should be checked to select the most appropriate definition for context.
+- Type constants not expanded if in type argument of another type.
+
 ## [1.16.1 - 2025-11-22]
 
 #### Fixed
