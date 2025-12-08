@@ -1,5 +1,16 @@
 # Change Log
 
+## [1.16.3 - 2025-12-08]
+
+#### Fixed
+- Hover not showing for methods named using a PHP reserved name or keyword.
+- Type aliases not expanded after the first reference when appearing multiple times in a type.
+- Global namespaced symbol suggestions not fully qualified in non-global namespace context when `insertUseDeclaration` is `false`.
+- False type error when an array shape tuple is compared to a typed array.
+- Template type not resolving when constraint is `key-of` another template type.
+- Incorrect `ldap-Set_option` stub.
+- PHPDoc that follows a trait use clause not parsed.
+
 ## [1.16.2 - 2025-11-27]
 
 #### Fixed
