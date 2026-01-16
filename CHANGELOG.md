@@ -1,5 +1,22 @@
 # Change Log
 
+## [1.16.4 - 2026-01-16]
+
+#### Fixed
+- Bad parsing of `@param` union type when followed by by-reference parameter.
+- Template types not resolving to boolean literals.
+- `xor` breaking language intelligence in subsequent code.
+- Anonymous class methods being added as object shape properties.
+- Variable hover contains `@var` information for other variables when using array destructure syntax.
+- Index access types not resolved in some contexts.
+- Property type being lost when there is both an annotated and declared property of the same name.
+- Type alias that references another type alias not resolved fully.
+- Variable types reported as `never` in `catch` blocks if there are no assignment expressions in `try` block.
+- Type hinting `$this` as a union type ignored.
+- Function FQSEN in `@see` not recognised.
+- Dot files not being excluded even though they match an exclude glob.
+- PHPDoc optional closure parameters not parsed correctly.
+
 ## [1.16.3 - 2025-12-08]
 
 #### Fixed
