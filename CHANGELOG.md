@@ -1,5 +1,15 @@
 # Change Log
 
+## [1.16.5 - 2026-02-02]
+
+#### Fixed
+- `CodeActionContext.only` being ignored for some code actions.
+- Global function and constant suggestions prefixed with `\` when not configured to.
+- Implementations code lens not working for hooked properties.
+- Document highlight not working when origin is within phpdoc.
+- Abstract hooked properties not reported as not implemented.
+- PHPDoc immediately following another PHPDoc being ignored in class member lists.
+
 ## [1.16.4 - 2026-01-16]
 
 #### Fixed
