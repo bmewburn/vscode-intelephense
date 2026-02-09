@@ -1,5 +1,33 @@
 # Change Log
 
+## [1.17.0 - 2026-02-09] Pre-release
+
+#### Added
+- [Inline values provider](https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#textDocument_inlineValue) for better synergy with xdebug extension.
+- Support for `@mixin` with an intersection type.
+- Support for `value-of<T>` type.
+- Support for default template type arguments eg `@template T of bool = false`.
+- More diagnostics.
+
+#### Changed
+- Signature help now uses short type names instead of fully qualified type names to increase legibility.
+- Variables can be now renamed to expressions, for example `$value` => `$this->value`.
+- When not provided by the client, default storage will be the following:  
+  - *nix
+    - storagePath - `$XDG_CONFIG_HOME/intelephense/workspace/` or `$HOME/.config/intelephense/workspace/`
+    - globalStoragePath - `$XDG_CONFIG_HOME/intelephense/global/` or `$HOME/.config/intelephense/global/`
+    - licenceKey - `$globalStoragePath/licence.txt` or `$globalStoragePath/license.txt`
+  - Windows
+    - storagePath - `%AppData%/intelephense/workspace/` or `%UserProfile%/intelephense/workspace/`
+    - globalStoragePath - `%AppData%/intelephense/global/` or `%UserProfile%/intelephense/global/`
+    - licenceKey - `$globalStoragePath/licence.txt` or `$globalStoragePath/license.txt`
+
+#### Fixed
+- Conditional type where a parameter template type is the subject yielding unexpected type when argument is a union.
+- Closure `static` return type resolved too early.
+- False type error when comparing an array shape to a typed array.
+- Various diagnostics issues.
+
 ## [1.16.5 - 2026-02-02]
 
 #### Fixed
