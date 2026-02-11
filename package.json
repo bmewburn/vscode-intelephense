@@ -699,6 +699,12 @@
                     "markdownDescription": "Enables reporting of errors associated with type member access.",
                     "scope": "window"
                 },
+                "intelephense.diagnostics.unreachableCode": {
+                    "type": "boolean",
+                    "default": true,
+                    "markdownDescription": "Enables reporting of unreachable code.",
+                    "scope": "window"
+                },
                 "intelephense.runtime": {
                     "type": "string",
                     "markdownDescription": "Path to a Node.js executable. Use this if you wish to use a different version of Node.js. Defaults to Node.js shipped with VSCode.",
