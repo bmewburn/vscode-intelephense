@@ -1161,7 +1161,7 @@ And function, trait, class, interface declarations not in inner statement list.
 - Moved licence key storage from config to global memento.
 - Unused catch clause variable diagnostic suppressed.
 - removed interbase, wddx, recode from default stubs.
-- Changed default file exclude pattern to `**/vendor/**/{Tests,tests}/**` to not exclude frmaework test classes.
+- Changed default file exclude pattern to `**/vendor/**/{Tests,tests}/**` to not exclude framework test classes.
 
 #### Fixed
 - False undefined var in arrow functions.
