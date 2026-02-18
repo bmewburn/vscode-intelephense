@@ -1,5 +1,16 @@
 # Change Log
 
+## [1.17.1 - 2026-02-18] Pre-release
+
+#### Added
+- More diagnostics.
+
+#### Fixed
+- Various diagnostic fixes.
+- Implement all abstract methods not working for anonymous classes.
+- Incorrect array creation type inference when one or more elements is a union type.
+- Constant values not being computed when declared using an expression rather than a literal value.
+
 ## [1.17.0 - 2026-02-09] Pre-release
 
 #### Added
