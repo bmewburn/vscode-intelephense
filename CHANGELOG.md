@@ -1,5 +1,21 @@
 # Change Log
 
+## [1.17.2 - 2026-02-23] Pre-release
+
+#### Added
+- More diagnostics.
+- PHP 8.5 `(void)` cast.
+
+#### Changed
+- Updated stubs.
+
+#### Fixed
+- False namespace declaration must be first statement when doc block preceedes declaration.
+- False ctor cannot declare return type error for anon function.
+- `class_alias` aliases not recognised if `class` constant used to declare alias name.
+- Templates in `@param-closure-this` not resolved.
+- False possible undefined variable after try-catch-finally block.
+
 ## [1.17.1 - 2026-02-18] Pre-release
 
 #### Added

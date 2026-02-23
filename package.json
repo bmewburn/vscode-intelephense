@@ -10,7 +10,7 @@
     "sponsor": {
         "url": "https://intelephense.com"
     },
-    "version": "1.17.1",
+    "version": "1.17.2",
     "publisher": "bmewburn",
     "engines": {
         "vscode": "^1.91.0"
@@ -959,12 +959,12 @@
         "rimraf": "~6.1.0",
         "ts-loader": "~9.5.4",
         "typescript": "~5.9.3",
-        "webpack": "~5.102.1",
+        "webpack": "~5.105.2",
         "webpack-cli": "~6.0.1"
     },
     "dependencies": {
         "fs-extra": "~11.3.2",
-        "intelephense": "1.17.1-beta",
+        "intelephense": "1.17.2-beta",
         "semver": "~7.7.3",
         "vscode-languageclient": "9.0.1"
     },
