@@ -705,6 +705,55 @@
                     "markdownDescription": "Enables reporting of unreachable code.",
                     "scope": "window"
                 },
+                "intelephense.diagnostics.strictTypes": {
+                    "type": "boolean",
+                    "default": false,
+                    "markdownDescription": "When enabled, type checks will be performed as if a `declare(strict_types=1)` directive is present in all files.",
+                    "scope": "window"
+                },
+                "intelephense.diagnostics.suppressUndefinedMembersWhenMagicMethodDeclared": {
+                    "type": "boolean",
+                    "default": true,
+                    "markdownDescription": "Suppresses undefined property and method errors when `__get` or `__call` magic methods are declared.",
+                    "scope": "window"
+                },
+                "intelephense.diagnostics.severity": {
+                    "type": "object",
+                    "patternProperties": {
+                        "P\\d{4}": {
+                            "type": "number",
+                            "enum": [
+                                1,
+                                2,
+                                3,
+                                4
+                            ],
+                            "enumDescriptions": [
+                                "Error.",
+                                "Warning.",
+                                "Information.",
+                                "Hint."
+                            ]
+                        }
+                    },
+                    "markdownDescription": "Sets the severity level for each diagnostic code.",
+                    "scope": "window"
+                },
+                "intelephense.diagnostics.exclude": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "pattern": "\\*|P\\d{4}"
+                        }
+                    },
+                    "default": {
+                        "**/vendor/**": ["*"]
+                    },
+                    "markdownDescription": "A map of globs to diagnostic codes to be excluded for the matching files. Use `*` as a value in the array to exclude all diagnostics. By default the vendor directory is excluded. You can override this by setting `**/vendor/**` to an empty array.",
+                    "scope": "resource"
+                },
                 "intelephense.runtime": {
                     "type": "string",
                     "markdownDescription": "Path to a Node.js executable. Use this if you wish to use a different version of Node.js. Defaults to Node.js shipped with VSCode.",
