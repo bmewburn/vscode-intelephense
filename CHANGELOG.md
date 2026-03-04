@@ -1,5 +1,17 @@
 # Change Log
 
+## [1.17.3 - 2026-03-04]
+
+#### Added
+- Setting `intelephense.diagnostics.suppressUndefinedMembersWhenMagicMethodDeclared` to configure if undefined method and property diagnostics should be suppressed if magic methods are declared. Defaults to `true`.
+- Setting `intelephense.diagnostics.severity` to configure the severity of each diagnostic.
+- Setting `intelephense.diagnostics.strictTypes` to configure type checks to be performed as if `declare(strict_types=1)` has been declared in every file. Defaults to `false`.
+- Setting `intelephense.diagnostics.exclude` to disable some or all diagnostics on a per file basis.
+
+#### Fixed
+- Various control flow analysis and type inference issues.
+- PHPDoc completion missing `@throws` or showing `@throws mixed`.
+
 ## [1.17.2 - 2026-02-23] Pre-release
 
 #### Added
