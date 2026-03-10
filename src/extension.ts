@@ -254,7 +254,10 @@ function createClient(context:ExtensionContext, middleware:IntelephenseMiddlewar
 		],
         initializationOptions: initializationOptions,
         revealOutputChannelOn: RevealOutputChannelOn.Never,
-		middleware: middleware
+		middleware: middleware,
+        markdown: {
+            supportHtml: true
+        }
 	}
 
 	// Create the language client and start the client.
