@@ -51,7 +51,7 @@ The language server (intelephense) is proprietary. Please see [here](https://git
 2. Add glob patterns for non standard php file extensions to the `files.associations` setting.
 
     For example: `"files.associations": { "*.module": "php" }`.
-3. Optionally purchase and enter your [licence key](https://intelephense.com) by opening the command pallete 
+3. Optionally purchase and enter your [licence key](https://intelephense.com) by opening the command palette 
 -- `ctrl + shift + p` -- and searching for `Enter licence key`.
 
 Further configuration options are available in the `intelephense` section of settings.
