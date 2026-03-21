@@ -512,6 +512,18 @@
                     "markdownDescription": "Controls whether suggestions will include a `sortText` property that may influence sort order.",
                     "scope": "window"
                 },
+                "intelephense.completion.withOverrideAttribute": {
+                    "type": "boolean",
+                    "default": true,
+                    "markdownDescription": "Method completions will include an `#[Override]` attribute where appropriate if targeting PHP 8.3+.",
+                    "scope": "window"
+                },
+                "intelephense.completion.withMethodBody": {
+                    "type": "boolean",
+                    "default": true,
+                    "markdownDescription": "Method completions will include either a `parent` call or a `throw new Exception('Not implemented')` in the method body.",
+                    "scope": "window"
+                },
                 "intelephense.format.enable": {
                     "type": "boolean",
                     "default": true,
@@ -703,6 +715,12 @@
                     "type": "boolean",
                     "default": true,
                     "markdownDescription": "Enables reporting of unreachable code.",
+                    "scope": "window"
+                },
+                "intelephense.diagnostics.suspectCode": {
+                    "type": "boolean",
+                    "default": true,
+                    "markdownDescription": "Enables reporting of irregularities in code that may be indicative of a bug. For example, assignments in a conditional expression or duplicate array keys.",
                     "scope": "window"
                 },
                 "intelephense.diagnostics.strictTypes": {
