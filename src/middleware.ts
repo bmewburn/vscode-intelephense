@@ -71,12 +71,6 @@ export function createMiddleware(): IntelephenseMiddleware {
             if (v && v.files && v.files.exclude) {
                 v.files.exclude = mergeExclude(v.files.exclude, configurationParams.items[i].scopeUri);
             }
-            if (v && v.telemetry === null) {
-                let vscodeConfig = workspace.getConfiguration('telemetry');
-                if (vscodeConfig) {
-                    v.telemetry.enabled = vscodeConfig.get('enableTelemetry', true);
-                }
-            }
             if (v && v.diagnostics && v.diagnostics.run === null) {
                 let vscodeConfig = workspace.getConfiguration('php.validate');
                 if (vscodeConfig) {

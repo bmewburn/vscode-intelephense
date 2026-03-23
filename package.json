@@ -10,7 +10,7 @@
     "sponsor": {
         "url": "https://intelephense.com"
     },
-    "version": "1.17.3",
+    "version": "1.17.4",
     "publisher": "bmewburn",
     "engines": {
         "vscode": "^1.91.0"
@@ -788,13 +788,10 @@
                     "scope": "application"
                 },
                 "intelephense.telemetry.enabled": {
-                    "type": [
-                        "boolean",
-                        "null"
-                    ],
-                    "markdownDescription": "Anonymous usage and crash data will be sent to Azure Application Insights. Inherits from telemetry.enableTelemetry.",
+                    "type": "boolean",
+                    "markdownDescription": "When set to `true`, anonymous usage and crash data will be sent to Azure Application Insights. Defaults to `false`.",
                     "scope": "window",
-                    "default": null
+                    "default": false
                 },
                 "intelephense.rename.exclude": {
                     "type": "array",
@@ -1031,7 +1028,7 @@
     },
     "dependencies": {
         "fs-extra": "~11.3.2",
-        "intelephense": "1.17.3-beta",
+        "intelephense": "1.17.4-beta",
         "semver": "~7.7.3",
         "vscode-languageclient": "9.0.1"
     },

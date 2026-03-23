@@ -1,5 +1,29 @@
 # Change Log
 
+## [1.17.4 - 2026-03-23]
+
+#### Added
+- More diagnostics.
+- Setting `intelephense.diagnostics.suspectCode` to control whether suspected problems in the code should be reported. Diagnostics grouped under this setting include duplicate array keys, duplicate switch/match cases, loop variable overwriting, `void` assignment, assignments in control expressions.
+- Find all references and rename now works for variable references listed in `compact` arguments.
+- Setting to control if method override/implementation suggestions should include a placeholder method body -- `intelephense.completion.withMethodBody`. Defaults to `true`.
+- Partial support for custom assertions. `@assert`, `@psalm-assert`, `@phpstan-assert` and `*-if-false` and `*-if-true` variants supported. Only type assertion of simple variable arguments is currently supported. For example `@assert string $param` and passing `$var` as the argument. Multiple assertions targeting the same parameter are not supported, ie, adding both an `*-if-true` AND `*-if-false` annotation.
+
+#### Changed
+- Method override/implementation suggestions now include `#[Override]` attribute when PHP target version is 8.3+. To disable adding this attribute set `intelephense.completion.withOverrideAttribute` to `false`.
+- Improved how unused variable reporting works when `compact` is encountered.
+- Improved type inference of array elements when key is a simple variable.
+- Improved template type resolution for templates that appear in constraints of other templates.
+- Find all implementations now works for all methods, previously it was restricted to abstract or interface declared methods.
+- Find all declarations will now get the root declaration(s) in a type hierarchy regardless of whether it is an interface or abstract declaration.
+- Crash telemetry now defaults to disabled.
+
+#### Fixed
+- False method compatibility error with abstract trait method and base class with final method implementation.
+- Highlight not working when origin is variadic parameter in PHPDoc.
+- Added back auto prefix `$` to variable renames if applicable.
+- Reference/rename not working for variables in anonymous class declaration argument list.
+
 ## [1.17.3 - 2026-03-04]
 
 #### Added
