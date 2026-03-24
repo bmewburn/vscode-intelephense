@@ -1004,6 +1004,14 @@
                     "default": true,
                     "markdownDescription": "Will show inlay hints for call argument parameter names if named arguments are not already in use.",
                     "scope": "window"
+                },
+                "intelephense.throwDepth": {
+                    "type": "number",
+                    "default": 0,
+                    "minimum": 0,
+                    "maximum": 10,
+                    "markdownDescription": "The maximum call depth to follow when analyzing throw expressions. Defaults to `0`, which limits analysis to the current function. Higher values can have a negative impact on performance.",
+                    "scope": "window"
                 }
 
             }
