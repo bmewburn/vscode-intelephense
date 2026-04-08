@@ -1,5 +1,24 @@
 # Change Log
 
+## [1.17.5 - 2026-04-08]
+
+#### Added
+- `throwDepth` setting to control maximum call depth when analysing `throw` expressions. Defaults to `0` (current call declaration body only). Max `10`. Higher values may impact performance.
+
+#### Changed
+- Methods declared with `@method` with no return type are given return type of `void` instead of `mixed`.
+- `@param` type is now optional.
+- Tweaked suggestion order.
+
+#### Fixed
+- False no type information available diagnostic when property/parameter inherits documented type.
+- False method compatibility error when a trait method and interface method return `self`.
+- `bool` subject type not expanded to `true|false` when comparing to `true` in conditional type.
+- No import quickfix for undefined PHPDoc types.
+- Incorrect method description shown in hover when multiple methods of same name are declared using `@method`.
+- Array access type inferred as `mixed` when subject is a template type with array shape constraint.
+- False undefined phpdoc type in constant unions.
+
 ## [1.17.4 - 2026-03-23]
 
 #### Added
