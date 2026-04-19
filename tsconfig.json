@@ -4,6 +4,7 @@
 		"module": "node20",
 		"moduleResolution": "node16",
 		"outDir": "out",
+        "rootDir": "src",
 		"lib": [ "es2022" ],
 		"sourceMap": true
 	},

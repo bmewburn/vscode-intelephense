@@ -1,5 +1,20 @@
 # Change Log
 
+## [1.17.6 - 2026-04-19]
+
+#### Changed
+- Indexing now uses LSP work done `$/progress` notifications instead of custom notifications.
+- Indexer file queue processing debounce increased to 500ms.
+- On-type diagnostics debounce reduced to 1000ms.
+
+#### Fixed
+- Empty array shapes showing parse error.
+- Should not narrow variable type when using `is_a` and `is_subclass_of` with `$allow_string` value of `true` and variable type of `string`.
+- Editing a file causing promoted properties to become undefined.
+- Editing a file causing definition location inaccuracies.
+- Duplicate/unecessary indexing when responding to file change events.
+- Editing a file causing anonymous class type hierarchy bug.
+
 ## [1.17.5 - 2026-04-08]
 
 #### Added
