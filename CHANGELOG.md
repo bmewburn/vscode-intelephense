@@ -1,5 +1,10 @@
 # Change Log
 
+## [1.17.7 - 2026-04-20]
+
+#### Fixed
+- `require` document links not working when the expression is a simple string literal.
+
 ## [1.17.6 - 2026-04-19]
 
 #### Changed
