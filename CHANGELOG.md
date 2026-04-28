@@ -1,5 +1,18 @@
 # Change Log
 
+## [1.18.0 - 2026-04-28]
+
+#### Added
+- Ability to provide configuration via a JSON file named `intelephense.config.json` when client does not support LSP `workspace.configuration`. Top level `intelephense` property is unnecessary. File must be a direct child of workspace folder. JSON `configuration` schema can be found at https://github.com/bmewburn/vscode-intelephense/blob/master/package.json.
+
+#### Changed
+- Updated stubs.
+
+#### Fixed
+- Diagnostics not refreshing when `diagnostics.exclude` edited.
+- Some `*.exclude` properties not working on basename when non-path glob provided.
+- Race condition between getting configuration and opening documents causing settings to be ignored. Documents will now be opened regardless, and then closed if they should not have been opened due to `files.maxSize`, `files.associations` or `files.exclude` settings once they are fetched. 
+
 ## [1.17.7 - 2026-04-20]
 
 #### Fixed

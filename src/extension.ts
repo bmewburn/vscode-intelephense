@@ -22,9 +22,7 @@ import { createMiddleware, IntelephenseMiddleware } from './middleware';
 import * as fs from 'fs-extra';
 
 const PHP_LANGUAGE_ID = 'php';
-const VERSION = '1.17.7';
-const INDEXING_STARTED_NOTIFICATION = new NotificationType('indexingStarted');
-const INDEXING_ENDED_NOTIFICATION = new NotificationType('indexingEnded');
+const VERSION = '1.18.0';
 const CANCEL_INDEXING_REQUEST = new RequestType('cancelIndexing');
 const INDEX_WORKSPACE_CMD_NAME = 'intelephense.index.workspace';
 const CANCEL_INDEXING_CMD_NAME = 'intelephense.cancel.indexing';
@@ -83,7 +81,7 @@ export async function activate(context: ExtensionContext) {
 	let clearCache = false;
 	context.workspaceState.update('version', VERSION);
 
-	if (!versionMemento || (semver.neq(versionMemento, VERSION))) {
+	if ((!versionMemento || (semver.neq(versionMemento, VERSION))) && context.storagePath) {
 		try {
 			await fs.remove(context.storagePath);
 		} catch (e) {
@@ -111,7 +109,6 @@ export async function activate(context: ExtensionContext) {
 	);  
 
 	languageClient.start().then(() => {
-		registerNotificationListeners();
 		showStartMessage(context);
 	});
 }
@@ -235,7 +232,7 @@ function createClient(context:ExtensionContext, middleware:IntelephenseMiddlewar
 	if (memory && memory >= 256) {
 		let maxOldSpaceSize = '--max-old-space-size=' + memory.toString();
 		serverOptions.run.options = { execArgv: [maxOldSpaceSize] };
-		serverOptions.debug.options.execArgv.push(maxOldSpaceSize);
+		serverOptions.debug.options!.execArgv!.push(maxOldSpaceSize);
 	}
 
 	let initializationOptions = {
@@ -300,7 +297,6 @@ function indexWorkspace() {
 	languageClient.stop().then(_ => {
 		languageClient = createClient(extensionContext, middleware, true);
 		languageClient.start().then(() => {
-            registerNotificationListeners();
             showStartMessage(extensionContext);
         });
 	});
@@ -347,29 +343,10 @@ function enterLicenceKey(context:ExtensionContext) {
                 await languageClient.stop();
                 languageClient = createClient(context, middleware, true);
                 languageClient.start().then(() => {
-                    registerNotificationListeners();
                     showStartMessage(context);
                 });
             }
 		}
-	});
-}
-
-function registerNotificationListeners() {
-	let resolveIndexingPromise: () => void;
-	languageClient.onNotification(INDEXING_STARTED_NOTIFICATION.method, () => {
-		window.setStatusBarMessage('$(sync~spin) intelephense ' + VERSION.toString() + ' indexing ...', new Promise<void>((resolve, reject) => {
-			resolveIndexingPromise = () => {
-				resolve();
-			}
-		}));
-	});
-
-	languageClient.onNotification(INDEXING_ENDED_NOTIFICATION.method, () => {
-		if (resolveIndexingPromise) {
-			resolveIndexingPromise();
-		}
-		resolveIndexingPromise = undefined;
 	});
 }
 

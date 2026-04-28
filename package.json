@@ -10,7 +10,7 @@
     "sponsor": {
         "url": "https://intelephense.com"
     },
-    "version": "1.17.7",
+    "version": "1.18.0",
     "publisher": "bmewburn",
     "engines": {
         "vscode": "^1.91.0"
@@ -1036,7 +1036,7 @@
     },
     "dependencies": {
         "fs-extra": "11.3.4",
-        "intelephense": "1.17.7-beta",
+        "intelephense": "1.18.0",
         "semver": "7.7.4",
         "vscode-languageclient": "9.0.1"
     },
