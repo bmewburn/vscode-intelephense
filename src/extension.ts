@@ -22,7 +22,7 @@ import { createMiddleware, IntelephenseMiddleware } from './middleware';
 import * as fs from 'fs-extra';
 
 const PHP_LANGUAGE_ID = 'php';
-const VERSION = '1.18.0';
+const VERSION = '1.18.1';
 const CANCEL_INDEXING_REQUEST = new RequestType('cancelIndexing');
 const INDEX_WORKSPACE_CMD_NAME = 'intelephense.index.workspace';
 const CANCEL_INDEXING_CMD_NAME = 'intelephense.cancel.indexing';

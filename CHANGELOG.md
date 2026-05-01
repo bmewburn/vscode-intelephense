@@ -1,5 +1,24 @@
 # Change Log
 
+## [1.18.1 - 2026-05-01]
+
+#### Changed
+- Suppress undefined member diagnostics in traits when scope is `$this` and every type that uses the trait implements the member.
+- The `intelephense.diagnostics.undefinedVariables` setting has changed from a boolean to an enum of `'on'|'local'|'off'`. Defaults to `'on'`. When set to `'local'` only local scope undefined variables diagnostics will be emitted. **BREAKING**
+- The `intelephense.diagnostics.argumentCount` setting has changed from a boolean to an enum of `'on'|'declared'|'off'`. Defaults to `'on'`. When set to `'declared'` only declared functions/method argument count diagnostics will be emitted. That is, annotated `@method` methods will be ignored. **BREAKING**
+- `P1132 No type information available` diagnostics will no longer show for properties with an initialiser or for parameters with a default argument.
+- `P1119 Too many argument` errors will no longer show for functions that call `func_get_args`.
+
+#### Fixed
+
+- Document symbols broken when using a namespace definition with a body.
+- `#[Override]` inserted in wrong spot for method override completion if method modifiers and or `function` keyword already present.
+- False key type errors when using array access notation on `ArrayAccess` implementations.
+- PHPDoc parse error on `list{a, b}`.
+- Variable type narrowed to never if RHS of `instanceof` is a variable of type `class-string`.
+- False dead code diagnostic when switch case expression is `false` constant.
+- Template types not resolving inside methods that inherit template documentation from ancestors in type hierarchy.
+
 ## [1.18.0 - 2026-04-28]
 
 #### Added
