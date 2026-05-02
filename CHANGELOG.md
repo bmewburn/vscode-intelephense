@@ -1,5 +1,14 @@
 # Change Log
 
+## [1.18.2 - 2026-05-02]
+
+#### Fixed
+- False array key type error when array is initially empty.
+- False duplicate trait in use list when multiple traits in same file use same trait.
+- False trait method collision when trait method is identical but inherited by different pathways.
+- False unused property error when trait declares property and composing class declares the property as a promoted property.
+- Make `instanceof` work with `class-string<T>`.
+
 ## [1.18.1 - 2026-05-01]
 
 #### Changed
