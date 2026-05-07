@@ -58,7 +58,7 @@ Further configuration options are available in the `intelephense` section of set
 
 ## Support
 
-Try the [Intelephense Documentation](https://github.com/bmewburn/intelephense-docs).
+Try the [Intelephense Documentation](https://intelephense.com/docs).
 
 Found a bug? Got a feature request? [Create an issue](https://github.com/bmewburn/vscode-intelephense/issues).
 
