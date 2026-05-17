@@ -1,5 +1,19 @@
 # Change Log
 
+## [1.18.3 - 2026-05-17]
+
+#### Fixed
+- False only variable can be passed by ref error with `extract`.
+- Undefined variable diagnostics not showing within closures in script scope when `intelephense.diagnostics.undefinedVariables` is set to `local`.
+- Parse error when encountering DNF type after readonly promoted prop modifier.
+- Parameter highlight not working in closures.
+- If parameter rename text does not start with `$` it should be automatically prepended.
+- `completion.withMethodBody` setting not working for implement all abstract functions code action.
+- Incorrect resolution of conditional type when subject type is `mixed`.
+- Go to definition not working for callable arrays when first element is a variable reference.
+- Imports not counted as reference in reference code lens.
+- Hovering over `@property` property name showing type as `unset`.
+
 ## [1.18.2 - 2026-05-02]
 
 #### Fixed
